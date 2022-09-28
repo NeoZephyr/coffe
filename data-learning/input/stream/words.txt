@@ -1,0 +1,4 @@
+hello spark streaming kafka hbase hive spark core
+spark sql
+hive sql
+kafka streaming

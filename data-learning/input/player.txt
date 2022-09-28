@@ -1,0 +1,7 @@
+23    james    1    36
+7     durant   2    32
+0     tatum    4    23
+13    harden   2    30
+4     rose     3    31
+11    irving   2    28
+30    curry    5    33

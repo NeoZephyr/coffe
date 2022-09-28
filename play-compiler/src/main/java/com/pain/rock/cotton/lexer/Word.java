@@ -1,0 +1,10 @@
+package com.pain.rock.cotton.lexer;
+
+public class Word extends Token {
+    public final String lexeme;
+
+    public Word(int tag, String lexeme) {
+        super(tag);
+        this.lexeme = lexeme;
+    }
+}

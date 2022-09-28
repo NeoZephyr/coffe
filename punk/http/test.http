@@ -1,0 +1,6 @@
+GET localhost:8088/ping
+Content-Type: application/json
+
+{
+  "name": "jack000"
+}

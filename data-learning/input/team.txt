@@ -1,0 +1,4 @@
+1   Lakers   LosAngeles
+2   Nets     Brooklyn
+3   Knicks   NewYork
+4   Celtics  Boston
