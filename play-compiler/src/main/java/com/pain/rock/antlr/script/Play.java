@@ -198,7 +198,7 @@ public class Play {
         }
     }
 
-    private static Map parseParams(String args[]) throws Exception {
+    private static Map parseParams(String[] args) throws Exception {
         Map<String, Object> params = new HashMap<>();
 
         for (int i = 0; i < args.length; i++) {

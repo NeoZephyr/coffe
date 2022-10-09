@@ -4,6 +4,7 @@ import com.pain.rock.easy.lexer.EasyLexer;
 import com.pain.rock.easy.lexer.Token;
 import com.pain.rock.easy.lexer.TokenReader;
 import com.pain.rock.easy.lexer.TokenType;
+import com.pain.rock.easy.parser.ast.ASTNode;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import java.util.List;
 
 public class EasyParser {
 
+    // Primary -> IntLiteral | Identifier | '(' Additive ')' | ('+' | '-') Primary
     /**
      * Program -> IntDeclaration | ExpressionStmt | AssignmentStmt
      *
@@ -226,6 +228,7 @@ public class EasyParser {
         return root;
     }
 
+    // Primary -> IntLiteral | Identifier | '(' Additive ')' | ('+' | '-') Primary
     private EasyASTNode primary(TokenReader reader) throws Exception {
         Token token = reader.peek();
 
@@ -241,6 +244,19 @@ public class EasyParser {
         if (token.getType() == TokenType.Identifier) {
             reader.read();
             return new EasyASTNode(ASTNodeType.Identifier, token.getText());
+        }
+
+        if ((token.getType() == TokenType.Plus) || (token.getType() == TokenType.Minus)) {
+            reader.read();
+            EasyASTNode root = new EasyASTNode(ASTNodeType.Unary, token.getText());
+            EasyASTNode child = primary(reader);
+
+            if (child == null) {
+                throw new Exception("invalid primary, expect primary after unary operator");
+            }
+
+            root.addChild(child);
+            return root;
         }
 
         if (token.getType() == TokenType.LeftParenthesis) {

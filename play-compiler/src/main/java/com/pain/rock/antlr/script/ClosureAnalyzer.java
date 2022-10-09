@@ -21,7 +21,7 @@ public class ClosureAnalyzer {
     public void analyzeClosures() {
         for (Type type : tree.types) {
             if (type instanceof Function && !((Function) type).isMethod()) {
-                Set set = calcClosureVariables(type);
+                Set set = calcClosureVariables((Function) type);
 
                 if (set.size() > 0) {
                     ((Function) type).closureVariables = set;

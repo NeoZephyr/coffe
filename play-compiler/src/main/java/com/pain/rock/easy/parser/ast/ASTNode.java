@@ -1,4 +1,6 @@
-package com.pain.rock.easy.parser;
+package com.pain.rock.easy.parser.ast;
+
+import com.pain.rock.easy.parser.ASTNodeType;
 
 import java.util.List;
 

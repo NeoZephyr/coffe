@@ -9,5 +9,6 @@ public enum ASTNodeType {
     Multiplicative,
     Additive,
     Identifier,
-    IntLiteral
+    IntLiteral,
+    Unary
 }

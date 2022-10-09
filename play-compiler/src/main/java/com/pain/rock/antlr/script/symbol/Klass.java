@@ -101,7 +101,7 @@ public class Klass extends Scope implements Type {
     }
 
     @Override
-    protected boolean containsSymbol(Symbol symbol) {
+    public boolean containsSymbol(Symbol symbol) {
         if (symbol == thisRef || symbol == superRef) {
             return true;
         }

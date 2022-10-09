@@ -127,6 +127,8 @@ public class EchoServer {
                     }
                 })
                 .bind(6060)
-                .sync();;
+                .sync();
+
+        log.info("===== start");
     }
 }

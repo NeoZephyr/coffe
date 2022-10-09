@@ -1,6 +1,6 @@
 package com.pain.rock.easy.script;
 
-import com.pain.rock.easy.parser.ASTNode;
+import com.pain.rock.easy.parser.ast.ASTNode;
 import com.pain.rock.easy.parser.ASTNodeType;
 import com.pain.rock.easy.parser.EasyParser;
 import org.apache.commons.lang3.StringUtils;
@@ -116,6 +116,15 @@ public class EasyScript {
                     throw new Exception("variable " + varName + " has not been initialized");
                 }
                 result = variables.get(varName);
+                break;
+            case Unary:
+                String operator = node.getText();
+
+                if (StringUtils.equals(operator, "+")) {
+                    result = evaluate(node.getChildren().get(0), indent + "\t");
+                } else {
+                    result = -evaluate(node.getChildren().get(0), indent + "\t");
+                }
                 break;
             case IntDeclaration:
                 varName = node.getText();

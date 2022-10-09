@@ -29,6 +29,8 @@ public class EasyLexer {
             while ((ic = reader.read()) != -1) {
                 char c = (char) ic;
 
+                // process -1 as EOF
+
                 switch (state) {
                     case Initial:
                         state = initToken(c);
@@ -213,7 +215,7 @@ public class EasyLexer {
 
     @AllArgsConstructor
     @NoArgsConstructor
-    private class EasyToken implements Token {
+    private static class EasyToken implements Token {
 
         private TokenType type;
         private String text;
@@ -229,7 +231,7 @@ public class EasyLexer {
         }
     }
 
-    private class EasyTokenReader implements TokenReader {
+    private static class EasyTokenReader implements TokenReader {
 
         private final List<Token> tokens;
         private int position = 0;
