@@ -82,6 +82,7 @@ public class EchoServer {
         new ServerBootstrap()
                 .group(new NioEventLoopGroup(3))
                 .channel(NioServerSocketChannel.class)
+                .option(ChannelOption.SO_RCVBUF, 10) // 接收缓冲区
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
 
                     @Override

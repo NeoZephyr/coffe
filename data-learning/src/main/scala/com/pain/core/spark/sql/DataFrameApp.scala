@@ -12,33 +12,41 @@ object DataFrameApp {
     def main(args: Array[String]): Unit = {
         val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
 
+        import spark.implicits._
+
         // createFromSeq1(spark)
         // createFromSeq2(spark)
         // createFromCsv(spark)
         // createFromMysql(spark)
         // createFromRow(spark)
 
-        createFromClass(spark)
+        // createFromClass(spark)
 
         // join(spark)
 
-        val people: DataFrame = spark.read.json("input/people.json")
+        // val people: DataFrame = spark.read.json("input/people.json")
         // show(people)
         // select(spark, people)
         // filter(spark, people)
         // view(spark, people)
-        people
-            .filter(people.col("age") > 25)
-            .withColumnRenamed("name", "nick")
-            .withColumn("province", col("city"))
-            .withColumn("country", lit("China"))
-            .show(false)
-
-        import spark.implicits._
-
-        val peopleDs: Dataset[Person] = people.as[Person]
-        peopleDs.show()
+//        people
+//            .filter(people.col("age") > 25)
+//            .withColumnRenamed("name", "nick")
+//            .withColumn("province", col("city"))
+//            .withColumn("country", lit("China"))
+//            .show(false)
+//
+//
+//        val peopleDs: Dataset[Person] = people.as[Person]
+//        peopleDs.show()
         Seq(1, 100, 1000).toDS().show()
+
+        spark.read
+          .option("encoding", "UTF-8")
+          .option("header", value = true)
+          .option("multiLine", value = true)
+          .csv("input/student.csv")
+          .show()
 
         spark.stop()
     }

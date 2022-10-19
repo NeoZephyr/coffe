@@ -35,3 +35,7 @@ build/
 /derby.log
 /pm/
 /big/
+/input/weibo/
+/input/user/
+/input/location/
+/input/cache/
