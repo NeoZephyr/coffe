@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 @Slf4j
-public class DemoClient {
+public class NativeClient {
 
     public static void main(String[] args) throws IOException {
         blockService();

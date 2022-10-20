@@ -1,6 +1,7 @@
-package pipe;
+package pipe.chan;
 
 import lombok.extern.slf4j.Slf4j;
+import pipe.ByteBufferUtil;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -14,7 +15,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 @Slf4j
-public class Chan {
+public class NativeChan {
     public static void main(String[] args) throws ParseException {
         fileChan();
         // debugChan();

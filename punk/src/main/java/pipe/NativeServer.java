@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
-public class DemoServer {
+public class NativeServer {
     public static void main(String[] args) throws IOException {
         // selectService();
         multiService();
