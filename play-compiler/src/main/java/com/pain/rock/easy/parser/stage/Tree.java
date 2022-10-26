@@ -1,4 +1,4 @@
-package com.pain.rock.easy.parser.ast;
+package com.pain.rock.easy.parser.stage;
 
 public interface Tree {
 

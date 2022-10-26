@@ -4,7 +4,8 @@ import com.pain.rock.easy.lexer.EasyLexer;
 import com.pain.rock.easy.lexer.Token;
 import com.pain.rock.easy.lexer.TokenReader;
 import com.pain.rock.easy.lexer.TokenType;
-import com.pain.rock.easy.parser.ast.ASTNode;
+import com.pain.rock.easy.parser.ast.*;
+import com.pain.rock.easy.parser.stage.ASTNode;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,16 @@ public class EasyParser {
 
         EasyLexer lexer = new EasyLexer();
         TokenReader tokenReader = lexer.tokenize(script);
+        return program1(tokenReader);
+    }
+
+    public Program parse0(String script) throws Exception {
+        if (StringUtils.isBlank(script)) {
+            return null;
+        }
+
+        EasyLexer lexer = new EasyLexer();
+        TokenReader tokenReader = lexer.tokenize(script);
         return program(tokenReader);
     }
 
@@ -50,7 +61,7 @@ public class EasyParser {
         }
     }
 
-    private ASTNode program(TokenReader reader) throws Exception {
+    private ASTNode program1(TokenReader reader) throws Exception {
         EasyASTNode node = new EasyASTNode(ASTNodeType.Program, "program");
 
         while (reader.peek() != null) {
@@ -72,6 +83,130 @@ public class EasyParser {
         }
 
         return node;
+    }
+
+    /**
+     * prog : blockStatements
+     *      ;
+     */
+    private Program program(TokenReader reader) {
+        List<BlockStatement> blockStatements = blockStatements(reader);
+        return new Program(blockStatements);
+    }
+
+    /**
+     * blockStatements : blockStatement*
+     *                 ;
+     */
+    private List<BlockStatement> blockStatements(TokenReader reader) {
+        List<BlockStatement> blockStatements = new ArrayList<>();
+
+        while (true) {
+            BlockStatement blockStatement = blockStatement(reader);
+
+            if (blockStatement == null) {
+                break;
+            }
+
+            blockStatements.add(blockStatement);
+        }
+        return blockStatements;
+    }
+
+    /**
+     * blockStatement : variableDeclarators ';'
+     *                | statement
+     *                | functionDeclaration
+     *                | classDeclaration
+     *                ;
+     */
+    private BlockStatement blockStatement(TokenReader reader) {
+        return null;
+    }
+
+    /**
+     * variableDeclarators : typeType variableDeclarator (',' variableDeclarator)*
+     *                     ;
+     */
+    private VariableDeclarators variableDeclarators(TokenReader reader) {
+        Type type = type(reader);
+        List<VariableDeclarator> variableDeclarators = new ArrayList<>();
+        return new VariableDeclarators(type, variableDeclarators);
+    }
+
+    /**
+     * statement
+     *     : blockLabel=block
+     *     | RETURN expression? ';'
+     *     | SEMI
+     *     | statementExpression=expression ';'
+     *     ;
+     */
+    private Statement statement(TokenReader reader) {
+        return null;
+    }
+
+    /**
+     * typeType : (classOrInterfaceType | functionType | primitiveType) ('[' ']')*
+     *          ;
+     */
+    private Type type(TokenReader reader) {
+        return null;
+    }
+
+    /**
+     * variableDeclarator : variableDeclaratorId ('=' variableInitializer)?
+     *                    ;
+     */
+    private VariableDeclarator variableDeclarator(TokenReader reader) {
+        return null;
+    }
+
+    /**
+     * variableDeclaratorId : IDENTIFIER ('[' ']')*
+     *                      ;
+     */
+    private VariableDeclaratorId variableDeclaratorId(TokenReader reader) {
+        return null;
+    }
+
+    /**
+     * variableInitializer : arrayInitializer
+     *                     | expression
+     *                     ;
+     */
+    private VariableInitializer variableInitializer(TokenReader reader) {
+        return null;
+    }
+
+    /**
+     * arrayInitializer : '{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
+     *                  ;
+     */
+    private ArrayInitializer arrayInitializer(TokenReader reader) {
+        return null;
+    }
+
+    /**
+     * expression : primary
+     *            | expression postfix=('++' | '--')
+     *            | prefix=('+'|'-'|'++'|'--') expression
+     *            ;
+     */
+    private Expression expression(TokenReader reader) {
+        return null;
+    }
+
+    /**
+     * primary : '(' expression ')'
+     *         | THIS
+     *         | SUPER
+     *         | literal
+     *         | IDENTIFIER
+     *         ;
+     */
+    private Primary primary(TokenReader reader) {
+        return null;
     }
 
     private EasyASTNode intDeclaration(TokenReader reader) throws Exception {
@@ -198,7 +333,7 @@ public class EasyParser {
     }
 
     private EasyASTNode multiplicative(TokenReader reader) throws Exception {
-        EasyASTNode child1 = primary(reader);
+        EasyASTNode child1 = primary1(reader);
         EasyASTNode root = child1;
 
         if (root == null) {
@@ -210,7 +345,7 @@ public class EasyParser {
 
             if (token != null && (token.getType() == TokenType.Star || token.getType() == TokenType.Slash)) {
                 reader.read();
-                EasyASTNode child2 = primary(reader);
+                EasyASTNode child2 = primary1(reader);
 
                 if (child2 != null) {
                     root = new EasyASTNode(ASTNodeType.Multiplicative, token.getText());
@@ -229,7 +364,7 @@ public class EasyParser {
     }
 
     // Primary -> IntLiteral | Identifier | '(' Additive ')' | ('+' | '-') Primary
-    private EasyASTNode primary(TokenReader reader) throws Exception {
+    private EasyASTNode primary1(TokenReader reader) throws Exception {
         Token token = reader.peek();
 
         if (token == null) {
@@ -249,7 +384,7 @@ public class EasyParser {
         if ((token.getType() == TokenType.Plus) || (token.getType() == TokenType.Minus)) {
             reader.read();
             EasyASTNode root = new EasyASTNode(ASTNodeType.Unary, token.getText());
-            EasyASTNode child = primary(reader);
+            EasyASTNode child = primary1(reader);
 
             if (child == null) {
                 throw new Exception("invalid primary, expect primary after unary operator");
@@ -309,7 +444,7 @@ public class EasyParser {
      * mul -> pri | pri * mul | pri / mul
      */
     private EasyASTNode multiplicativeRecursive(TokenReader reader) throws Exception {
-        EasyASTNode child1 = primary(reader);
+        EasyASTNode child1 = primary1(reader);
         EasyASTNode root = child1;
         Token token = reader.peek();
 

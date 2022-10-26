@@ -1,6 +1,6 @@
 package com.pain.rock.easy.parser;
 
-import com.pain.rock.easy.parser.ast.ASTNode;
+import com.pain.rock.easy.parser.stage.ASTNode;
 import org.junit.Test;
 
 import java.io.BufferedReader;
