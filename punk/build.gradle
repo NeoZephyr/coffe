@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
 
+    implementation fileTree(dir:"libs", includes: ["*.jar"])
     // org.springframework.boot:spring-boot-starter-jetty:
     implementation group: "org.springframework.boot", name: "spring-boot-starter-jetty", version: "2.1.18.RELEASE"
 

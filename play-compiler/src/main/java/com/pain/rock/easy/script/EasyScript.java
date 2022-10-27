@@ -1,6 +1,6 @@
 package com.pain.rock.easy.script;
 
-import com.pain.rock.easy.parser.stage.ASTNode;
+import com.pain.rock.easy.parser.ASTNode;
 import com.pain.rock.easy.parser.ASTNodeType;
 import com.pain.rock.easy.parser.EasyParser;
 import org.apache.commons.lang3.StringUtils;
