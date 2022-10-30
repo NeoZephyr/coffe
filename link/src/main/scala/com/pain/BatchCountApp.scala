@@ -1,6 +1,6 @@
 package com.pain
 
-import org.apache.commons.io.{Charsets, FileUtils}
+import org.apache.commons.io.FileUtils
 import org.apache.flink.api.common.JobExecutionResult
 import org.apache.flink.api.common.accumulators.LongCounter
 import org.apache.flink.api.common.functions.RichMapFunction
