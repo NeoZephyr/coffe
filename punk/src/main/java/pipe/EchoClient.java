@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class EchoClient {
@@ -116,7 +117,7 @@ public class EchoClient {
 
     public static void testRedis() throws InterruptedException {
         NioEventLoopGroup group = new NioEventLoopGroup(1);
-        Channel channel = new Bootstrap()
+        Bootstrap bootstrap = new Bootstrap()
                 .group(group)
                 .channel(NioSocketChannel.class)
                 .handler(new ChannelInitializer<Channel>() {
@@ -138,16 +139,25 @@ public class EchoClient {
                             }
                         });
                     }
-                })
-                .connect("127.0.0.1", 6379)
-                .sync() // wait connect complete
-                .channel();
+                });
 
-//        ChannelFuture future = channel.close();
-//        future.sync();
+        connect(bootstrap, "127.0.0.1", 6370, 3);
 
-        channel.closeFuture().sync();
-        group.shutdownGracefully();
+        log.info("=== done");
+    }
+
+    private static void connect(Bootstrap bootstrap, String host, int port, int retry) {
+        bootstrap.connect(host, port).addListener(future -> {
+            if (future.isSuccess()) {
+                log.info("=== connected");
+            } else if (retry == 0) {
+                log.info("=== retry times exhausted");
+            } else {
+                log.info("=== left connect times: {}", retry);
+                bootstrap.config().group().schedule(() ->
+                        connect(bootstrap, host, port, retry - 1), 3, TimeUnit.SECONDS);
+            }
+        });
     }
 
     private static String date() {

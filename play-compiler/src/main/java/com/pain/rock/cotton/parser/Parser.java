@@ -43,7 +43,7 @@ public class Parser {
      */
     private List<BlockStatement> blockStatements() {
         List<BlockStatement> blockStatements = new ArrayList<>();
-        Token token = input.peek();
+        Token token = input.peek(1);
 
         while (true) {
             BlockStatement blockStatement = blockStatement();
