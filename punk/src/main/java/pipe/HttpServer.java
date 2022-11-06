@@ -10,6 +10,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.stream.ChunkedWriteHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.CONTENT_LENGTH;
@@ -34,6 +35,11 @@ public class HttpServer {
                     protected void initChannel(NioSocketChannel ch) throws Exception { // exec once
                         ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
                         ch.pipeline().addLast(new HttpServerCodec());
+
+                        // 写大数据流
+                        // ch.pipeline().addLast(new ChunkedWriteHandler());
+                        // 对 http message 进行聚合，形成 FullHttpRequest 或者 FullHttpResponse
+                        // ch.pipeline().addLast(new HttpObjectAggregator(1024 * 64));
                         ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
