@@ -2,6 +2,11 @@ package com.pain.rock.cotton.lexer;
 
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Data
 public class Token {
 
@@ -129,11 +134,31 @@ public class Token {
         }
     }
 
+    private static Map<String, Kind> keywords = new HashMap<>();
+
+    static {
+        Kind[] kinds = Kind.values();
+
+        for (Kind kind : kinds) {
+            if (kind.literal != null) {
+                keywords.put(kind.literal, kind);
+            }
+        }
+    }
+
     Kind kind;
     String text;
 
     public Token(Kind kind, String text) {
         this.kind = kind;
         this.text = text;
+    }
+
+    public static boolean isKeyword(String lexeme) {
+        return keywords.containsKey(lexeme);
+    }
+
+    public static Kind kind(String lexeme) {
+        return keywords.get(lexeme);
     }
 }

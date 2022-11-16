@@ -9,6 +9,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,8 +29,8 @@ public class EchoClient {
 
     public static void main(String[] args) throws InterruptedException {
         // testFuture();
-        // interactiveChannel();
-        testRedis();
+        interactiveChannel();
+        // testRedis();
     }
 
     public static void testFuture() throws InterruptedException {
@@ -35,6 +38,10 @@ public class EchoClient {
         ChannelFuture future = new Bootstrap()
                 .group(group)
                 .channel(NioSocketChannel.class)
+
+                // io.netty.channel.nio.AbstractNioChannel.AbstractNioUnsafe#connect
+                // SO_TIMEOUT 主要用在阻塞 IO，阻塞 IO 中 accept，read 等都是无限等待的，如果不希望永远阻塞，使用它调整超时时间
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 300) // 如果在指定毫秒内无法连接，抛出 timeout 异常
                 .handler(new ChannelInitializer<Channel>() {
                     @Override
                     protected void initChannel(Channel ch) throws Exception { // exec once
@@ -87,32 +94,62 @@ public class EchoClient {
                         log.info("===== init channel");
                         ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
                         ch.pipeline().addLast(new StringEncoder());
+                        ch.pipeline().addLast(new IdleStateHandler(0, 3, 0));
+                        ch.pipeline().addLast(new ChannelDuplexHandler() {
+                            @Override
+                            public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+                                IdleStateEvent event = (IdleStateEvent) evt;
+
+                                if (event.state() == IdleState.WRITER_IDLE) {
+                                    log.info("=== write idle timeout");
+                                    // ctx.writeAndFlush("ping");
+                                }
+                            }
+                        });
+                        ch.pipeline().addLast(new ChannelInboundHandlerAdapter() {
+                            @Override
+                            public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+                                log.info("=== inactive");
+
+                                // ChannelFuture future = channel.close();
+                                // future.sync();
+                            }
+
+                            @Override
+                            public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+                                log.info("=== exceptionCaught");
+                            }
+                        });
                     }
                 })
                 .connect("127.0.0.1", 6060)
                 .sync() // wait connect complete
                 .channel();
 
-        Scanner scanner = new Scanner(System.in);
+        new Thread(() -> {
+            Scanner scanner = new Scanner(System.in);
 
-        while (true) {
-            String input = scanner.nextLine();
+            while (true) {
+                String input = scanner.nextLine();
 
-            if (StringUtils.isBlank(input)) {
-                continue;
+                if (StringUtils.isBlank(input)) {
+                    continue;
+                }
+
+                input = StringUtils.strip(input);
+
+                if (StringUtils.equalsIgnoreCase(input, "exit")) {
+                    break;
+                }
+                channel.writeAndFlush(date() + ": " + input);
             }
+        }).start();
 
-            input = StringUtils.strip(input);
-
-            if (StringUtils.equalsIgnoreCase(input, "exit")) {
-                break;
-            }
-            channel.writeAndFlush(date() + ": " + input);
-        }
-
-        ChannelFuture future = channel.close();
-        future.sync();
+        ChannelFuture closeFuture = channel.closeFuture();
+        closeFuture.sync();
         group.shutdownGracefully();
+
+        log.info("=== end");
     }
 
     public static void testRedis() throws InterruptedException {
