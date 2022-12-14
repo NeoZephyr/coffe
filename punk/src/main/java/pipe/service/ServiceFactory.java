@@ -16,6 +16,7 @@ import pipe.handler.RpcResponseMessageHandler;
 import pipe.message.RpcRequestMessage;
 
 import java.lang.reflect.Proxy;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
@@ -54,7 +55,7 @@ public class ServiceFactory {
             RpcResponseMessageHandler.promises.put(seqId, promise);
 
             // promise.addListener(future -> {});
-            promise.await();
+            promise.await(1, TimeUnit.SECONDS);
 
             if (promise.isSuccess()) {
                 return promise.getNow();

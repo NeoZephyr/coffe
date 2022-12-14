@@ -11,4 +11,9 @@ public class DefaultProbeService implements ProbeService {
     public String ready(String component) {
         return String.format("%s is ready!", component);
     }
+
+    @Override
+    public String status() {
+        throw new UnsupportedOperationException("not support status probe");
+    }
 }

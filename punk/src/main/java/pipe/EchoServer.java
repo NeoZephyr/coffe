@@ -24,7 +24,8 @@ public class EchoServer {
     public static void main(String[] args) throws InterruptedException {
         // loopGroup();
         // runServer();
-        // handlerFlow();
+        // handleFlow();
+        handleRpc();
     }
 
     public static void loopGroup() {

@@ -7,7 +7,7 @@ import java.nio.ByteOrder;
 public class ProcotolFrameDecoder extends LengthFieldBasedFrameDecoder {
 
     public ProcotolFrameDecoder() {
-        this(1024, 12, 4, 0, 0);
+        this(4096, 12, 4, 0, 0);
     }
 
     public ProcotolFrameDecoder(int maxFrameLength, int lengthFieldOffset, int lengthFieldLength) {

@@ -195,6 +195,9 @@ public class EchoClient {
 
         result = service.ready("kafka");
         log.info("ready result: {}", result);
+
+        String status = service.status();
+        log.info("status result: {}", status);
     }
 
     private static void connect(Bootstrap bootstrap, String host, int port, int retry) {

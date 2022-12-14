@@ -2,8 +2,13 @@ package pipe.message;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
+/**
+ * 一定要可以序列化，不然啥错误都没有
+ */
 @Data
-public abstract class Message {
+public abstract class Message implements Serializable {
     public int seqId;
     public int msgType;
 
@@ -15,6 +20,10 @@ public abstract class Message {
     public static Class<? extends Message> getMsgClass(int msgType) {
         if (msgType == RPC_REQUEST_MESSAGE_TYPE) {
             return RpcRequestMessage.class;
+        }
+
+        if (msgType == RPC_RESPONSE_MESSAGE_TYPE) {
+            return RpcResponseMessage.class;
         }
 
         throw new IllegalArgumentException("msgType " + msgType + " is invalid");
