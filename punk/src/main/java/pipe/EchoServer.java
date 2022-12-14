@@ -14,6 +14,9 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.EventExecutor;
 import lombok.extern.slf4j.Slf4j;
+import pipe.codec.MessageCodec;
+import pipe.codec.ProcotolFrameDecoder;
+import pipe.handler.RpcRequestMessageHandler;
 
 @Slf4j
 public class EchoServer {
@@ -21,8 +24,7 @@ public class EchoServer {
     public static void main(String[] args) throws InterruptedException {
         // loopGroup();
         // runServer();
-
-        handlerFlow();
+        // handlerFlow();
     }
 
     public static void loopGroup() {
@@ -51,6 +53,7 @@ public class EchoServer {
                         ch.pipeline().addLast(new LoggingHandler(LogLevel.DEBUG));
 
                         // AbstractChannelHandlerContext#invokeChannelRead
+                        // 指定 io 线程
                         ch.pipeline().addLast(ioWorkers, "io", new ChannelInboundHandlerAdapter() {
                             @Override
                             public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -81,7 +84,7 @@ public class EchoServer {
     }
 
     // in1 -> in2 -> out1 -> out2
-    public static void handlerFlow() throws InterruptedException {
+    public static void handleFlow() throws InterruptedException {
         new ServerBootstrap()
                 .group(new NioEventLoopGroup(3))
                 .channel(NioServerSocketChannel.class)
@@ -147,5 +150,38 @@ public class EchoServer {
                 .sync();
 
         log.info("===== start");
+    }
+
+    public static void handleRpc() {
+        NioEventLoopGroup boss = new NioEventLoopGroup(2);
+        NioEventLoopGroup worker = new NioEventLoopGroup(4);
+
+        LoggingHandler loggingHandler = new LoggingHandler(LogLevel.DEBUG);
+        MessageCodec messageCodec = new MessageCodec();
+        RpcRequestMessageHandler rpcHandler = new RpcRequestMessageHandler();
+
+        try {
+            Channel channel = new ServerBootstrap().channel(NioServerSocketChannel.class)
+                    .group(boss, worker)
+                    .childHandler(new ChannelInitializer<NioSocketChannel>() {
+
+                        @Override
+                        protected void initChannel(NioSocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new ProcotolFrameDecoder());
+                            ch.pipeline().addLast(loggingHandler);
+                            ch.pipeline().addLast(messageCodec);
+                            ch.pipeline().addLast(rpcHandler);
+                        }
+                    })
+                    .bind(6060)
+                    .sync()
+                    .channel();
+            channel.closeFuture().sync();
+        } catch (InterruptedException e) {
+            log.error("server error", e);
+        } finally {
+            boss.shutdownGracefully();
+            worker.shutdownGracefully();
+        }
     }
 }

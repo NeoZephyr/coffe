@@ -3,11 +3,18 @@ package jubi.server.mysql;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import jubi.server.mysql.constant.MySQLCtxAttrKey;
-import jubi.server.mysql.packet.MySQLErrorPacket;
-import jubi.server.mysql.packet.MySQLPacket;
+import jubi.server.mysql.packet.*;
+import jubi.session.SessionKey;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import static jubi.server.mysql.constant.MySQLCtxAttrKey.CONNECTION_ID;
+import static jubi.server.mysql.constant.MySQLCtxAttrKey.SESSION_KEY;
 
 @Slf4j
 public class MySQLHandler extends SimpleChannelInboundHandler<MySQLPacket> {
@@ -15,6 +22,7 @@ public class MySQLHandler extends SimpleChannelInboundHandler<MySQLPacket> {
     private String connectionUrl;
     private ThreadPoolExecutor execPool;
     private volatile boolean closed = false;
+    private Map<Integer, SessionKey> connIdToSessionKey = new ConcurrentHashMap<>();
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
@@ -23,8 +31,28 @@ public class MySQLHandler extends SimpleChannelInboundHandler<MySQLPacket> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, MySQLPacket msg) throws Exception {
-        // TODO
+    protected void channelRead0(ChannelHandlerContext ctx, MySQLPacket packet) throws Exception {
+        ensureSessionOpened(ctx);
+
+        List<MySQLPacket> response;
+
+        if (packet.getPacketType() == MySQLPacketType.PING) {
+            response = handlePing(ctx, (MySQLPingPacket) packet);
+        } else if (packet.getPacketType() == MySQLPacketType.QUIT) {
+            response = handleQuit(ctx, (MySQLQuitPacket) packet);
+        } else if (packet.getPacketType() == MySQLPacketType.INIT_DB) {
+            response = handleInitDb(ctx, (MySQLInitDbPacket) packet);
+        } else if (packet.getPacketType() == MySQLPacketType.QUERY) {
+            response = handleQuery(ctx, (MySQLQueryPacket) packet);
+        } else {
+            throw new UnsupportedOperationException(packet.getPacketType().toString());
+        }
+
+        for (MySQLPacket responsePacket : response) {
+            ctx.channel().write(responsePacket);
+        }
+
+        ctx.channel().flush();
     }
 
     @Override
@@ -41,119 +69,63 @@ public class MySQLHandler extends SimpleChannelInboundHandler<MySQLPacket> {
         }
     }
 
-    private void closeSession(ChannelHandlerContext ctx) {}
-//
-//        override def channelRead0(ctx: ChannelHandlerContext, packet: MySQLCommandPacket): Unit = Future {
-//            ensureSessionOpened(ctx)
-//            packet match {
-//                case pkt: MySQLComPingPacket => handlePing(ctx, pkt)
-//                case pkt: MySQLComInitDbPacket => handleInitDb(ctx, pkt)
-//                case pkt: MySQLComQuitPacket => handleQuit(ctx, pkt)
-//                case pkt: MySQLComQueryPacket => handleQuery(ctx, pkt)
-//                case bad => throw new UnsupportedOperationException(bad.getClass.getSimpleName)
-//            }
-//        } onComplete {
-//            case Success(responsePackets) =>
-//                responsePackets.foreach(ctx.channel.write)
-//                ctx.channel.flush()
-//            case Failure(cause) =>
-//                exceptionCaught(ctx, cause)
-//        }
-//
-//        def ensureSessionOpened(ctx: ChannelHandlerContext): Unit =
-//        if (ctx.channel.attr(SESSION_HANDLE).get == null) synchronized {
-//            if (ctx.channel.attr(SESSION_HANDLE).get == null) {
-//                val sessionHandle = openSession(ctx)
-//                ctx.channel.attr(SESSION_HANDLE).set(sessionHandle)
-//                val connectionId = ctx.channel.attr(CONNECTION_ID).get
-//                connIdToSessHandle.put(connectionId, sessionHandle)
-//            }
-//        }
-//
-//        def openSession(ctx: ChannelHandlerContext): SessionHandle = synchronized {
-//            try {
-//                val user = ctx.channel.attr(USER).get
-//                val remoteIp = ctx.channel.attr(REMOTE_IP).get
-//                // TODO parse SET command, save other variables at ChannelHandlerContext
-//                val sessionConf = Option(ctx.channel.attr(DATABASE).get) match {
-//                    case Some(db) => Map("use:database" -> db)
-//                    case None => Map.empty[String, String]
-//                }
-//                // v1 is sufficient now, upgrade version when needed
-//                val proto = TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V1
-//                val sessionHandle = be.openSession(
-//                        proto,
-//                        user,
-//                        "",
-//                        remoteIp,
-//                        sessionConf ++ Map(
-//                                KYUUBI_SESSION_CONNECTION_URL_KEY -> connectionUrl,
-//                                KYUUBI_SESSION_REAL_USER_KEY -> user))
-//                sessionHandle
-//            } catch {
-//                case rethrow: Exception =>
-//                    warn(s"Error opening session: ${rethrow.getMessage}")
-//                    throw rethrow
-//            }
-//        }
-//
-//        def closeSession(ctx: ChannelHandlerContext): Unit = synchronized {
-//            if (!closed) {
-//                val handle = ctx.channel.attr(SESSION_HANDLE).get
-//                info(s"Received request of closing $handle")
-//                try be.closeSession(handle)
-//      catch {
-//                    case rethrow: Exception =>
-//                        warn(s"Error closing session: ${rethrow.getMessage}")
-//                        throw rethrow
-//                } finally {
-//                    val connectionId = ctx.channel.attr(CONNECTION_ID).getAndSet(null)
-//                    ctx.channel.attr(SESSION_HANDLE).set(null)
-//                    connIdToSessHandle.remove(connectionId)
-//                }
-//                closed = true
-//                info(s"Finished closing $handle")
-//            }
-//        }
-//
-//        def handlePing(
-//                ctx: ChannelHandlerContext,
-//                pkg: MySQLComPingPacket): Seq[MySQLPacket] = {
-//                MySQLOKPacket(1) :: Nil
-//        }
-//
-//        def handleInitDb(
-//                ctx: ChannelHandlerContext,
-//                pkg: MySQLComInitDbPacket): Seq[MySQLPacket] = {
-//                beExecuteStatement(ctx, s"use ${pkg.database}")
-//                MySQLOKPacket(1) :: Nil
-//        }
-//
-//        def handleQuit(
-//                ctx: ChannelHandlerContext,
-//                pkg: MySQLComQuitPacket): Seq[MySQLPacket] = {
-//                closeSession(ctx)
-//                MySQLOKPacket(1) :: Nil
-//        }
-//
+    private SessionKey openSession(ChannelHandlerContext ctx) {
+        String user = ctx.channel().attr(MySQLCtxAttrKey.USER).get();
+        String remoteIp = ctx.channel().attr(MySQLCtxAttrKey.REMOTE_IP).get();
+        String database = ctx.channel().attr(MySQLCtxAttrKey.DATABASE).get();
+
+        return new SessionKey("");
+    }
+
+    private void closeSession(ChannelHandlerContext ctx) {
+        synchronized (this) {
+            if (!closed) {
+                SessionKey sessionKey = ctx.channel().attr(SESSION_KEY).get();
+                ctx.channel().attr(SESSION_KEY).set(null);
+                Integer connectionId = ctx.channel().attr(MySQLCtxAttrKey.CONNECTION_ID).getAndSet(null);
+                closed = true;
+                connIdToSessionKey.remove(connectionId);
+            }
+        }
+    }
+
+    private void ensureSessionOpened(ChannelHandlerContext ctx) {
+        if (ctx.channel().attr(SESSION_KEY).get() == null) {
+            synchronized (this) {
+                if (ctx.channel().attr(SESSION_KEY).get() == null) {
+                    SessionKey sessionKey = openSession(ctx);
+                    ctx.channel().attr(SESSION_KEY).set(sessionKey);
+                    Integer connectionId = ctx.channel().attr(CONNECTION_ID).get();
+                    connIdToSessionKey.put(connectionId, sessionKey);
+                }
+            }
+        }
+    }
+
+    List<MySQLPacket> handlePing(ChannelHandlerContext ctx, MySQLPingPacket packet) {
+        return Collections.singletonList(new MySQLOkPacket());
+    }
+
+    List<MySQLPacket> handleInitDb(ChannelHandlerContext ctx, MySQLInitDbPacket packet) {
+        // use packet.getDatabase()
+        return Collections.singletonList(new MySQLOkPacket());
+    }
+
+    List<MySQLPacket> handleQuit(ChannelHandlerContext ctx, MySQLQuitPacket packet) {
+        closeSession(ctx);
+        return Collections.singletonList(new MySQLOkPacket());
+    }
+
+    List<MySQLPacket> handleQuery(ChannelHandlerContext ctx, MySQLQueryPacket packet) {
+        return null;
+    }
+
 //        def handleQuery(
 //                ctx: ChannelHandlerContext,
 //                pkg: MySQLComQueryPacket): Seq[MySQLPacket] = {
-//                debug(s"Receive query: ${pkg.sql}")
 //                executeStatement(ctx, pkg.sql).toPackets
 //        }
-//
-//        def executeStatement(ctx: ChannelHandlerContext, sql: String): MySQLQueryResult = {
-//                val newSQL = MySQLDialectHelper.convertQuery(sql)
-//        if (sql != newSQL) debug(s"Converted to $newSQL")
-//
-//        if (MySQLDialectHelper.shouldExecuteLocal(newSQL)) {
-//            MySQLDialectHelper.localExecuteStatement(ctx, newSQL)
-//        } else {
-//            beExecuteStatement(ctx, newSQL)
-//        }
-//  }
-//
+
 //        private def beExecuteStatement(ctx: ChannelHandlerContext, sql: String): MySQLQueryResult = {
 //        try {
 //            val ssHandle = ctx.channel.attr(SESSION_HANDLE).get
@@ -182,4 +154,15 @@ public class MySQLHandler extends SimpleChannelInboundHandler<MySQLPacket> {
 //        }
 //  }
 //    }
+//
+//        def executeStatement(ctx: ChannelHandlerContext, sql: String): MySQLQueryResult = {
+//                val newSQL = MySQLDialectHelper.convertQuery(sql)
+//        if (sql != newSQL) debug(s"Converted to $newSQL")
+//
+//        if (MySQLDialectHelper.shouldExecuteLocal(newSQL)) {
+//            MySQLDialectHelper.localExecuteStatement(ctx, newSQL)
+//        } else {
+//            beExecuteStatement(ctx, newSQL)
+//        }
+//  }
 }

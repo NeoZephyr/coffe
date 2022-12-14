@@ -14,6 +14,8 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import pipe.service.ProbeService;
+import pipe.service.ServiceFactory;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -27,10 +29,12 @@ public class EchoClient {
 
     public static final byte[] NEWLINE = {13, 10};
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ClassNotFoundException {
         // testFuture();
-        interactiveChannel();
+        // interactiveChannel();
         // testRedis();
+
+        callRpc();
     }
 
     public static void testFuture() throws InterruptedException {
@@ -181,6 +185,16 @@ public class EchoClient {
         connect(bootstrap, "127.0.0.1", 6370, 3);
 
         log.info("=== done");
+    }
+
+    public static void callRpc() throws ClassNotFoundException {
+        String face = "pipe.service.ProbeService";
+        ProbeService service = (ProbeService) ServiceFactory.getProxyService(Class.forName(face));
+        String result = service.ping();
+        log.info("ping result: {}", result);
+
+        result = service.ready("kafka");
+        log.info("ready result: {}", result);
     }
 
     private static void connect(Bootstrap bootstrap, String host, int port, int retry) {
