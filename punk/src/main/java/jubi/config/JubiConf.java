@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -18,12 +17,67 @@ public class JubiConf {
 
     private final Map<String, String> settings = new ConcurrentHashMap<>();
 
+    private static final Object jubiConfUpdateLock = new Object();
+    private static volatile Map<String, ConfigEntry<?>> jubiConfEntries = Collections.emptyMap();
+
     public static final String JUBI_CONF_DIR = "JUBI_CONF_DIR";
     public static final String JUBI_CONF_FILE_NAME = "jubi-defaults.conf";
     public static final String JUBI_HOME = "JUBI_HOME";
 
+    public static final ConfigEntry<Long> ENGINE_OPEN_RETRY_WAIT = buildConf("jubi.session.engine.open.retry.times")
+            .doc("How many times retrying to open the engine after failure.")
+            .longConf()
+            .createWithDefault(10L);
+
+    public static final ConfigEntry<String> SERVER_PRINCIPAL = buildConf("jubi.init.principal")
+            .doc("Name of the Kerberos principal.")
+            .stringConf()
+            .create();
+
+    public static ConfigBuilder buildConf(String key) {
+        return new ConfigBuilder(key).callback(JubiConf::register);
+    }
+
+    public static void register(ConfigEntry<?> entry) {
+        synchronized (jubiConfUpdateLock) {
+            assert (!containsConfigEntry(entry)) : String.format("Duplicate ConfigEntry. %s has been registered", entry.key());
+            HashMap<String, ConfigEntry<?>> updatedMap = new HashMap<>(jubiConfEntries);
+            updatedMap.put(entry.key(), entry);
+            jubiConfEntries = updatedMap;
+        }
+    }
+
+    public static void unregister(ConfigEntry<?> entry) {
+        synchronized (jubiConfUpdateLock) {
+            HashMap<String, ConfigEntry<?>> updatedMap = new HashMap<>(jubiConfEntries);
+            updatedMap.remove(entry.key());
+            jubiConfEntries = updatedMap;
+        }
+    }
+
     public JubiConf set(String key, String value) {
+        assert (key != null) : "key cannot be null";
+        assert (value != null) : String.format("value cannot be null for key: %s", key);
         settings.put(key, value);
+        return this;
+    }
+
+    public JubiConf setIfMissing(String key, String value) {
+        assert (key != null) : "key cannot be null";
+        assert (value != null) : String.format("value cannot be null for key: %s", key);
+        settings.putIfAbsent(key, value);
+        return this;
+    }
+
+    public <T> JubiConf set(ConfigEntry<T> entry, T value) {
+        assert (containsConfigEntry(entry)) : String.format("%s is not registered", entry);
+        settings.put(entry.key(), entry.convertToText(value));
+        return this;
+    }
+
+    public <T> JubiConf setIfMissing(ConfigEntry<T> entry, T value) {
+        assert (containsConfigEntry(entry)) : String.format("%s is not registered", entry);
+        settings.putIfAbsent(entry.key(), entry.convertToText(value));
         return this;
     }
 
@@ -31,8 +85,28 @@ public class JubiConf {
         return settings.get(key);
     }
 
+    public <T> T get(ConfigEntry<T> entry) {
+        String valueText = settings.get(entry.key());
+
+        if (StringUtils.isBlank(valueText)) {
+            return entry.defaultValue();
+        }
+
+        return entry.convertToValue(valueText);
+    }
+
+    public Map<String, String> getAll() {
+        return new HashMap<>(settings);
+    }
+
     public JubiConf unset(String key) {
         settings.remove(key);
+        return this;
+    }
+
+    public JubiConf unset(ConfigEntry<?> entry) {
+        assert (containsConfigEntry(entry)) : String.format("%s is not registered", entry);
+        unset(entry.key());
         return this;
     }
 
@@ -47,8 +121,7 @@ public class JubiConf {
                 .stream()
                 .filter(entry -> entry.getKey().startsWith("jubi."))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        settings.putAll(sysDefaults);
-        return this;
+        return loadFromMap(sysDefaults);
     }
 
     public JubiConf loadFileDefaults() throws JubiException {
@@ -57,14 +130,14 @@ public class JubiConf {
         if (StringUtils.isBlank(confDir)) {
             String homeDir = System.getenv().get(JUBI_HOME);
 
-            if (StringUtils.isBlank(homeDir)) {
+            if (!StringUtils.isBlank(homeDir)) {
                 confDir = homeDir + File.separator + "conf";
             }
         }
 
         File file = null;
 
-        if (StringUtils.isBlank(confDir)) {
+        if (!StringUtils.isBlank(confDir)) {
             file = new File(confDir + File.separator + JUBI_CONF_FILE_NAME);
         } else {
             URL url = Thread.currentThread().getContextClassLoader().getResource(JUBI_CONF_FILE_NAME);
@@ -85,12 +158,29 @@ public class JubiConf {
                 Map<String, String> fileDefaults = properties.stringPropertyNames()
                         .stream()
                         .collect(Collectors.toMap(k -> k, k -> properties.getProperty(k).trim()));
-                settings.putAll(fileDefaults);
+                return loadFromMap(fileDefaults);
             }
         } catch (IOException e) {
             throw new JubiException("failed to load jubi properties from " + file.getAbsolutePath(), e);
         }
+    }
 
-        return this;
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        JubiConf cloned = new JubiConf();
+        settings.forEach(cloned::set);
+        return cloned;
+    }
+
+    private static ConfigEntry<?> getConfigEntry(String key) {
+        return jubiConfEntries.get(key);
+    }
+
+    private static Collection<ConfigEntry<?>> getConfigEntries() {
+        return jubiConfEntries.values();
+    }
+
+    private static boolean containsConfigEntry(ConfigEntry<?> entry) {
+        return getConfigEntry(entry.key()) == entry;
     }
 }
