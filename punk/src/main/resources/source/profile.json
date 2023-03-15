@@ -1,0 +1,47 @@
+[
+  {
+    "identities": [
+      {
+        "type": "wechat",
+        "value": "wechat_200"
+      },
+      {
+        "type": "email",
+        "value": "newton@qq.com"
+      }
+    ],
+    "data": {
+      "_name": "牛顿"
+    }
+  },
+  {
+    "identities": [
+      {
+        "type": "wechat",
+        "value": "wechat_300"
+      },
+      {
+        "type": "email",
+        "value": "rierman@qq.com"
+      }
+    ],
+    "data": {
+      "_name": "日耳曼蛮族"
+    }
+  },
+  {
+    "identities": [
+      {
+        "type": "wechat",
+        "value": "wechat_400"
+      },
+      {
+        "type": "email",
+        "value": "burutus@qq.com"
+      }
+    ],
+    "data": {
+      "_name": "布鲁图斯"
+    }
+  }
+]

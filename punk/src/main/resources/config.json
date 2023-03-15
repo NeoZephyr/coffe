@@ -1,0 +1,24 @@
+{
+  "extdatadmconnector": {
+    "tenantId": "1734229266",
+    "projectId": "extdatadmconnector",
+    "appId": "cl033a186692024b7",
+    "appSecret": "161d452bee54a9dffadcc175876293152b561d59",
+    "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dragon_bee-gbl_jt",
+    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
+    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
+    "token": "023315c395bb6a908bc28c8f8157887f"
+  },
+  "monitor_delta": {
+    "tenantId": "1734229266",
+    "projectId": "monitor_delta",
+    "appId": "cl03a7186c5eead40",
+    "appSecret": "ba4dc69ef26abbdbe34064c9351d5a397895987e",
+    "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_jiatu-xxxxxx",
+    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
+    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
+    "token": "89a4f1675eb7755f90ed4a76386a1ba0"
+  }
+}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package com.pain.flame.grpc;
+
+option java_multiple_files = true;
+option java_outer_classname = "PunkProto";
+option java_package = "com.pain.flame.grpc";
+
+// Service definition
+
+service Punk {
+  rpc Ping(PingRequest) returns (PingResponse) {}
+}
+
+message PingRequest {
+}
+
+message PingResponse {
+  bool success = 1;
+  string message = 2;
+}

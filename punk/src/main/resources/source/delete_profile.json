@@ -1,0 +1,17 @@
+[
+  {
+    "scene": "deleteprofile",
+    "profileId": "",
+    "identityType": "wechat",
+    "identityValue": "wechat_200",
+    "deleteType": "primaryProfile",
+    "deleteInfo": {
+      "identityInfos": [
+        {
+          "type": "email",
+          "value": "rierman@qq.com"
+        }
+      ]
+    }
+  }
+]
