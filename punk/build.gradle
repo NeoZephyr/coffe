@@ -54,6 +54,7 @@ dependencies {
     implementation 'org.apache.commons:commons-csv:1.8'
     implementation 'org.apache.commons:commons-collections4:4.4'
     implementation 'org.antlr:antlr4:4.11.1'
+    implementation 'org.apache.zookeeper:zookeeper:3.4.14'
 
 //      https://mvnrepository.com/artifact/org.mybatis/mybatis
 //    implementation group: 'org.mybatis', name: 'mybatis', version: '3.4.6'

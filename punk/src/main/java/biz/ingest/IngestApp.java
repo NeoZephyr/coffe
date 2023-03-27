@@ -16,12 +16,12 @@ public class IngestApp {
 
     public static void main(String[] args) throws IOException {
         Map<String, AppInfo> appInfoMap = loadConfig();
-        appInfo = appInfoMap.get("monitor_delta");
+        appInfo = appInfoMap.get("extdatadmconnector");
 
         // System.out.println(getToken());
 
-        // ingestProfile(appInfo);
-        deleteIdentity(appInfo);
+        ingestProfile(appInfo);
+        // deleteIdentity(appInfo);
     }
 
     public static String getToken() {

@@ -21,20 +21,22 @@ public class Token {
     }
 
     TokenKind kind;
-    String text;
+    String lexeme;
+
+    // int line;
     int position;
     int length;
 
-    public Token(TokenKind kind, String text, int position) {
+    public Token(TokenKind kind, String lexeme, int position) {
         this.kind = kind;
-        this.text = text;
+        this.lexeme = lexeme;
         this.position = position;
-        this.length = text.length();
+        this.length = lexeme.length();
     }
 
-    public Token(TokenKind kind, String text) {
+    public Token(TokenKind kind, String lexeme) {
         this.kind = kind;
-        this.text = text;
+        this.lexeme = lexeme;
     }
 
     public static boolean isKeyword(String lexeme) {

@@ -6,7 +6,7 @@ public class Lexer {
 
     boolean fetchedEOF = false;
 
-    private final String text;
+    private final String source;
     private int pos = 0;
     private char ch;
     private int line = 0;
@@ -73,8 +73,8 @@ public class Lexer {
 //            | [\uD800-\uDBFF] [\uDC00-\uDFFF] // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
 //    ;
 
-    public Lexer(String text) {
-        this.text = text;
+    public Lexer(String source) {
+        this.source = source;
     }
 
     // 1. hex, number
@@ -150,7 +150,7 @@ public class Lexer {
             bufSize++;
         }
 
-        String lexeme = text.substring(mark, mark + bufSize);
+        String lexeme = source.substring(mark, mark + bufSize);
         return new Token(TokenKind.HEX_LITERAL, lexeme);
     }
 
@@ -170,7 +170,7 @@ public class Lexer {
             bufSize++;
         }
 
-        String lexeme = text.substring(mark, mark + bufSize);
+        String lexeme = source.substring(mark, mark + bufSize);
         return new Token(TokenKind.HEX_LITERAL, lexeme);
     }
 
@@ -343,7 +343,7 @@ public class Lexer {
             bufSize++;
         }
 
-        String lexeme = text.substring(mark, mark + bufSize);
+        String lexeme = source.substring(mark, mark + bufSize);
 
         if (Token.isKeyword(lexeme)) {
             TokenKind kind = Token.kind(lexeme);
@@ -372,11 +372,20 @@ public class Lexer {
 //
 //                    return Token(EOF, None)
 
-    private char charAt(int index) {
-        if (index >= text.length()) {
+    // peek, peekNext
+    private char advance() {
+        if (pos++ >= source.length()) {
             return CharUtils.EOF;
         }
 
-        return text.charAt(index);
+        return source.charAt(pos);
+    }
+
+    private char charAt(int index) {
+        if (index >= source.length()) {
+            return CharUtils.EOF;
+        }
+
+        return source.charAt(index);
     }
 }

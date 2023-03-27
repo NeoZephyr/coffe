@@ -2,46 +2,38 @@
   {
     "identities": [
       {
-        "type": "wechat",
-        "value": "wechat_200"
-      },
-      {
         "type": "email",
-        "value": "newton@qq.com"
+        "value": "kazan@qq.com"
       }
     ],
     "data": {
-      "_name": "牛顿"
+      "_name": "悲鸣洞穴的魔剑"
     }
   },
   {
     "identities": [
       {
-        "type": "wechat",
-        "value": "wechat_300"
-      },
-      {
-        "type": "email",
-        "value": "rierman@qq.com"
+        "type": "mobile",
+        "value": "18900221155"
       }
     ],
     "data": {
-      "_name": "日耳曼蛮族"
+      "_name": "悲鸣洞穴的☠️"
     }
   },
   {
     "identities": [
       {
-        "type": "wechat",
-        "value": "wechat_400"
+        "type": "mobile",
+        "value": "13590015430"
       },
       {
         "type": "email",
-        "value": "burutus@qq.com"
+        "value": "xiehuang@qq.com"
       }
     ],
     "data": {
-      "_name": "布鲁图斯"
+      "_name": "美国狗子"
     }
   }
 ]

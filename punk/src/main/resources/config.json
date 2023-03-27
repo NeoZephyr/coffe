@@ -8,7 +8,7 @@
     "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dragon_bee-gbl_jt",
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
-    "token": "023315c395bb6a908bc28c8f8157887f"
+    "token": "699d42193fb0812f3b0a7aac775ffcc1"
   },
   "monitor_delta": {
     "tenantId": "1734229266",

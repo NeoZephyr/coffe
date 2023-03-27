@@ -47,6 +47,7 @@ public class CharUtils {
         restIdFlags['_'] = true;
     }
 
+    // isAlphaNumeric
     public static boolean isBlank(char c) {
         return (c <= blankFlags.length && blankFlags[c]) || c == '　'; // Chinese space
     }

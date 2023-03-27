@@ -1,0 +1,3 @@
+﻿rowId,identityType,identityValue,customerId,failedReason
+1471116999286587392,cp_datahubconnector_uid,1471115488607080448,1471115527261995008,身份匹配失败，同行身份匹配到多个客户
+1471116999286587392,mobile,18900221155,1471110612326236160,身份匹配失败，同行身份匹配到多个客户
