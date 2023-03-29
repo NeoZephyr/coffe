@@ -1,7 +1,10 @@
 package compile.craft;
 
+import lombok.extern.slf4j.Slf4j;
+
 import static compile.craft.CharUtils.*;
 
+@Slf4j
 public class Lexer {
 
     boolean fetchedEOF = false;
@@ -10,6 +13,7 @@ public class Lexer {
     private int pos = 0;
     private char ch;
     private int line = 0;
+    private int col = 0;
 
 //
 //    CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
@@ -17,10 +21,6 @@ public class Lexer {
 //    STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
 //
 //    NULL_LITERAL:       'null';
-//
-//// Identifiers
-//
-//    IDENTIFIER:         Letter LetterOrDigit*;
 //
 //// Separators
 //    XOR_ASSIGN:         '^=';
@@ -37,91 +37,49 @@ public class Lexer {
 //    WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 //    COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
 //    LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
-//
-//// Fragment rules
-//
-//    fragment Digits
-//    : [0-9] ([0-9_]* [0-9])?
-//    ;
-//
-//    fragment HexDigit
-//    : [0-9a-fA-F]
-//    ;
-//
-//    fragment HexDigits
-//    : HexDigit ((HexDigit | '_')* HexDigit)?
-//    ;
-//
-//    fragment ExponentPart
-//    : [eE] [+-]? Digits
-//    ;
-//
+
 //    fragment EscapeSequence
 //    : '\\' [btnfr"'\\]
 //            | '\\' ([0-3]? [0-7])? [0-7]
 //            | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
 //            ;
-//
-//    fragment LetterOrDigit
-//    : Letter
-//    | [0-9]
-//    ;
-//
-//    fragment Letter
-//    : [a-zA-Z$_] // these are the "java letters" below 0x7F
-//            | ~[\u0000-\u007F\uD800-\uDBFF] // covers all characters above 0x7F which are not a surrogate
-//            | [\uD800-\uDBFF] [\uDC00-\uDFFF] // covers UTF-16 surrogate pairs encodings for U+10000 to U+10FFFF
-//    ;
+
 
     public Lexer(String source) {
         this.source = source;
     }
 
-    // 1. hex, number
+    /**
+     * 1. line 维护
+     *
+     */
     public Token nextToken() {
         if (fetchedEOF) {
             return null;
         }
 
         while (true) {
-            if (isBlank(ch)) {
-                if (ch == '\n') {
-                    line++;
-                }
+            do {
+                advance();
+            } while (isBlank(ch));
 
-                ch = charAt(++pos);
-                continue;
+            if (ch == EOF) {
+                fetchedEOF = true;
+                return null;
             }
 
-            if (isFirstIdChar(ch)) {
-                return scanId();
+            // 处理 // 注释
+
+            if (isIdentifierStart(ch)) {
+                return scanIdentifier();
             }
 
-            switch (ch) {
-                case '0':
-                    if (charAt(pos + 1) == 'x') {
-                        return scanHex();
-                    } else {
-                    }
-                    break;
-                case '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9':
-                    break;
+            if (ch == '.') {
             }
-//            switch (ch) {
-//                case '0':
-//                    if (charAt(pos + 1) == 'x') {
-//                        scanChar();
-//                        scanChar();
-//                        scanHexaDecimal();
-//                    } else {
-//                        scanNumber();
-//                    }
-//                    return;
-//            }
 
-            // fd
-            /* fd
-            */
+            if (CharUtils.isDigit(ch)) {
+                return scanNumber();
+            }
 
             break;
         }
@@ -129,221 +87,206 @@ public class Lexer {
         return null;
     }
 
-    private void scanChar() {
-        ch = charAt(++pos);
-    }
+    private Token scanNumber() {
+        int start = pos;
 
-    // BINARY_LITERAL:     '0' [bB] [01] ([01_]* [01])? [lL]?;
-    private Token scanBin() {
-        int mark = pos;
-        int bufSize = 1;
+        if (ch == '0') {
+            advance();
 
-        scanChar();
+            // HEX_LITERAL:        '0' [xX] [0-9a-fA-F] ([0-9a-fA-F_]* [0-9a-fA-F])? [lL]?;
+            // HEX_FLOAT_LITERAL:  '0' [xX] (HexDigits '.'? | HexDigits? '.' HexDigits) [pP] [+-]? Digits [fFdD]?;
+            // HexDigits: HexDigit ((HexDigit | '_')* HexDigit)?;
+            // Digits: [0-9] ([0-9_]* [0-9])?;
 
-        while (true) {
-            ch = charAt(++pos);
+            if (ch == 'x' || ch == 'X') {
+                if (peek() == '.') {
+                    scanHexFraction(false);
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.HEX_FLOAT_LITERAL, lexeme);
+                }
 
-            if (!isBit(ch)) {
-                break;
+                scanHex();
+
+                if (ch == '.') {
+                    scanHexFraction(true);
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.HEX_FLOAT_LITERAL, lexeme);
+                } else if (ch == 'p' || ch == 'P') {
+                    char c = peek();
+
+                    if (c == '+' || c == '-') {
+                        advance();
+                    }
+
+                    scanDigit();
+
+                    if ((ch != 'f') && (ch != 'F') && (ch != 'd') && (ch != 'D')) {
+                        retreat();
+                    }
+
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.HEX_FLOAT_LITERAL, lexeme);
+                } else if (ch == 'l' || ch == 'L') {
+                    // verifyEndOfNumber
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.HEX_LITERAL, lexeme);
+                } else {
+                    retreat();
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.HEX_LITERAL, lexeme);
+                }
+            } else if (ch == 'b' || ch == 'B') {
+                // BINARY_LITERAL:     '0' [bB] [01] ([01_]* [01])? [lL]?;
+                scanBit();
+
+                if (ch == 'l' || ch == 'L') {
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.BINARY_LITERAL, lexeme);
+                } else {
+                    retreat();
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.BINARY_LITERAL, lexeme);
+                }
+            } else if (ch == '_' || isOct(ch)) {
+                // OCT_LITERAL:        '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?;
+                scanOct();
+
+                // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
+                // FLOAT_LITERAL:      Digits (ExponentPart [fFdD]? | [fFdD]);
+
+                System.out.println(0_00___9900f);
+                System.out.println(0_00___0d);
+                System.out.println(0_00___0f);
+                System.out.println(0_00_77__0L);
+                System.out.println(0_00_77.0__0);
+                System.out.println(0005.);
+                System.out.println(0009.);
+                System.out.println(0004e1);
+                System.out.println(0009e1);
+
+                if (isDigit(ch)) {
+                    scanDigit();
+
+                    if (ch == '.') {
+                        scanFraction();
+                        String lexeme = source.substring(start, pos + 1);
+                        return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    } else if (ch == 'e' || ch == 'E') {
+                        scanExp();
+                        String lexeme = source.substring(start, pos + 1);
+                        return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    } else if (ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D') {
+                        String lexeme = source.substring(start, pos + 1);
+                        return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    }
+
+                    error("invalid float literal");
+                } else if (ch == '.') {
+                    scanFraction();
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                } else if (ch == 'e' || ch == 'E') {
+                    scanExp();
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                } else {
+                    if (ch == 'l' || ch == 'L') {
+                        String lexeme = source.substring(start, pos + 1);
+                        return new Token(TokenKind.OCT_LITERAL, lexeme);
+                    } else if (ch == 'd' || ch == 'D' || ch == 'f' || ch == 'F') {
+                        String lexeme = source.substring(start, pos + 1);
+                        return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    } else {
+                        retreat();
+                        String lexeme = source.substring(start, pos + 1);
+                        return new Token(TokenKind.OCT_LITERAL, lexeme);
+                    }
+                }
+            } else {
+                // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
+                // FLOAT_LITERAL:      Digits (ExponentPart [fFdD]? | [fFdD]);
+                // DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
+                // ExponentPart:       [eE] [+-]? Digits;
+
+                if (ch == 'l' || ch == 'L') {
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.DECIMAL_LITERAL, lexeme);
+                }
+
+                while (isDigit(ch)) {
+                    advance();
+                }
+
+                if (ch == '.') {
+                    scanFraction();
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                } else if (ch == 'e' || ch == 'E') {
+                    scanExp();
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                } else if (ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D') {
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                }
+
+                error("invalid float literal");
             }
+        } else {
+            // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
+            // FLOAT_LITERAL:      Digits (ExponentPart [fFdD]? | [fFdD]);
+            // DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
+            // ExponentPart:       [eE] [+-]? Digits;
+            if (ch == '.') {
+                scanDigit();
 
-            bufSize++;
-        }
+                if (ch == 'e' || ch == 'E') {
+                    scanExp();
+                }
 
-        String lexeme = source.substring(mark, mark + bufSize);
-        return new Token(TokenKind.HEX_LITERAL, lexeme);
-    }
+                String lexeme = source.substring(start, pos + 1);
+                return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+            } else {
+                // TODO ignore beginning
+                scanDigit();
 
-    private Token scanHex() {
-        int mark = pos;
-        int bufSize = 1;
+                if (ch == '.') {
+                    scanFraction();
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                } else if (ch == 'e' || ch == 'E') {
+                    scanExp();
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                } else if (ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D') {
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                } else if (ch == 'l' || ch == 'L') {
+                    String lexeme = source.substring(start, pos + 1);
+                    return new Token(TokenKind.DECIMAL_LITERAL, lexeme);
+                }
 
-        scanChar();
-
-        while (true) {
-            ch = charAt(++pos);
-
-            if (!isHex(ch)) {
-                break;
+                retreat();
+                String lexeme = source.substring(start, pos + 1);
+                return new Token(TokenKind.DECIMAL_LITERAL, lexeme);
             }
-
-            bufSize++;
         }
-
-        String lexeme = source.substring(mark, mark + bufSize);
-        return new Token(TokenKind.HEX_LITERAL, lexeme);
     }
 
     public static void main(String[] args) {
-        // TODO
-        // BINARY_LITERAL:     '0' [bB] [01] ([01_]* [01])? [lL]?;
         System.out.println(0b11_01);
         System.out.println(0B10_01L);
     }
 
+    private Token scanIdentifier() {
+        int start = pos - 1;
 
-//    public void scanNumber() {
-//        mark = pos;
-//        numberSale = 0;
-//        numberExp = false;
-//        bufPos = 0;
-//
-//        if (ch == '0' && charAt(pos + 1) == 'b' && dbType != DbType.odps) {
-//            int i = 2;
-//            int mark = pos + 2;
-//            for (;;++i) {
-//                char ch = charAt(pos + i);
-//                if (ch == '0' || ch == '1') {
-//                    continue;
-//                } else if (ch >= '2' && ch <= '9') {
-//                    break;
-//                } else {
-//                    bufPos += i;
-//                    pos += i;
-//                    stringVal = subString(mark, i - 2);
-//                    this.ch = charAt(pos);
-//                    token = Token.BITS;
-//                    return;
-//                }
-//            }
-//        }
-//
-//        if (ch == '-') {
-//            bufPos++;
-//            ch = charAt(++pos);
-//        }
-//
-//        for (;;) {
-//            if (ch >= '0' && ch <= '9') {
-//                bufPos++;
-//            } else {
-//                break;
-//            }
-//            ch = charAt(++pos);
-//        }
-//
-//        if (ch == '.') {
-//            if (charAt(pos + 1) == '.') {
-//                token = Token.LITERAL_INT;
-//                return;
-//            }
-//            bufPos++;
-//            ch = charAt(++pos);
-//
-//            for (numberSale = 0;;numberSale++) {
-//                if (ch >= '0' && ch <= '9') {
-//                    bufPos++;
-//                } else {
-//                    break;
-//                }
-//                ch = charAt(++pos);
-//            }
-//
-//            numberExp = true;
-//        }
-//
-//        if ((ch == 'e' || ch == 'E')
-//                && (isDigit(charAt(pos + 1)) || (isDigit2(charAt(pos + 1)) && isDigit2(charAt(pos + 2))))) {
-//            numberExp = true;
-//
-//            bufPos++;
-//            ch = charAt(++pos);
-//
-//            if (ch == '+' || ch == '-') {
-//                bufPos++;
-//                ch = charAt(++pos);
-//            }
-//
-//            for (;;) {
-//                if (ch >= '0' && ch <= '9') {
-//                    bufPos++;
-//                } else {
-//                    break;
-//                }
-//                ch = charAt(++pos);
-//            }
-//
-//            if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
-//                numberExp = false;
-//            }
-//        }
-//
-//        if (numberSale > 0 || numberExp) {
-//            if (text.charAt(mark) == '.' && isIdentifierChar(ch)) {
-//                pos = mark + 1;
-//                ch = charAt(pos);
-//                token = Token.DOT;
-//                return;
-//            }
-//            token = Token.LITERAL_FLOAT;
-//            return;
-//        }
-//
-//        if (ch != '`') {
-//            if (isFirstIdentifierChar(ch)
-//                    && ch != '）'
-//                    && !(ch == 'b' && bufPos == 1 && charAt(pos - 1) == '0' && dbType != DbType.odps)
-//            ) {
-//                bufPos++;
-//                boolean brace = false;
-//                for (;;) {
-//                    char c0 = ch;
-//                    ch = charAt(++pos);
-//
-//                    if (isEOF()) {
-//                        break;
-//                    }
-//
-//                    if (!isIdentifierChar(ch)) {
-//                        if (ch == '{' && charAt(pos - 1) == '$' && !brace) {
-//                            bufPos++;
-//                            brace = true;
-//                            continue;
-//                        }
-//
-//                        if (ch == '}' && brace) {
-//                            bufPos++;
-//                            brace = false;
-//                            continue;
-//                        }
-//
-//                        if ((ch == '（'  || ch == '）')
-//                                && c0 > 256) {
-//                            bufPos++;
-//                            continue;
-//                        }
-//                        break;
-//                    }
-//
-//                    bufPos++;
-//                    continue;
-//                }
-//
-//                stringVal = addSymbol();
-//                hash_lower = FnvHash.hashCode64(stringVal);
-//                token = Token.IDENTIFIER;
-//                return;
-//            }
-//        }
-//
-//        token = Token.LITERAL_INT;
-//    }
+        do {
+            advance();
+        } while (isIdentifierChar(ch));
 
-    private Token scanId() {
-        int mark = pos;
-        int bufSize = 1;
-
-        while (true) {
-            ch = charAt(++pos);
-
-            if (!isIdChar(ch)) {
-                break;
-            }
-
-            bufSize++;
-        }
-
-        String lexeme = source.substring(mark, mark + bufSize);
+        String lexeme = source.substring(start, pos);
+        retreat();
 
         if (Token.isKeyword(lexeme)) {
             TokenKind kind = Token.kind(lexeme);
@@ -353,39 +296,192 @@ public class Lexer {
         }
     }
 
-    //
+    private void scanHex() {
+        advance();
 
-//            if self.current_char == '{':
-//            self.advance()
-//            self.skip_comment()
-//            continue
+        if (!isHex(ch)) {
+            error("invalid hexadecimal literal");
+        }
 
-//            if self.current_char == ':' and self.peek() == '=':
-//            self.advance()
-//            self.advance()
-//            return Token(ASSIGN, ':=')
-//            if self.current_char == '.':
-//            self.advance()
-//            return Token(DOT, '.')
-//
-//            self.error()
-//
-//                    return Token(EOF, None)
+        do {
+            if (ch == '_') {
+                do {
+                    advance();
+                } while(ch == '_');
 
-    // peek, peekNext
-    private char advance() {
-        if (pos++ >= source.length()) {
-            return CharUtils.EOF;
+                if (!isHex(ch)) {
+                    error("invalid hexadecimal literal");
+                }
+            }
+
+            do {
+                advance();
+            } while (isHex(ch));
+        } while (ch == '_');
+    }
+
+    private void scanBit() {
+        advance();
+
+        if (!isBit(ch)) {
+            error("invalid binary literal");
+        }
+
+        do {
+            if (ch == '_') {
+                do {
+                    advance();
+                } while(ch == '_');
+
+                if (!isBit(ch)) {
+                    error("invalid binary literal");
+                }
+            }
+
+            do {
+                advance();
+            } while (isBit(ch));
+        } while (ch == '_');
+    }
+
+    private void scanOct() {
+        do {
+            if (ch == '_') {
+                do {
+                    advance();
+                } while(ch == '_');
+
+                if (!isDigit(ch)) {
+                    error("invalid octal literal");
+                }
+
+                if (!isOct(ch)) {
+                    return;
+                }
+            }
+
+            do {
+                advance();
+            } while (isOct(ch));
+        } while (ch == '_');
+    }
+
+    private void scanDigit() {
+        advance();
+
+        if (!isDigit(ch)) {
+            error("invalid decimal literal");
+        }
+
+        do {
+            if (ch == '_') {
+                do {
+                    advance();
+                } while(ch == '_');
+
+                if (!isDigit(ch)) {
+                    error("invalid decimal literal");
+                }
+            }
+
+            do {
+                advance();
+            } while (isDigit(ch));
+        } while (ch == '_');
+    }
+
+    // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
+    private void scanFraction() {
+        if (isDigit(peek())) {
+            scanDigit();
+        } else {
+            advance();
+        }
+
+        if (ch == 'e' || ch == 'E') {
+            char c = peek();
+
+            if (c == '+' || c == '-') {
+                advance();
+            }
+
+            scanDigit();
+        }
+
+        if ((ch != 'f') && (ch != 'F') && (ch != 'd') && (ch != 'D')) {
+            retreat();
+        }
+    }
+
+    // HEX_FLOAT_LITERAL:  '0' [xX] (HexDigits '.'? | HexDigits? '.' HexDigits) [pP] [+-]? Digits [fFdD]?;
+    private void scanHexFraction(boolean hasDigit) {
+        if (hasDigit) {
+            if (isHex(peek())) {
+                scanHex();
+            }
+            advance();
+        } else {
+            scanHex();
+        }
+
+        if ((ch != 'p') && (ch != 'P')) {
+            error("invalid hexadecimal literal");
+        }
+
+        char c = peek();
+
+        if (c == '+' || c == '-') {
+            advance();
+        }
+
+        scanDigit();
+
+        if ((ch != 'f') && (ch != 'F') && (ch != 'd') && (ch != 'D')) {
+            retreat();
+        }
+    }
+
+    private void scanExp() {
+        char c = peek();
+
+        if (c == '+' || c == '-') {
+            advance();
+        }
+
+        scanDigit();
+
+        if ((ch != 'f') && (ch != 'F') && (ch != 'd') && (ch != 'D')) {
+            retreat();
+        }
+    }
+
+    private void advance() {
+        if (pos >= source.length()) {
+            ch = CharUtils.EOF;
+            return;
+        }
+
+        ch = source.charAt(pos++);
+    }
+
+    private void retreat() {
+        if (ch != EOF) {
+            if (--pos < 0) {
+                error("tokenizer exceed beginning of source");
+            }
+        }
+    }
+
+    private char peek() {
+        if (pos >= source.length()) {
+            return EOF;
         }
 
         return source.charAt(pos);
     }
 
-    private char charAt(int index) {
-        if (index >= source.length()) {
-            return CharUtils.EOF;
-        }
-
-        return source.charAt(index);
+    private void error(String msg) {
+        log.error("lexer error: {}", msg);
+        throw new RuntimeException(msg);
     }
 }

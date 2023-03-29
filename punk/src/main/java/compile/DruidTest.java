@@ -1,4 +1,4 @@
-package druid;
+package compile;
 
 import com.alibaba.druid.sql.SQLUtils;
 import com.alibaba.druid.sql.ast.SQLExpr;
