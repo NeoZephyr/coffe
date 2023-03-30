@@ -75,6 +75,7 @@ public class Lexer {
             }
 
             if (ch == '.') {
+                return scanNumber();
             }
 
             if (CharUtils.isDigit(ch)) {
@@ -88,7 +89,8 @@ public class Lexer {
     }
 
     private Token scanNumber() {
-        int start = pos;
+        int start = pos - 1;
+        TokenKind tokenKind = null;
 
         if (ch == '0') {
             advance();
@@ -100,137 +102,116 @@ public class Lexer {
 
             if (ch == 'x' || ch == 'X') {
                 if (peek() == '.') {
+                    advance();
                     scanHexFraction(false);
-                    String lexeme = source.substring(start, pos + 1);
+                    String lexeme = source.substring(start, pos);
                     return new Token(TokenKind.HEX_FLOAT_LITERAL, lexeme);
-                }
-
-                scanHex();
-
-                if (ch == '.') {
-                    scanHexFraction(true);
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.HEX_FLOAT_LITERAL, lexeme);
-                } else if (ch == 'p' || ch == 'P') {
-                    char c = peek();
-
-                    if (c == '+' || c == '-') {
-                        advance();
-                    }
-
-                    scanDigit();
-
-                    if ((ch != 'f') && (ch != 'F') && (ch != 'd') && (ch != 'D')) {
-                        retreat();
-                    }
-
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.HEX_FLOAT_LITERAL, lexeme);
-                } else if (ch == 'l' || ch == 'L') {
-                    // verifyEndOfNumber
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.HEX_LITERAL, lexeme);
                 } else {
-                    retreat();
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.HEX_LITERAL, lexeme);
+                    scanHex();
+
+                    if (ch == '.') {
+                        scanHexFraction(true);
+                        tokenKind = TokenKind.HEX_FLOAT_LITERAL;
+                    } else if (ch == 'p' || ch == 'P') {
+                        scanExp();
+                        tokenKind = TokenKind.HEX_FLOAT_LITERAL;
+                    } else if (ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D') {
+                        tokenKind = TokenKind.HEX_FLOAT_LITERAL;
+                    } else if (ch == 'l' || ch == 'L') {
+                        tokenKind = TokenKind.HEX_LITERAL;
+                    } else {
+                        retreat();
+                        tokenKind = TokenKind.HEX_LITERAL;
+                    }
+
+                    // verifyEndOfNumber
+                    String lexeme = source.substring(start, pos);
+                    return new Token(tokenKind, lexeme);
                 }
             } else if (ch == 'b' || ch == 'B') {
                 // BINARY_LITERAL:     '0' [bB] [01] ([01_]* [01])? [lL]?;
                 scanBit();
 
-                if (ch == 'l' || ch == 'L') {
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.BINARY_LITERAL, lexeme);
-                } else {
+                if ((ch != 'l') && (ch != 'L')) {
                     retreat();
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.BINARY_LITERAL, lexeme);
                 }
+
+                String lexeme = source.substring(start, pos);
+                return new Token(TokenKind.BINARY_LITERAL, lexeme);
             } else if (ch == '_' || isOct(ch)) {
                 // OCT_LITERAL:        '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?;
-                scanOct();
-
                 // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
                 // FLOAT_LITERAL:      Digits (ExponentPart [fFdD]? | [fFdD]);
-
-                System.out.println(0_00___9900f);
-                System.out.println(0_00___0d);
-                System.out.println(0_00___0f);
-                System.out.println(0_00_77__0L);
-                System.out.println(0_00_77.0__0);
-                System.out.println(0005.);
-                System.out.println(0009.);
-                System.out.println(0004e1);
-                System.out.println(0009e1);
+                scanOct();
 
                 if (isDigit(ch)) {
                     scanDigit();
 
                     if (ch == '.') {
                         scanFraction();
-                        String lexeme = source.substring(start, pos + 1);
-                        return new Token(TokenKind.FLOAT_LITERAL, lexeme);
                     } else if (ch == 'e' || ch == 'E') {
                         scanExp();
-                        String lexeme = source.substring(start, pos + 1);
-                        return new Token(TokenKind.FLOAT_LITERAL, lexeme);
-                    } else if (ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D') {
-                        String lexeme = source.substring(start, pos + 1);
-                        return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    } else if ((ch != 'f') && (ch != 'F') && (ch != 'd') && (ch != 'D')) {
+                        error("invalid oct literal");
                     }
 
-                    error("invalid float literal");
+                    tokenKind = TokenKind.FLOAT_LITERAL;
                 } else if (ch == '.') {
                     scanFraction();
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.FLOAT_LITERAL;
                 } else if (ch == 'e' || ch == 'E') {
                     scanExp();
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.FLOAT_LITERAL;
+                } else if (ch == 'd' || ch == 'D' || ch == 'f' || ch == 'F') {
+                    tokenKind = TokenKind.FLOAT_LITERAL;
+                } else if (ch == 'l' || ch == 'L') {
+                    tokenKind = TokenKind.OCT_LITERAL;
                 } else {
-                    if (ch == 'l' || ch == 'L') {
-                        String lexeme = source.substring(start, pos + 1);
-                        return new Token(TokenKind.OCT_LITERAL, lexeme);
-                    } else if (ch == 'd' || ch == 'D' || ch == 'f' || ch == 'F') {
-                        String lexeme = source.substring(start, pos + 1);
-                        return new Token(TokenKind.FLOAT_LITERAL, lexeme);
-                    } else {
-                        retreat();
-                        String lexeme = source.substring(start, pos + 1);
-                        return new Token(TokenKind.OCT_LITERAL, lexeme);
-                    }
+                    retreat();
+                    tokenKind = TokenKind.OCT_LITERAL;
                 }
+
+                String lexeme = source.substring(start, pos);
+                return new Token(tokenKind, lexeme);
             } else {
                 // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
                 // FLOAT_LITERAL:      Digits (ExponentPart [fFdD]? | [fFdD]);
                 // DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;
                 // ExponentPart:       [eE] [+-]? Digits;
 
-                if (ch == 'l' || ch == 'L') {
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.DECIMAL_LITERAL, lexeme);
-                }
+                if (isDigit(ch)) {
+                    do {
+                        advance();
+                    } while (isDigit(ch));
 
-                while (isDigit(ch)) {
-                    advance();
-                }
-
-                if (ch == '.') {
+                    if (ch == '.') {
+                        scanFraction();
+                        tokenKind = TokenKind.FLOAT_LITERAL;
+                    } else if (ch == 'e' || ch == 'E') {
+                        scanExp();
+                        tokenKind = TokenKind.FLOAT_LITERAL;
+                    } else if ((ch == 'f') || ch == 'F' || ch == 'd' || ch == 'D') {
+                        tokenKind = TokenKind.FLOAT_LITERAL;
+                    } else {
+                        error("invalid float literal");
+                    }
+                } else if (ch == '.') {
                     scanFraction();
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.FLOAT_LITERAL;
                 } else if (ch == 'e' || ch == 'E') {
                     scanExp();
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.FLOAT_LITERAL;
+                } else if (ch == 'l' || ch == 'L') {
+                    tokenKind = TokenKind.DECIMAL_LITERAL;
                 } else if (ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D') {
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.FLOAT_LITERAL;
+                } else {
+                    retreat();
+                    tokenKind = TokenKind.DECIMAL_LITERAL;
                 }
 
-                error("invalid float literal");
+                String lexeme = source.substring(start, pos);
+                return new Token(tokenKind, lexeme);
             }
         } else {
             // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
@@ -244,38 +225,29 @@ public class Lexer {
                     scanExp();
                 }
 
-                String lexeme = source.substring(start, pos + 1);
-                return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                tokenKind = TokenKind.FLOAT_LITERAL;
             } else {
-                // TODO ignore beginning
-                scanDigit();
+                scanDigit(true);
 
                 if (ch == '.') {
                     scanFraction();
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.FLOAT_LITERAL;
                 } else if (ch == 'e' || ch == 'E') {
                     scanExp();
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.FLOAT_LITERAL;
                 } else if (ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D') {
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.FLOAT_LITERAL;
                 } else if (ch == 'l' || ch == 'L') {
-                    String lexeme = source.substring(start, pos + 1);
-                    return new Token(TokenKind.DECIMAL_LITERAL, lexeme);
+                    tokenKind = TokenKind.DECIMAL_LITERAL;
+                } else {
+                    retreat();
+                    tokenKind = TokenKind.DECIMAL_LITERAL;
                 }
-
-                retreat();
-                String lexeme = source.substring(start, pos + 1);
-                return new Token(TokenKind.DECIMAL_LITERAL, lexeme);
             }
-        }
-    }
 
-    public static void main(String[] args) {
-        System.out.println(0b11_01);
-        System.out.println(0B10_01L);
+            String lexeme = source.substring(start, pos);
+            return new Token(tokenKind, lexeme);
+        }
     }
 
     private Token scanIdentifier() {
@@ -366,10 +338,14 @@ public class Lexer {
         } while (ch == '_');
     }
 
-    private void scanDigit() {
+    private void scanDigit(boolean hasDigit) {
         advance();
 
-        if (!isDigit(ch)) {
+        if (hasDigit) {
+            if ((ch != '_') && !isDigit(ch)) {
+                return;
+            }
+        } else if (!isDigit(ch)) {
             error("invalid decimal literal");
         }
 
@@ -388,6 +364,10 @@ public class Lexer {
                 advance();
             } while (isDigit(ch));
         } while (ch == '_');
+    }
+
+    private void scanDigit() {
+        scanDigit(false);
     }
 
     // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
@@ -418,8 +398,9 @@ public class Lexer {
         if (hasDigit) {
             if (isHex(peek())) {
                 scanHex();
+            } else {
+                advance();
             }
-            advance();
         } else {
             scanHex();
         }
