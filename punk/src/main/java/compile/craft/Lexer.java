@@ -104,8 +104,7 @@ public class Lexer {
                 if (peek() == '.') {
                     advance();
                     scanHexFraction(false);
-                    String lexeme = source.substring(start, pos);
-                    return new Token(TokenKind.HEX_FLOAT_LITERAL, lexeme);
+                    tokenKind = TokenKind.HEX_FLOAT_LITERAL;
                 } else {
                     scanHex();
 
@@ -123,10 +122,6 @@ public class Lexer {
                         retreat();
                         tokenKind = TokenKind.HEX_LITERAL;
                     }
-
-                    // verifyEndOfNumber
-                    String lexeme = source.substring(start, pos);
-                    return new Token(tokenKind, lexeme);
                 }
             } else if (ch == 'b' || ch == 'B') {
                 // BINARY_LITERAL:     '0' [bB] [01] ([01_]* [01])? [lL]?;
@@ -136,8 +131,7 @@ public class Lexer {
                     retreat();
                 }
 
-                String lexeme = source.substring(start, pos);
-                return new Token(TokenKind.BINARY_LITERAL, lexeme);
+                tokenKind = TokenKind.BINARY_LITERAL;
             } else if (ch == '_' || isOct(ch)) {
                 // OCT_LITERAL:        '0' '_'* [0-7] ([0-7_]* [0-7])? [lL]?;
                 // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
@@ -170,9 +164,6 @@ public class Lexer {
                     retreat();
                     tokenKind = TokenKind.OCT_LITERAL;
                 }
-
-                String lexeme = source.substring(start, pos);
-                return new Token(tokenKind, lexeme);
             } else {
                 // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
                 // FLOAT_LITERAL:      Digits (ExponentPart [fFdD]? | [fFdD]);
@@ -209,9 +200,6 @@ public class Lexer {
                     retreat();
                     tokenKind = TokenKind.DECIMAL_LITERAL;
                 }
-
-                String lexeme = source.substring(start, pos);
-                return new Token(tokenKind, lexeme);
             }
         } else {
             // FLOAT_LITERAL:      (Digits '.' Digits? | '.' Digits) ExponentPart? [fFdD]?;
@@ -244,10 +232,10 @@ public class Lexer {
                     tokenKind = TokenKind.DECIMAL_LITERAL;
                 }
             }
-
-            String lexeme = source.substring(start, pos);
-            return new Token(tokenKind, lexeme);
         }
+
+        String lexeme = source.substring(start, pos);
+        return new Token(tokenKind, lexeme);
     }
 
     private Token scanIdentifier() {
@@ -409,17 +397,7 @@ public class Lexer {
             error("invalid hexadecimal literal");
         }
 
-        char c = peek();
-
-        if (c == '+' || c == '-') {
-            advance();
-        }
-
-        scanDigit();
-
-        if ((ch != 'f') && (ch != 'F') && (ch != 'd') && (ch != 'D')) {
-            retreat();
-        }
+        scanExp();
     }
 
     private void scanExp() {
