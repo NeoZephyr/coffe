@@ -1,54 +1,24 @@
 package compile;
 
-import com.alibaba.druid.sql.SQLUtils;
-import com.alibaba.druid.sql.ast.SQLExpr;
-import com.alibaba.druid.sql.parser.Token;
-import com.alibaba.druid.util.JdbcConstants;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class DruidTest {
-    public static void main(String[] args) {
-        SQLExpr expr = SQLUtils.toSQLExpr("id=3", JdbcConstants.MYSQL);
-        System.out.println(expr);
+    // char c = ' ';
+    public static void main(String[] args) throws IOException {
+        // SQLExpr expr = SQLUtils.toSQLExpr("id=3", JdbcConstants.MYSQL);
+        // System.out.println(expr);
 
-        System.out.println(A.B);
-        System.out.println(A.name);
+        FileReader reader = new FileReader("/Users/meilb/Documents/self/coffe/punk/test.txt");
+        BufferedReader bufReader = new BufferedReader(reader);
+        char[] buf = new char[100];
+        int count = bufReader.read(buf);
+        System.out.println(count);
 
-        for (A value : A.values()) {
-            System.out.println("=== age: " + value.age + ", ===: " + value.ordinal() + ", ===: " + value.name());
-        }
-
-        char c = '\u200B';
-        int a = c;
-        System.out.println("c: = " + c);
-        c = 0x1A;
-        System.out.println(c);
-        c = 26;
-        System.out.println(c);
-        System.out.println(0x7F);
-        System.out.println(0xA0);
-        System.out.println(0x1F);
-
-        // HEX_FLOAT_LITERAL:  '0' [xX] (HexDigits '.'? | HexDigits? '.' HexDigits) [pP] [+-]? Digits [fFdD]?;
-        // System.out.println(0xF.1234Ep0);
-    }
-
-    enum A {
-        C("ccc"),
-        B;
-
-        static String name = "xxx";
-
-        String age;
-
-        A(){
-            this(null);
-        }
-
-        A(String age){
-            this.age = age;
+        for (int i = 0; i < 20; ++i) {
+            int d = buf[i];
+            System.out.printf("int format: %d, char format: %c，%b%n", d, buf[i], buf[i] == '\n');
         }
     }
-
-//    public Lexer(String input, boolean skipComment){
-//    }
 }

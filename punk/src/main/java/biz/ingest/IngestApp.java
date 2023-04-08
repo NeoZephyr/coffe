@@ -16,11 +16,12 @@ public class IngestApp {
 
     public static void main(String[] args) throws IOException {
         Map<String, AppInfo> appInfoMap = loadConfig();
-        appInfo = appInfoMap.get("extdatadmconnector");
+        appInfo = appInfoMap.get("CloudNativeTest");
 
         // System.out.println(getToken());
 
-        ingestProfile(appInfo);
+        // ingestProfile(appInfo);
+        ingestDocument(appInfo);
         // deleteIdentity(appInfo);
     }
 
@@ -35,6 +36,14 @@ public class IngestApp {
 
         for (Map profile : dataList) {
             restService.post(appInfo.profileUrl, profile, appInfo);
+        }
+    }
+
+    public static void ingestDocument(AppInfo appInfo) throws IOException {
+        List<Map> dataList = loadData("source/document.json");
+
+        for (Map document : dataList) {
+            restService.post(appInfo.orderUrl, document, appInfo);
         }
     }
 

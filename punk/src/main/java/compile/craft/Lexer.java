@@ -15,9 +15,7 @@ public class Lexer {
     private int line = 0;
     private int col = 0;
 
-//
-//    CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
-//
+
 //    STRING_LITERAL:     '"' (~["\\\r\n] | EscapeSequence)* '"';
 //
 //    NULL_LITERAL:       'null';
@@ -28,9 +26,7 @@ public class Lexer {
 //    COLONCOLON:         '::';
 //
 //// Additional symbols not defined in the lexical specification
-//
 //    AT:                 '@';
-//    ELLIPSIS:           '...';
 //
 //// Whitespace and comments
 //
@@ -38,19 +34,14 @@ public class Lexer {
 //    COMMENT:            '/*' .*? '*/'    -> channel(HIDDEN);
 //    LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 
-//    fragment EscapeSequence
-//    : '\\' [btnfr"'\\]
-//            | '\\' ([0-3]? [0-7])? [0-7]
-//            | '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
-//            ;
-
-
     public Lexer(String source) {
         this.source = source;
     }
 
     /**
      * 1. line 维护
+     * 2. col 维护
+     * 3. verify number end
      *
      */
     public Token nextToken() {
@@ -75,17 +66,39 @@ public class Lexer {
             }
 
             if (ch == '.') {
-                return scanNumber();
+                advance();
+
+                if (isDigit(ch)) {
+                    return scanNumber();
+                } else if (ch == '.') {
+                    if (peek() == '.') {
+                        advance();
+                        return new Token(TokenKind.ELLIPSIS);
+                    }
+                }
+
+                retreat();
+                return new Token(TokenKind.DOT);
             }
 
             if (CharUtils.isDigit(ch)) {
                 return scanNumber();
             }
 
-            break;
-        }
+            // '\\' 'u005c'? [btnfr"'\\]
+            char b = '\u005cb';
+            char c = ' ';
+            System.out.println("ab\ndd");
+            c = '\n';
 
-        return null;
+            // CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
+            // EscapeSequence: '\\' 'u005c'? [btnfr"'\\]
+            // EscapeSequence: '\\' 'u005c'? ([0-3]? [0-7])? [0-7]
+            // EscapeSequence: '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
+            if (ch == '\'') {
+                System.out.println('a');
+            }
+        }
     }
 
     private Token scanNumber() {
@@ -234,6 +247,7 @@ public class Lexer {
             }
         }
 
+        // verifyEndOfNumber
         String lexeme = source.substring(start, pos);
         return new Token(tokenKind, lexeme);
     }

@@ -1,14 +1,14 @@
 {
-  "extdatadmconnector": {
+  "CloudNativeTest": {
     "tenantId": "1734229266",
-    "projectId": "extdatadmconnector",
-    "appId": "cl033a186692024b7",
-    "appSecret": "161d452bee54a9dffadcc175876293152b561d59",
+    "projectId": "CloudNativeTest",
+    "appId": "cl010c18755e7c70e",
+    "appSecret": "fe916771595430da785b66f10f231c8a86bf4f81",
     "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
-    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dragon_bee-gbl_jt",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_warrior-for-dmhub",
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
-    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
-    "token": "699d42193fb0812f3b0a7aac775ffcc1"
+    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_weapon_order-dmhub-order",
+    "token": "e47dd9716393cb0d2dac0cc36fbe3abd"
   },
   "monitor_delta": {
     "tenantId": "1734229266",

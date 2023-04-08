@@ -39,6 +39,11 @@ public class Token {
         this.lexeme = lexeme;
     }
 
+    public Token(TokenKind kind) {
+        this.kind = kind;
+        this.lexeme = kind.literal;
+    }
+
     public static boolean isKeyword(String lexeme) {
         return keywords.containsKey(lexeme);
     }
