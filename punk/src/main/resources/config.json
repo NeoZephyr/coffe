@@ -7,8 +7,8 @@
     "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
     "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_warrior-for-dmhub",
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
-    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_weapon_order-dmhub-order",
-    "token": "e47dd9716393cb0d2dac0cc36fbe3abd"
+    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_kaili_enhance_coupon-kaili-encah",
+    "token": "65488a148a64422f895e3531ed63c120"
   },
   "monitor_delta": {
     "tenantId": "1734229266",

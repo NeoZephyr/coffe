@@ -2,6 +2,7 @@ package jubi.config;
 
 import com.google.common.collect.Maps;
 import jubi.JubiException;
+import jubi.service.discovery.RetryPolicyKind;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -33,6 +34,43 @@ public class JubiConf {
             .doc("Name of the Kerberos principal.")
             .stringConf()
             .create();
+
+    public static final ConfigEntry<String> HA_ADDRESSES = buildConf("jubi.ha.addresses")
+            .doc("The connection string for the discovery ensemble")
+            .stringConf()
+            .create();
+
+    public static final ConfigEntry<Integer> HA_ZK_CONN_TIMEOUT = buildConf("jubi.ha.zookeeper.connection.timeout")
+            .doc("The timeout(ms) of creating the connection to the ZooKeeper ensemble")
+            .intConf()
+            .createWithDefault(15 * 1000);
+
+    public static final ConfigEntry<Integer> HA_ZK_SESSION_TIMEOUT = buildConf("jubi.ha.zookeeper.session.timeout")
+            .doc("The timeout(ms) of a connected session to be idled")
+            .intConf()
+            .createWithDefault(60 * 1000);
+
+    public static final ConfigEntry<Integer> HA_ZK_CONN_MAX_RETRIES = buildConf("jubi.ha.zookeeper.connection.max.retries")
+            .doc("Max retry times for connecting to the ZooKeeper ensemble")
+            .intConf()
+            .createWithDefault(3);
+
+    public static final ConfigEntry<Integer> HA_ZK_CONN_BASE_RETRY_WAIT = buildConf("jubi.ha.zookeeper.connection.base.retry.wait")
+            .doc("Initial amount of time to wait between retries to the ZooKeeper ensemble")
+            .intConf()
+            .createWithDefault(1000);
+
+    public static final ConfigEntry<Integer> HA_ZK_CONN_MAX_RETRY_WAIT = buildConf("jubi.ha.zookeeper.connection.max.retry.wait")
+            .doc("Max amount of time to wait between retries for " +
+                    "BOUNDED_EXPONENTIAL_BACKOFF policy can reach, or max time until " +
+                    "elapsed for UNTIL_ELAPSED policy to connect the zookeeper ensemble")
+            .intConf()
+            .createWithDefault(30 * 1000);
+
+    public static final ConfigEntry<String> HA_ZK_CONN_RETRY_POLICY_KIND = buildConf("jubi.ha.zookeeper.connection.retry.policy")
+            .doc("The retry policy for connecting to the ZooKeeper ensemble")
+            .stringConf()
+            .createWithDefault(RetryPolicyKind.EXPONENTIAL_BACKOFF.name());
 
     public static ConfigBuilder buildConf(String key) {
         return new ConfigBuilder(key).callback(JubiConf::register);
