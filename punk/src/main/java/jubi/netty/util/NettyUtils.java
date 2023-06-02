@@ -3,6 +3,7 @@ package jubi.netty.util;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
+import io.netty.channel.ServerChannel;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,6 +20,10 @@ public class NettyUtils {
             return channel.remoteAddress().toString();
         }
         return "<unknown remote>";
+    }
+
+    public static Class<? extends ServerChannel> getServerChannelClass(IOMode mode) {
+        return null;
     }
 
     public static Class<? extends Channel> getClientChannelClass(IOMode mode) {

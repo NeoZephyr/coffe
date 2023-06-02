@@ -2,13 +2,15 @@ package jubi.netty.protocol;
 
 import io.netty.buffer.ByteBuf;
 
-public abstract class Message implements Encodable {
+public interface Message extends Encodable {
 
-    public abstract Type type();
+    Type type();
 
-    public enum Type implements Encodable {
+    enum Type implements Encodable {
         UNKNOWN_TYPE(-1),
-        RPC_RESPONSE(0)
+        RPC_REQUEST(0),
+        RPC_RESPONSE(1),
+        RPC_FAILURE(2),
         ;
 
         private final byte id;
@@ -22,12 +24,6 @@ public abstract class Message implements Encodable {
             return id;
         }
 
-        @Override
-        public int encodedLength() {
-            return 1;
-        }
-
-        @Override
         public void encode(ByteBuf buf) {
             buf.writeByte(id);
         }
@@ -45,8 +41,9 @@ public abstract class Message implements Encodable {
         }
     }
 
-    public static Message decode(Type type, ByteBuf buf) {
+    static Message decode(Type type, ByteBuf buf) {
         switch (type) {
+            case RPC_REQUEST:
             case RPC_RESPONSE:
                 return RpcResponse.decode(buf);
             default:

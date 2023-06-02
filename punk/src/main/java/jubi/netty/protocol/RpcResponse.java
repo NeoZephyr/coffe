@@ -5,7 +5,7 @@ import jubi.netty.util.ByteBufUtils;
 
 import java.util.Objects;
 
-public class RpcResponse extends Message {
+public class RpcResponse extends AbstractMessage implements ResponseMessage {
 
     private long requestId;
     private StatusCode statusCode;
@@ -19,18 +19,6 @@ public class RpcResponse extends Message {
         this.requestId = requestId;
         this.statusCode = statusCode;
         this.message = message;
-    }
-
-    @Override
-    public int encodedLength() {
-        return Long.BYTES + Integer.BYTES + ByteBufUtils.encodedLength(message);
-    }
-
-    @Override
-    public void encode(ByteBuf buf) {
-        buf.writeLong(requestId);
-        buf.writeInt(statusCode.code());
-        ByteBufUtils.writeLengthAndString(buf, message);
     }
 
     public static RpcResponse decode(ByteBuf buf) {
@@ -83,5 +71,10 @@ public class RpcResponse extends Message {
 
     public long getRequestId() {
         return requestId;
+    }
+
+    @Override
+    public void encode(ByteBuf buf) {
+
     }
 }

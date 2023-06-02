@@ -133,6 +133,20 @@ public class JubiConf {
         return entry.convertToValue(valueText);
     }
 
+    public <T> T get(ConfigEntry<T> entry, T defaultValue) {
+        String valueText = settings.get(entry.key());
+
+        if (StringUtils.isBlank(valueText)) {
+            if (entry.defaultValue() != null) {
+                return entry.defaultValue();
+            } else {
+                return defaultValue;
+            }
+        }
+
+        return entry.convertToValue(valueText);
+    }
+
     public Map<String, String> getAll() {
         return new HashMap<>(settings);
     }

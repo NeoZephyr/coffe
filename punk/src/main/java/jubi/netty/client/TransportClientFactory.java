@@ -4,8 +4,9 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import jubi.netty.handler.TransportFrameDecoder;
-import jubi.netty.handler.TransportResponseHandler;
+import jubi.netty.TransportConf;
+import jubi.netty.TransportContext;
+import jubi.netty.handler.TransportChannelHandler;
 import jubi.netty.util.IOMode;
 import jubi.netty.util.NettyUtils;
 import jubi.netty.util.Utils;
@@ -20,12 +21,20 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * config:
+ *  1. pool size
+ *  2. tcp param
+ *
+ * state control
+ */
 @Slf4j
 public class TransportClientFactory implements Closeable {
 
     private static class ClientPool {
         TransportClient[] clients;
         Object[] locks;
+        volatile long lastConnectFailed;
 
         ClientPool(int size) {
             clients = new TransportClient[size];
@@ -34,17 +43,21 @@ public class TransportClientFactory implements Closeable {
             for (int i = 0; i < size; ++i) {
                 locks[i] = new Object();
             }
+
+            lastConnectFailed = 0;
         }
     }
 
-    private Random rand;
-    private TransportContext context;
-    private TransportConf conf;
-    private ConcurrentHashMap<SocketAddress, ClientPool> connectionPool;
-    private int numConnectionsPerPeer;
-    private Class<? extends Channel> socketChannelClass;
-    private EventLoopGroup workerGroup;
-    private PooledByteBufAllocator allocator;
+    /** Random number generator for picking connections between peers. */
+    private final Random rand;
+    private final TransportContext context;
+    private final TransportConf conf;
+    private final int fastFailTimeWindow;
+    private final ConcurrentHashMap<SocketAddress, ClientPool> connectionPool;
+    private final int numConnectionsPerPeer;
+    private final Class<? extends Channel> socketChannelClass;
+    private final EventLoopGroup workerGroup;
+    private final PooledByteBufAllocator allocator;
 
     public TransportClientFactory(TransportContext context) {
         this.context = Objects.requireNonNull(context);
@@ -52,31 +65,35 @@ public class TransportClientFactory implements Closeable {
         this.connectionPool = new ConcurrentHashMap<>();
         this.numConnectionsPerPeer = conf.numConnectionsPerPeer();
         this.rand = new Random();
+        this.fastFailTimeWindow = conf.connectRetryWaitMs();
+
         IOMode ioMode = conf.ioMode();
         this.socketChannelClass = NettyUtils.getClientChannelClass(ioMode);
         this.workerGroup = NettyUtils.createEventLoop(ioMode, conf.clientThreads(), "netty-rpc-client");
         this.allocator = NettyUtils.createPooledByteBufAllocator(conf.preferDirectBuffer(), false, conf.clientThreads());
     }
 
-    public TransportClient createClient(String host, int port) throws IOException, InterruptedException {
-        return createClient(host, port, -1);
+    public TransportClient createClient(String host, int port) throws InterruptedException, IOException {
+        return createClient(host, port, false);
     }
 
-    public TransportClient createClient(String host, int port, int partitionId) throws IOException, InterruptedException {
-        return createClient(host, port, partitionId, new TransportFrameDecoder());
-    }
-
-    public TransportClient createClient(String host, int port, int partitionId, ChannelInboundHandlerAdapter decoder) throws IOException, InterruptedException {
+    public TransportClient createClient(String host, int port, boolean fastFail) throws IOException, InterruptedException {
+        // Use unresolved address here to avoid DNS resolution each time we creates a client.
         InetSocketAddress unresolvedAddress = InetSocketAddress.createUnresolved(host, port);
         ClientPool clientPool = connectionPool.computeIfAbsent(unresolvedAddress, x -> new ClientPool(numConnectionsPerPeer));
-        int index = partitionId < 0 ? rand.nextInt(numConnectionsPerPeer) : partitionId % numConnectionsPerPeer;
+        int index = rand.nextInt(numConnectionsPerPeer);
         TransportClient client = clientPool.clients[index];
 
         if (client != null && client.isActive()) {
-            TransportResponseHandler handler = client.getChannel().pipeline().get(TransportResponseHandler.class);
+            TransportChannelHandler handler = client.getChannel().pipeline().get(TransportChannelHandler.class);
+
+            // Make sure that the channel will not timeout by updating the last use time of the handler
+            synchronized (handler) {
+                handler.getResponseProcessor().updateLastRequestTime();
+            }
 
             if (client.isActive()) {
-                log.info("Returning cached connection to {}: {}", client.getSocketAddress(), client);
+                log.trace("Returning cached connection to {}: {}", client.getSocketAddress(), client);
                 return client;
             }
         }
@@ -84,9 +101,10 @@ public class TransportClientFactory implements Closeable {
         long preResolveHost = System.nanoTime();
         InetSocketAddress resolvedAddress = new InetSocketAddress(host, port);
         long hostResolveTimeMs = (System.nanoTime() - preResolveHost) / 1000000;
+        String resolveMsg = resolvedAddress.isUnresolved() ? "failed" : "succeed";
 
         if (hostResolveTimeMs > 2000) {
-            log.warn("DNS resolution for {} took {} ms", resolvedAddress, hostResolveTimeMs);
+            log.warn("DNS resolution {} for {} took {} ms", resolveMsg, resolvedAddress, hostResolveTimeMs);
         }
 
         synchronized (clientPool.locks[index]) {
@@ -94,23 +112,40 @@ public class TransportClientFactory implements Closeable {
 
             if (client != null) {
                 if (client.isActive()) {
-                    log.info("Returning cached connection to {}: {}", resolvedAddress, client);
+                    log.debug("Returning cached connection to {}: {}", resolvedAddress, client);
                     return client;
                 } else {
                     log.info("Found inactive connection to {}, creating a new one.", resolvedAddress);
                 }
             }
 
-            clientPool.clients[index] = internalCreateClient(resolvedAddress, decoder);
+            if (fastFail && System.currentTimeMillis() - clientPool.lastConnectFailed < fastFailTimeWindow) {
+                throw new IOException(String.format("Connecting to %s failed in the last %s ms, fail this connection directly",
+                        resolvedAddress, fastFailTimeWindow));
+            }
+
+            try {
+                clientPool.clients[index] = doCreateClient(resolvedAddress);
+                clientPool.lastConnectFailed = 0;
+            } catch (IOException e) {
+                clientPool.lastConnectFailed = System.currentTimeMillis();
+                throw e;
+            }
+
             return clientPool.clients[index];
         }
     }
 
-    private TransportClient internalCreateClient(InetSocketAddress address, ChannelInboundHandlerAdapter decoder) throws InterruptedException, IOException {
+    public TransportClient createUnmanagedClient(String host, int port) throws IOException, InterruptedException {
+        final InetSocketAddress address = new InetSocketAddress(host, port);
+        return doCreateClient(address);
+    }
+
+    private TransportClient doCreateClient(InetSocketAddress address) throws InterruptedException, IOException {
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(socketChannelClass)
-                .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.TCP_NODELAY, true) // Disable Nagle's Algorithm since we don't want packets to wait
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, conf.connectTimeoutMs())
                 .option(ChannelOption.ALLOCATOR, allocator);
@@ -129,9 +164,8 @@ public class TransportClientFactory implements Closeable {
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) throws Exception {
-                TransportResponseHandler transportResponseHandler = context.initializePipeline(ch, decoder);
-                TransportClient client = new TransportClient(ch, transportResponseHandler);
-                clientRef.set(client);
+                TransportChannelHandler handler = context.initializePipeline(ch);
+                clientRef.set(handler.getClient());
                 channelRef.set(ch);
             }
         });

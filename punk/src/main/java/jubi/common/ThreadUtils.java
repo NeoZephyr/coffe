@@ -24,6 +24,20 @@ public class ThreadUtils {
         return executor;
     }
 
+    public static ThreadPoolExecutor newDaemonCachedThreadPool(int poolSize, String prefix) {
+        return newDaemonCachedThreadPool(poolSize, 60, prefix);
+    }
+
+    public static ExecutorService newDaemonFixedThreadPool(int poolSize, String prefix) {
+        return Executors.newFixedThreadPool(poolSize, getThreadFactory(prefix));
+    }
+
+    public static ThreadPoolExecutor newDaemonCachedThreadPool(int poolSize, long keepAliveSeconds, String prefix) {
+        ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(poolSize, poolSize, keepAliveSeconds, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), getThreadFactory(prefix));
+        poolExecutor.allowCoreThreadTimeOut(true);
+        return poolExecutor;
+    }
+
     public static ThreadFactory getThreadFactory(String name) {
         return new ThreadFactoryBuilder().setDaemon(true)
                 .setNameFormat(name + "-%d")

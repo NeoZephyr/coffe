@@ -1,39 +1,51 @@
 package jubi.netty.client;
 
+import com.google.common.util.concurrent.SettableFuture;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
+import jubi.netty.handler.TransportResponseProcessor;
+import jubi.netty.protocol.RpcRequest;
+import jubi.netty.protocol.RpcResponse;
 import lombok.extern.slf4j.Slf4j;
 import jubi.netty.exception.RpcException;
-import jubi.netty.handler.TransportResponseHandler;
-import jubi.netty.protocol.Message;
 import jubi.netty.util.NettyUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 public class TransportClient implements Closeable {
 
     private Channel channel;
-    private TransportResponseHandler handler;
+    private TransportResponseProcessor processor;
     private volatile boolean timeout;
 
     private static final AtomicLong counter = new AtomicLong();
 
-    public TransportClient(Channel channel, TransportResponseHandler handler) {
+    public TransportClient(Channel channel, TransportResponseProcessor processor) {
         this.channel = Objects.requireNonNull(channel);
-        this.handler = Objects.requireNonNull(handler);
+        this.processor = Objects.requireNonNull(processor);
         this.timeout = false;
     }
 
     public Channel getChannel() {
         return channel;
+    }
+
+    public void timeout() {
+        this.timeout = true;
+    }
+
+    public TransportResponseProcessor getProcessor() {
+        return processor;
     }
 
     public boolean isActive() {
@@ -44,11 +56,41 @@ public class TransportClient implements Closeable {
         return channel.remoteAddress();
     }
 
-    public ChannelFuture sendData(Message message, RpcResponseCallback callback) {
+    public long sendRpc(ByteBuffer message, RpcResponseCallback callback) {
         long requestId = requestId();
-        handler.addCallback(requestId, callback);
+        processor.addRpcCallback(requestId, callback);
         RpcChannelListener listener = new RpcChannelListener(requestId, callback);
-        return channel.writeAndFlush(message).addListener(listener);
+        channel.writeAndFlush(new RpcRequest(requestId, message)).addListener(listener);
+        return requestId;
+    }
+
+    public String sendRpcSync(ByteBuffer message, long timeoutMs) throws InterruptedException, ExecutionException, TimeoutException {
+        SettableFuture<String> result = SettableFuture.create();
+
+        sendRpc(message, new RpcResponseCallback() {
+            @Override
+            public void onSuccess(RpcResponse response) {
+                try {
+                    result.set(response.getMessage());
+                } catch (Throwable t) {
+                    log.warn("Error in responding RPC callback", t);
+                    result.setException(t);
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                result.setException(e);
+            }
+        });
+
+        return result.get(timeoutMs, TimeUnit.MILLISECONDS);
+    }
+
+    // fetchChunk and stream
+
+    public void removeRpcCallback(long requestId) {
+        processor.removeRpcCallback(requestId);
     }
 
     @Override
@@ -77,7 +119,7 @@ public class TransportClient implements Closeable {
             } else {
                 String errorMsg = String.format("Failed to send request %s to %s: %s, channel will be closed",
                         requestId, NettyUtils.getRemoteAddress(channel), future.cause());
-                log.warn(errorMsg);
+                log.warn(errorMsg, future.cause());
                 channel.close();
 
                 try {
@@ -104,7 +146,7 @@ public class TransportClient implements Closeable {
 
         @Override
         protected void handleFailure(String errorMsg, Throwable cause) {
-            handler.removeCallback(requestId);
+            processor.removeRpcCallback(requestId);
             callback.onFailure(new RpcException(errorMsg, cause));
         }
     }
