@@ -85,18 +85,8 @@ public class Lexer {
                 return scanNumber();
             }
 
-            // '\\' 'u005c'? [btnfr"'\\]
-            char b = '\u005cb';
-            char c = ' ';
-            System.out.println("ab\ndd");
-            c = '\n';
-
-            // CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
-            // EscapeSequence: '\\' 'u005c'? [btnfr"'\\]
-            // EscapeSequence: '\\' 'u005c'? ([0-3]? [0-7])? [0-7]
-            // EscapeSequence: '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
             if (ch == '\'') {
-                System.out.println('a');
+                return scanChar();
             }
         }
     }
@@ -268,6 +258,95 @@ public class Lexer {
         } else {
             return new Token(TokenKind.IDENTIFIER, lexeme);
         }
+    }
+
+    private Token scanChar() {
+        int start = pos - 1;
+        advance();
+
+        if (ch == '\'' || ch == '\r' || ch == '\n') {
+            error("Return, newline and quote not allow in character literal");
+        }
+
+        if (ch == '\\') {
+            scanEscapeSequence();
+        }
+
+        advance();
+
+        if (ch != '\'') {
+            error("Too many characters in character literal");
+        }
+
+        String lexeme = source.substring(start, pos);
+        return new Token(TokenKind.CHAR_LITERAL, lexeme);
+    }
+
+    private void scanEscapeSequence() {
+        char c1 = peek();
+        char c2 = peek(1);
+        char c3 = peek(2);
+        char c4 = peek(3);
+        char c5 = peek(4);
+        boolean flag = false;
+
+        if (c1 != 'u') {
+            advance();
+            flag = true;
+        } else if (c2 == '0' && c3 == '0' && c4 == '5' && c5 == 'c') {
+            advance();
+            advance();
+            advance();
+            advance();
+            advance();
+            advance();
+            flag = true;
+        }
+
+        if (flag) {
+            if (ch == 'b' || ch == 't' || ch == 'n' || ch == 'f' || ch == 'r' || ch == '"' || ch == '\'' || ch == '\\') {
+                return;
+            }
+
+            if (CharUtils.isOct(ch)) {
+                char cc = ch;
+                char nc = peek();
+
+                if (!CharUtils.isOct(nc)) {
+                    return;
+                }
+
+                advance();
+                nc = peek();
+
+                if (!CharUtils.isOct(nc) || cc > '3') {
+                    return;
+                }
+
+                advance();
+                return;
+            }
+
+            error("Illegal escape character in character literal");
+        }
+
+        do {
+            advance();
+        } while (ch == 'u');
+
+        c1 = ch;
+        c2 = peek();
+        c3 = peek(1);
+        c4 = peek(2);
+
+        if (CharUtils.isHex(c1) && CharUtils.isHex(c2) && CharUtils.isHex(c3) && CharUtils.isHex(c4)) {
+            advance();
+            advance();
+            advance();
+            return;
+        }
+
+        error("Illegal escape character in character literal");
     }
 
     private void scanHex() {
@@ -446,11 +525,17 @@ public class Lexer {
     }
 
     private char peek() {
-        if (pos >= source.length()) {
+        return peek(0);
+    }
+
+    private char peek(int offset) {
+        int p = pos + offset;
+
+        if (p >= source.length()) {
             return EOF;
         }
 
-        return source.charAt(pos);
+        return source.charAt(p);
     }
 
     private void error(String msg) {

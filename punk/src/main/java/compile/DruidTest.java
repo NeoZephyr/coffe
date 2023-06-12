@@ -10,15 +10,31 @@ public class DruidTest {
         // SQLExpr expr = SQLUtils.toSQLExpr("id=3", JdbcConstants.MYSQL);
         // System.out.println(expr);
 
-        FileReader reader = new FileReader("/Users/meilb/Documents/self/coffe/punk/test.txt");
-        BufferedReader bufReader = new BufferedReader(reader);
-        char[] buf = new char[100];
-        int count = bufReader.read(buf);
-        System.out.println(count);
+        // CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
+        // EscapeSequence: '\\' 'u005c'? [btnfr"'\\]
+        // EscapeSequence: '\\' 'u005c'? ([0-3]? [0-7])? [0-7]
+        // EscapeSequence: '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
 
-        for (int i = 0; i < 20; ++i) {
-            int d = buf[i];
-            System.out.printf("int format: %d, char format: %c，%b%n", d, buf[i], buf[i] == '\n');
-        }
+        char c = '\b';
+        char cc = '\uFFFF';
+
+        int i = c;
+        int ii = cc;
+
+        String s = String.valueOf(c);
+        System.out.println(c == cc);
+
+        System.out.println(c);
+        System.out.println(cc);
+        System.out.println(ii);
+        System.out.println(i);
+        System.out.println(s);
+
+        System.out.println('\u005c6');
+        System.out.println('\uuuuuuuuuu1111');
+        System.out.println('\uuu1111');
+        System.out.println('\uuuuuuuuuuuuuuuuu1111');
+
+        // '\\' 'u005c'? [btnfr"'\\]
     }
 }

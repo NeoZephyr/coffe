@@ -135,4 +135,49 @@ class LexerTest extends Specification {
         "0.030f"                       | "FLOAT_LITERAL"          | "0.030f"
         "0.6f"                         | "FLOAT_LITERAL"          | "0.6f"
     }
+
+    def "scan char without exception"() {
+        when:
+        Lexer lexer = new Lexer(source)
+        Token token = lexer.nextToken()
+
+        then:
+        kind == token.kind.name()
+        lexeme == token.lexeme
+
+        where:
+        source                         | kind                     | lexeme
+
+        // CHAR_LITERAL:       '\'' (~['\\\r\n] | EscapeSequence) '\'';
+        "'\\b'"             | "CHAR_LITERAL"       | "'\\b'"
+        "'\\n'"             | "CHAR_LITERAL"       | "'\\n'"
+        "'\\\"'"            | "CHAR_LITERAL"       | "'\\\"'"
+        "'\\''"             | "CHAR_LITERAL"       | "'\\''"
+        "'\\\\'"            | "CHAR_LITERAL"       | "'\\\\'"
+
+        // EscapeSequence: '\\' 'u005c'? [btnfr"'\\]
+
+        "'\\u005cb'"        | "CHAR_LITERAL"       | "'\\u005cb'"
+        "'\\u005cn'"        | "CHAR_LITERAL"       | "'\\u005cn'"
+        "'\\u005c\"'"       | "CHAR_LITERAL"       | "'\\u005c\"'"
+        "'\\u005c''"        | "CHAR_LITERAL"       | "'\\u005c''"
+        "'\\u005c\\'"       | "CHAR_LITERAL"       | "'\\u005c\\'"
+
+        // EscapeSequence: '\\' 'u005c'? ([0-3]? [0-7])? [0-7]
+
+        "'\\0'"             | "CHAR_LITERAL"       | "'\\0'"
+        "'\\7'"             | "CHAR_LITERAL"       | "'\\7'"
+        "'\\77'"            | "CHAR_LITERAL"       | "'\\77'"
+        "'\\377'"           | "CHAR_LITERAL"       | "'\\377'"
+
+        "'\\u005c0'"        | "CHAR_LITERAL"       | "'\\u005c0'"
+        "'\\u005c7'"        | "CHAR_LITERAL"       | "'\\u005c7'"
+        "'\\u005c77'"       | "CHAR_LITERAL"       | "'\\u005c77'"
+        "'\\u005c377'"      | "CHAR_LITERAL"       | "'\\u005c377'"
+
+        // EscapeSequence: '\\' 'u'+ HexDigit HexDigit HexDigit HexDigit
+
+        "'\\uFFFF'"         | "CHAR_LITERAL"       | "'\\uFFFF'"
+        "'\\uuuuFFFF'"      | "CHAR_LITERAL"       | "'\\uuuuFFFF'"
+    }
 }
