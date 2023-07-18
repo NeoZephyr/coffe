@@ -20,5 +20,16 @@
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
     "token": "89a4f1675eb7755f90ed4a76386a1ba0"
+  },
+  "extdmdataconnector": {
+    "tenantId": "1734229266",
+    "projectId": "extdmdataconnector",
+    "appId": "cl004b188a36b7ff4",
+    "appSecret": "16b75d0f884a705f35064448dcff3c30ff3695ef",
+    "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_t144_customer-ppppooo",
+    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
+    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
+    "token": "2ef10acc7ae0fc47384a940f1ca071c5"
   }
 }

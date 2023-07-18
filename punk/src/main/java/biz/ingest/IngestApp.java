@@ -16,12 +16,12 @@ public class IngestApp {
 
     public static void main(String[] args) throws IOException {
         Map<String, AppInfo> appInfoMap = loadConfig();
-        appInfo = appInfoMap.get("CloudNativeTest");
+        appInfo = appInfoMap.get("extdmdataconnector");
 
         // System.out.println(getToken());
 
-        // ingestProfile(appInfo);
-        ingestDocument(appInfo);
+        ingestProfile(appInfo);
+        // ingestDocument(appInfo);
         // deleteIdentity(appInfo);
     }
 

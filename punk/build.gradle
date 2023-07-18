@@ -48,6 +48,8 @@ dependencies {
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
 
+    implementation 'org.apache.htrace:htrace-core4:4.1.0-incubating'
+
     implementation group: 'io.netty', name: 'netty-all', version: '4.1.68.Final'
     implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
     implementation 'com.alibaba:druid:1.2.8'
