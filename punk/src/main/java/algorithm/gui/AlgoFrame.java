@@ -2,11 +2,13 @@ package algorithm.gui;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 public class AlgoFrame extends JFrame {
 
     private int canvasWidth;
     private int canvasHeight;
+    private Circle[] circles;
 
     public AlgoFrame(String title) {
         this(title, 1024, 768);
@@ -19,8 +21,8 @@ public class AlgoFrame extends JFrame {
         this.canvasHeight = canvasHeight;
 
         Canvas canvas = new Canvas();
-        // canvas.setPreferredSize(new Dimension(canvasWidth, canvasHeight));
         setContentPane(canvas);
+        pack();
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
@@ -34,12 +36,34 @@ public class AlgoFrame extends JFrame {
         return canvasHeight;
     }
 
-    static class Canvas extends JPanel {
+    public void render(Circle[] circles) {
+        this.circles = circles;
+
+        // 所有控件重新刷新一遍
+        repaint();
+    }
+
+    class Canvas extends JPanel {
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
-            g.drawOval(100, 100, 200, 200);
+            // 抗锯齿
+            RenderingHints hints = new RenderingHints(
+                    RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.addRenderingHints(hints);
+            GraphUtils.setStrokeWidth(g2d, 5);
+            GraphUtils.setColor(g2d, Color.BLUE);
+
+            for (Circle circle : circles) {
+                if (circle.filled) {
+                    GraphUtils.fillCircle(g2d, circle.getX(), circle.getY(), circle.getR());
+                } else {
+                    GraphUtils.strokeCircle(g2d, circle.getX(), circle.getY(), circle.getR());
+                }
+            }
         }
 
         /**
@@ -47,7 +71,7 @@ public class AlgoFrame extends JFrame {
          */
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(getWidth(), getHeight());
+            return new Dimension(canvasWidth, canvasHeight);
         }
     }
 }
