@@ -3,7 +3,7 @@ grammar Script;
 import Common;
 
 @header {
-package script;
+package compile.antlr.script;
 }
 
 classDeclaration

@@ -7,18 +7,29 @@ import java.util.Stack;
 public class ValidParentheses {
 
     public boolean isValid(String s) {
+        if (s == null || s.isEmpty()) {
+            return false;
+        }
+
+        int n = s.length();
+
+        if (n % 2 == 1) {
+            return false;
+        }
+
         Stack<Character> stack = new Stack<>();
-        Map<Character, Character> map = new HashMap<>();
-        map.put(')', '(');
-        map.put(']', '[');
-        map.put('}', '{');
+        Map<Character, Character> pairs = new HashMap<Character, Character>() {{
+            put(')', '(');
+            put(']', '[');
+            put('}', '{');
+        }};
 
         for (int i = 0; i < s.length(); ++i) {
             char c = s.charAt(i);
 
-            if (!map.containsKey(c)) {
+            if (!pairs.containsKey(c)) {
                 stack.push(c);
-            } else if (stack.isEmpty() || map.get(c) != stack.pop()) {
+            } else if (stack.isEmpty() || pairs.get(c) != stack.pop()) {
                 return false;
             }
         }
