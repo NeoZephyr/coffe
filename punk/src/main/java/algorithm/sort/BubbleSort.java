@@ -71,6 +71,7 @@ public class BubbleSort {
                 break;
             }
 
+            // 记录最后一次发生交换的位置，下一次的循环中不考虑再次之后的元素
             sortBorder = lastSwap;
         }
     }

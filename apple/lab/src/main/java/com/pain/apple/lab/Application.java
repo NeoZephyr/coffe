@@ -83,12 +83,8 @@ public class Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        workerService.save("jack");
-
-        // UserService userService = new UserService();
-        UserService userService = UserService.class.newInstance();
-        System.out.println(userService.admin);
-        System.out.println("=== test");
+        // workerService.save("jack");
+        workerService.testSave();
     }
 
     @Bean

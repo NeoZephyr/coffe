@@ -27,9 +27,9 @@
     "appId": "cl004b188a36b7ff4",
     "appSecret": "16b75d0f884a705f35064448dcff3c30ff3695ef",
     "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
-    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_t144_customer-ppppooo",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_t143_customer-plll",
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
-    "token": "2ef10acc7ae0fc47384a940f1ca071c5"
+    "token": "0aa86c63a50a301e6b157d17ace555d4"
   }
 }

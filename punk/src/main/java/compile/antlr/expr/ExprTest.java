@@ -8,7 +8,7 @@ import java.io.IOException;
 
 public class ExprTest {
     public static void main(String[] args) throws IOException {
-        CharStream inputStream = CharStreams.fromFileName("input/antlr/expr.txt");
+        CharStream inputStream = CharStreams.fromFileName("ast/expr.txt");
         ExprLexer lexer = new ExprLexer(inputStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ExprParser parser = new ExprParser(tokens);

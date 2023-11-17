@@ -29,15 +29,28 @@ public class MergeSort {
             return;
         }
 
+        // 优化：当元素较少时可以转而使用插入排序
+//        if (r - l <= 15) {
+//            insertSort(data, l, r);
+//            return;
+//        }
+
         int mid = (l + r) / 2;
         mergeSort(data, l, mid);
         mergeSort(data, mid + 1, r);
+
+        // 优化：已经有序，不再进行排序操作
+        if (data[mid] < (data[mid + 1]))
+            return;
+
         merge(data, l, mid, r);
     }
 
     private void merge(int[] data, int begin, int mid, int end) {
         int len = (end - begin + 1);
         int[] tmp = new int[len];
+
+        // Arrays.copyOfRange
 
         int p1 = begin;
         int p2 = mid + 1;

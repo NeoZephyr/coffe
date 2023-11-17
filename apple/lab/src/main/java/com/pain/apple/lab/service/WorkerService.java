@@ -3,21 +3,37 @@ package com.pain.apple.lab.service;
 import com.pain.apple.lab.domain.Worker;
 import com.pain.apple.lab.mapper.WorkerMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Slf4j
 @Service
-public class WorkerService {
+public class WorkerService implements ApplicationContextAware {
 
-    @Autowired
-    private WorkerMapper workerMapper;
+    private final WorkerMapper workerMapper;
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
 
-    @Transactional(rollbackFor = Exception.class)
+    private final UserService userService;
+
+    private ApplicationContext context;
+
+    public WorkerService(WorkerMapper workerMapper, CourseService courseService, UserService userService) {
+        this.workerMapper = workerMapper;
+        this.courseService = courseService;
+        this.userService = userService;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
+    }
+
+        @Transactional(rollbackFor = Exception.class)
     public void save(String name) throws Exception {
         Worker worker = new Worker();
         worker.setName(name);
@@ -36,5 +52,18 @@ public class WorkerService {
         }
 
         log.info("===== after save worker");
+    }
+
+    public void testSave() throws Exception {
+        WorkerService workerService = context.getBean(WorkerService.class);
+        workerService.doSave("xxxxx");
+    }
+
+    @Transactional
+    public void doSave(String name) throws Exception {
+        userService.doSth(name);
+        TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+
+        log.info("=== save worker");
     }
 }

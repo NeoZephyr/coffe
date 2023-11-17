@@ -1,6 +1,11 @@
 package com.pain.core.scala.basic
 
+import com.pain.support.JsonUtil
+
+import java.util
 import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import collection.JavaConverters._
+import scala.collection.JavaConversions._
 
 object CollectionApp {
     def main(args: Array[String]): Unit = {
@@ -12,6 +17,18 @@ object CollectionApp {
         testList()
 
         println(sum(10, 20, 30))
+
+        val tagCountStat = new util.ArrayList[util.Map[String, Any]]()
+        val detail = new util.HashMap[String, Any]()
+        tagCountStat.add(Map[String, Any]("tagId" -> 1111, "count" -> 10000).asJava)
+        val i = new util.HashMap[String, Any]()
+        i.put("tagId", 1111)
+        i.put("count", 10000)
+        val map = Map[String, Any]("tagId" -> 1111, "count" -> 10000)
+        detail.put("tags", tagCountStat)
+        println(JsonUtil.objToStr(tagCountStat))
+        println(JsonUtil.objToStr(i))
+        println(map.get("tagId"))
     }
 
     def testArray(): Unit = {
