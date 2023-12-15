@@ -15,12 +15,13 @@ public class PunkService extends PunkGrpc.PunkImplBase {
     @SneakyThrows
     @Override
     public void ping(PingRequest request, StreamObserver<PingResponse> responseObserver) {
-        int second = new Random().nextInt(60);
+        int second = new Random().nextInt(5);
 
-        Thread.sleep(second);
+        log.info("ping. sleep {}", second);
+        Thread.sleep(second * 1000);
         PingResponse response = PingResponse.newBuilder()
                 .setSuccess(true)
-                .setMessage("pong")
+                .setMessage(String.format("pong %d seconds", second))
                 .build();
 
         responseObserver.onNext(response);

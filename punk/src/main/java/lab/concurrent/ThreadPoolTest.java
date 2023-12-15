@@ -120,4 +120,39 @@ public class ThreadPoolTest {
             }
         }
     }
+
+    class A {
+        int a;
+    }
+
+    class B extends A {
+
+        public void test() {
+            int a = 10;
+            System.out.println(a);
+
+            Runnable runnable = () -> {
+                // int a = 100;
+                System.out.println(a);
+            };
+
+            // a = 100;
+
+            runnable.run();
+
+            ((Runnable) () -> {
+
+                int b = 100;
+
+                class C extends B {
+                    public void test() {
+                        System.out.println(a);
+                    }
+                }
+
+                System.out.println(a);
+                System.out.println(new C().a);
+            }).run();
+        }
+    }
 }

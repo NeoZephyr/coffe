@@ -2,13 +2,13 @@
   "CloudNativeTest": {
     "tenantId": "1734229266",
     "projectId": "CloudNativeTest",
-    "appId": "cl010c18755e7c70e",
-    "appSecret": "fe916771595430da785b66f10f231c8a86bf4f81",
+    "appId": "cl036e18c24769252",
+    "appSecret": "11f66138e65ae02c88421ef71bb68035667122bf",
     "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
-    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_warrior-for-dmhub",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_xie_jiao_tu-smokeeee",
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_kaili_enhance_coupon-kaili-encah",
-    "token": "65488a148a64422f895e3531ed63c120"
+    "token": "94e7ef863d7a1d45b72e352ca20b10ad"
   },
   "monitor_delta": {
     "tenantId": "1734229266",

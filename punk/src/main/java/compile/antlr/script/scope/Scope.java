@@ -38,10 +38,10 @@ public class Scope {
     public static VarSymbol getFuncVarSymbol(Scope scope, String name, List<Type> paramTypes) {
         for (Symbol symbol : scope.symbols) {
             if (symbol instanceof VarSymbol
-                    && ((VarSymbol) symbol).getType() instanceof FuncType
+                    && ((VarSymbol) symbol).type instanceof FuncType
                     && StringUtils.equals(symbol.name, name)) {
                 VarSymbol varSymbol = (VarSymbol) symbol;
-                FuncType funcType = (FuncType) varSymbol.getType();
+                FuncType funcType = (FuncType) varSymbol.type;
 
                 if (funcType.matchParamTypes(paramTypes)) {
                     return varSymbol;

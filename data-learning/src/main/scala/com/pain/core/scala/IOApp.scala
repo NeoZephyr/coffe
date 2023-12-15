@@ -8,6 +8,8 @@ object IOApp {
         testURL()
     }
 
+
+
     def testFile(): Unit = {
         val file = Source.fromFile("/Users/pain/Documents/bigdata/scala/scala-learning/input/article.txt")(scala.io.Codec.UTF8)
 

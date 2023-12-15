@@ -33,6 +33,7 @@ public class KlassSymbol extends Symbol {
     }
 
     public VarSymbol getVarSymbol(String name) {
+        return null;
     }
 
     @Override
@@ -175,4 +176,4 @@ public class KlassSymbol extends Symbol {
 //        return defaultConstructor;
 //    }
 
-}
+// }

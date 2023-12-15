@@ -42,7 +42,7 @@ public class FuncSymbol extends Symbol implements FuncType {
         paramTypes = new LinkedList<>();
 
         for (VarSymbol param : params) {
-            paramTypes.add(param.getType());
+            paramTypes.add(param.type);
         }
 
         return paramTypes;
@@ -57,7 +57,7 @@ public class FuncSymbol extends Symbol implements FuncType {
             VarSymbol symbol = params.get(i);
             Type type = paramTypes.get(i);
 
-            if (!symbol.getType().isType(type)) {
+            if (!symbol.type.isType(type)) {
                 return false;
             }
         }
