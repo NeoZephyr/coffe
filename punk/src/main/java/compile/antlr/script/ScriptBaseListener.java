@@ -90,13 +90,13 @@ public class ScriptBaseListener implements ScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTypeTypeOrVoid(ScriptParser.TypeTypeOrVoidContext ctx) { }
+	@Override public void enterTypeOrVoid(ScriptParser.TypeOrVoidContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTypeTypeOrVoid(ScriptParser.TypeTypeOrVoidContext ctx) { }
+	@Override public void exitTypeOrVoid(ScriptParser.TypeOrVoidContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -522,13 +522,13 @@ public class ScriptBaseListener implements ScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTypeType(ScriptParser.TypeTypeContext ctx) { }
+	@Override public void enterType(ScriptParser.TypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTypeType(ScriptParser.TypeTypeContext ctx) { }
+	@Override public void exitType(ScriptParser.TypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

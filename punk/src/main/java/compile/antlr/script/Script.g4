@@ -8,7 +8,7 @@ package compile.antlr.script;
 
 classDeclaration
     : CLASS IDENTIFIER
-      (EXTENDS typeType)?
+      (EXTENDS type)?
       (IMPLEMENTS typeList)?
       classBody
     ;
@@ -40,7 +40,7 @@ memberDeclaration
     ;
 
 functionDeclaration
-    : typeTypeOrVoid? IDENTIFIER formalParameters ('[' ']')*
+    : typeOrVoid? IDENTIFIER formalParameters ('[' ']')*
       (THROWS qualifiedNameList)?
       functionBody
     ;
@@ -50,8 +50,8 @@ functionBody
     | ';'
     ;
 
-typeTypeOrVoid
-    : typeType
+typeOrVoid
+    : type
     | VOID
     ;
 
@@ -69,11 +69,11 @@ formalParameterList
     ;
 
 formalParameter
-    : variableModifier* typeType variableDeclaratorId
+    : variableModifier* type variableDeclaratorId
     ;
 
 lastFormalParameter
-    : variableModifier* typeType '...' variableDeclaratorId
+    : variableModifier* type '...' variableDeclaratorId
     ;
 
 variableModifier
@@ -86,7 +86,7 @@ qualifiedName
     ;
 
 fieldDeclaration
-    //: typeType variableDeclarators ';'
+    //: type variableDeclarators ';'
     : variableDeclarators ';'
     ;
 
@@ -95,7 +95,7 @@ constructorDeclaration
     ;
 
 variableDeclarators
-    : typeType variableDeclarator (',' variableDeclarator)*
+    : type variableDeclarator (',' variableDeclarator)*
     ;
 
 variableDeclarator
@@ -121,8 +121,8 @@ classOrInterfaceType
     ;
 
 typeArgument
-    : typeType
-    | '?' ((EXTENDS | SUPER) typeType)?
+    : type
+    | '?' ((EXTENDS | SUPER) type)?
     ;
 
 literal
@@ -210,7 +210,7 @@ forInit
     ;
 
 enhancedForControl
-    : typeType variableDeclaratorId ':' expression
+    : type variableDeclaratorId ':' expression
     ;
 
 // EXPRESSIONS
@@ -242,7 +242,7 @@ expression
     | expression '[' expression ']'
     | functionCall
     // | NEW creator   //不用new关键字，而是用类名相同的函数直接生成对象。
-    // | '(' typeType ')' expression
+    // | '(' type ')' expression
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
@@ -250,7 +250,7 @@ expression
     | expression bop=('+'|'-') expression 
     | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
     | expression bop=('<=' | '>=' | '>' | '<') expression
-    | expression bop=INSTANCEOF typeType
+    | expression bop=INSTANCEOF type
     | expression bop=('==' | '!=') expression
     | expression bop='&' expression
     | expression bop='^' expression
@@ -265,7 +265,7 @@ expression
 
     // Java 8 functionReference
     // | expression '::' typeArguments? IDENTIFIER
-    // | typeType '::' (typeArguments? IDENTIFIER | NEW)
+    // | type '::' (typeArguments? IDENTIFIER | NEW)
     // | classType '::' typeArguments? NEW
     ;
 
@@ -276,19 +276,19 @@ primary
     | SUPER
     | literal
     | IDENTIFIER
-    // | typeTypeOrVoid '.' CLASS
+    // | typeOrVoid '.' CLASS
     ;
 
 typeList
-    : typeType (',' typeType)*
+    : type (',' type)*
     ;
 
-typeType
+type
     : (classOrInterfaceType | functionType | primitiveType) ('[' ']')*
     ;
 
 functionType
-    : FUNCTION typeTypeOrVoid '(' typeList? ')'
+    : FUNCTION typeOrVoid '(' typeList? ')'
     ;
 
 primitiveType

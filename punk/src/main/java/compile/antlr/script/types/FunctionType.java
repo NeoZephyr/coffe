@@ -1,8 +1,8 @@
-package compile.antlr.script.symbol;
+package compile.antlr.script.types;
 
 import java.util.List;
 
-public interface FuncType extends Type {
+public interface FunctionType extends Type {
 
     Type getReturnType();
 

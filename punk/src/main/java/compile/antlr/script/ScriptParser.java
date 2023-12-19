@@ -40,7 +40,7 @@ public class ScriptParser extends Parser {
 	public static final int
 		RULE_classDeclaration = 0, RULE_classBody = 1, RULE_classBodyDeclaration = 2, 
 		RULE_memberDeclaration = 3, RULE_functionDeclaration = 4, RULE_functionBody = 5, 
-		RULE_typeTypeOrVoid = 6, RULE_qualifiedNameList = 7, RULE_formalParameters = 8, 
+		RULE_typeOrVoid = 6, RULE_qualifiedNameList = 7, RULE_formalParameters = 8, 
 		RULE_formalParameterList = 9, RULE_formalParameter = 10, RULE_lastFormalParameter = 11, 
 		RULE_variableModifier = 12, RULE_qualifiedName = 13, RULE_fieldDeclaration = 14, 
 		RULE_constructorDeclaration = 15, RULE_variableDeclarators = 16, RULE_variableDeclarator = 17, 
@@ -51,12 +51,12 @@ public class ScriptParser extends Parser {
 		RULE_switchBlockStatementGroup = 31, RULE_switchLabel = 32, RULE_forControl = 33, 
 		RULE_forInit = 34, RULE_enhancedForControl = 35, RULE_parExpression = 36, 
 		RULE_expressionList = 37, RULE_functionCall = 38, RULE_expression = 39, 
-		RULE_primary = 40, RULE_typeList = 41, RULE_typeType = 42, RULE_functionType = 43, 
+		RULE_primary = 40, RULE_typeList = 41, RULE_type = 42, RULE_functionType = 43, 
 		RULE_primitiveType = 44, RULE_creator = 45, RULE_superSuffix = 46, RULE_arguments = 47;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"classDeclaration", "classBody", "classBodyDeclaration", "memberDeclaration", 
-			"functionDeclaration", "functionBody", "typeTypeOrVoid", "qualifiedNameList", 
+			"functionDeclaration", "functionBody", "typeOrVoid", "qualifiedNameList", 
 			"formalParameters", "formalParameterList", "formalParameter", "lastFormalParameter", 
 			"variableModifier", "qualifiedName", "fieldDeclaration", "constructorDeclaration", 
 			"variableDeclarators", "variableDeclarator", "variableDeclaratorId", 
@@ -64,7 +64,7 @@ public class ScriptParser extends Parser {
 			"literal", "integerLiteral", "floatLiteral", "prog", "block", "blockStatements", 
 			"blockStatement", "statement", "switchBlockStatementGroup", "switchLabel", 
 			"forControl", "forInit", "enhancedForControl", "parExpression", "expressionList", 
-			"functionCall", "expression", "primary", "typeList", "typeType", "functionType", 
+			"functionCall", "expression", "primary", "typeList", "type", "functionType", 
 			"primitiveType", "creator", "superSuffix", "arguments"
 		};
 	}
@@ -168,8 +168,8 @@ public class ScriptParser extends Parser {
 			return getRuleContext(ClassBodyContext.class,0);
 		}
 		public TerminalNode EXTENDS() { return getToken(ScriptParser.EXTENDS, 0); }
-		public TypeTypeContext typeType() {
-			return getRuleContext(TypeTypeContext.class,0);
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
 		public TerminalNode IMPLEMENTS() { return getToken(ScriptParser.IMPLEMENTS, 0); }
 		public TypeListContext typeList() {
@@ -186,6 +186,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitClassDeclaration(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitClassDeclaration(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -208,7 +213,7 @@ public class ScriptParser extends Parser {
 				setState(98);
 				match(EXTENDS);
 				setState(99);
-				typeType();
+				type();
 				}
 			}
 
@@ -259,6 +264,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitClassBody(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitClassBody(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -316,6 +326,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitClassBodyDeclaration(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitClassBodyDeclaration(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -389,6 +404,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitMemberDeclaration(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitMemberDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final MemberDeclarationContext memberDeclaration() throws RecognitionException {
@@ -440,8 +460,8 @@ public class ScriptParser extends Parser {
 		public FunctionBodyContext functionBody() {
 			return getRuleContext(FunctionBodyContext.class,0);
 		}
-		public TypeTypeOrVoidContext typeTypeOrVoid() {
-			return getRuleContext(TypeTypeOrVoidContext.class,0);
+		public TypeOrVoidContext typeOrVoid() {
+			return getRuleContext(TypeOrVoidContext.class,0);
 		}
 		public List<TerminalNode> LBRACK() { return getTokens(ScriptParser.LBRACK); }
 		public TerminalNode LBRACK(int i) {
@@ -467,6 +487,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFunctionDeclaration(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFunctionDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final FunctionDeclarationContext functionDeclaration() throws RecognitionException {
@@ -482,7 +507,7 @@ public class ScriptParser extends Parser {
 			case 1:
 				{
 				setState(126);
-				typeTypeOrVoid();
+				typeOrVoid();
 				}
 				break;
 			}
@@ -550,6 +575,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFunctionBody(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFunctionBody(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final FunctionBodyContext functionBody() throws RecognitionException {
@@ -588,28 +618,33 @@ public class ScriptParser extends Parser {
 		return _localctx;
 	}
 
-	public static class TypeTypeOrVoidContext extends ParserRuleContext {
-		public TypeTypeContext typeType() {
-			return getRuleContext(TypeTypeContext.class,0);
+	public static class TypeOrVoidContext extends ParserRuleContext {
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
 		public TerminalNode VOID() { return getToken(ScriptParser.VOID, 0); }
-		public TypeTypeOrVoidContext(ParserRuleContext parent, int invokingState) {
+		public TypeOrVoidContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_typeTypeOrVoid; }
+		@Override public int getRuleIndex() { return RULE_typeOrVoid; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).enterTypeTypeOrVoid(this);
+			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).enterTypeOrVoid(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitTypeTypeOrVoid(this);
+			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitTypeOrVoid(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitTypeOrVoid(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final TypeTypeOrVoidContext typeTypeOrVoid() throws RecognitionException {
-		TypeTypeOrVoidContext _localctx = new TypeTypeOrVoidContext(_ctx, getState());
-		enterRule(_localctx, 12, RULE_typeTypeOrVoid);
+	public final TypeOrVoidContext typeOrVoid() throws RecognitionException {
+		TypeOrVoidContext _localctx = new TypeOrVoidContext(_ctx, getState());
+		enterRule(_localctx, 12, RULE_typeOrVoid);
 		try {
 			setState(150);
 			_errHandler.sync(this);
@@ -628,7 +663,7 @@ public class ScriptParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(148);
-				typeType();
+				type();
 				}
 				break;
 			case VOID:
@@ -675,6 +710,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitQualifiedNameList(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitQualifiedNameList(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -733,6 +773,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFormalParameters(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFormalParameters(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -796,6 +841,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFormalParameterList(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFormalParameterList(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final FormalParameterListContext formalParameterList() throws RecognitionException {
@@ -815,7 +865,7 @@ public class ScriptParser extends Parser {
 				setState(171);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,12,_ctx);
-				while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+				while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 					if ( _alt==1 ) {
 						{
 						{
@@ -865,8 +915,8 @@ public class ScriptParser extends Parser {
 	}
 
 	public static class FormalParameterContext extends ParserRuleContext {
-		public TypeTypeContext typeType() {
-			return getRuleContext(TypeTypeContext.class,0);
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
 		public VariableDeclaratorIdContext variableDeclaratorId() {
 			return getRuleContext(VariableDeclaratorIdContext.class,0);
@@ -888,6 +938,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFormalParameter(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFormalParameter(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -913,7 +968,7 @@ public class ScriptParser extends Parser {
 				_la = _input.LA(1);
 			}
 			setState(187);
-			typeType();
+			type();
 			setState(188);
 			variableDeclaratorId();
 			}
@@ -930,8 +985,8 @@ public class ScriptParser extends Parser {
 	}
 
 	public static class LastFormalParameterContext extends ParserRuleContext {
-		public TypeTypeContext typeType() {
-			return getRuleContext(TypeTypeContext.class,0);
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
 		public TerminalNode ELLIPSIS() { return getToken(ScriptParser.ELLIPSIS, 0); }
 		public VariableDeclaratorIdContext variableDeclaratorId() {
@@ -954,6 +1009,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitLastFormalParameter(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitLastFormalParameter(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -979,7 +1039,7 @@ public class ScriptParser extends Parser {
 				_la = _input.LA(1);
 			}
 			setState(196);
-			typeType();
+			type();
 			setState(197);
 			match(ELLIPSIS);
 			setState(198);
@@ -1010,6 +1070,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitVariableModifier(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitVariableModifier(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1054,6 +1119,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitQualifiedName(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitQualifiedName(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1112,6 +1182,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFieldDeclaration(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFieldDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final FieldDeclarationContext fieldDeclaration() throws RecognitionException {
@@ -1162,6 +1237,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitConstructorDeclaration(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitConstructorDeclaration(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ConstructorDeclarationContext constructorDeclaration() throws RecognitionException {
@@ -1203,8 +1283,8 @@ public class ScriptParser extends Parser {
 	}
 
 	public static class VariableDeclaratorsContext extends ParserRuleContext {
-		public TypeTypeContext typeType() {
-			return getRuleContext(TypeTypeContext.class,0);
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
 		public List<VariableDeclaratorContext> variableDeclarator() {
 			return getRuleContexts(VariableDeclaratorContext.class);
@@ -1228,6 +1308,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitVariableDeclarators(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitVariableDeclarators(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final VariableDeclaratorsContext variableDeclarators() throws RecognitionException {
@@ -1238,7 +1323,7 @@ public class ScriptParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(221);
-			typeType();
+			type();
 			setState(222);
 			variableDeclarator();
 			setState(227);
@@ -1289,6 +1374,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitVariableDeclarator(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitVariableDeclarator(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1348,6 +1438,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitVariableDeclaratorId(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitVariableDeclaratorId(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final VariableDeclaratorIdContext variableDeclaratorId() throws RecognitionException {
@@ -1406,6 +1501,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitVariableInitializer(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitVariableInitializer(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1489,6 +1589,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitArrayInitializer(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitArrayInitializer(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ArrayInitializerContext arrayInitializer() throws RecognitionException {
@@ -1511,7 +1616,7 @@ public class ScriptParser extends Parser {
 				setState(253);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,23,_ctx);
-				while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+				while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 					if ( _alt==1 ) {
 						{
 						{
@@ -1575,6 +1680,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitClassOrInterfaceType(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitClassOrInterfaceType(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ClassOrInterfaceTypeContext classOrInterfaceType() throws RecognitionException {
@@ -1589,7 +1699,7 @@ public class ScriptParser extends Parser {
 			setState(268);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,26,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
@@ -1618,8 +1728,8 @@ public class ScriptParser extends Parser {
 	}
 
 	public static class TypeArgumentContext extends ParserRuleContext {
-		public TypeTypeContext typeType() {
-			return getRuleContext(TypeTypeContext.class,0);
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
 		public TerminalNode QUESTION() { return getToken(ScriptParser.QUESTION, 0); }
 		public TerminalNode EXTENDS() { return getToken(ScriptParser.EXTENDS, 0); }
@@ -1635,6 +1745,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitTypeArgument(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitTypeArgument(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1660,7 +1775,7 @@ public class ScriptParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(271);
-				typeType();
+				type();
 				}
 				break;
 			case QUESTION:
@@ -1684,7 +1799,7 @@ public class ScriptParser extends Parser {
 						consume();
 					}
 					setState(274);
-					typeType();
+					type();
 					}
 				}
 
@@ -1727,6 +1842,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitLiteral(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitLiteral(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1815,6 +1935,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitIntegerLiteral(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitIntegerLiteral(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final IntegerLiteralContext integerLiteral() throws RecognitionException {
@@ -1861,6 +1986,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFloatLiteral(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFloatLiteral(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1910,6 +2040,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitProg(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitProg(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ProgContext prog() throws RecognitionException {
@@ -1950,6 +2085,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitBlock(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitBlock(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -1996,6 +2136,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitBlockStatements(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitBlockStatements(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2058,6 +2203,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitBlockStatement(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitBlockStatement(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2173,6 +2323,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitStatement(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitStatement(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final StatementContext statement() throws RecognitionException {
@@ -2267,7 +2422,7 @@ public class ScriptParser extends Parser {
 				setState(341);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,33,_ctx);
-				while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+				while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 					if ( _alt==1 ) {
 						{
 						{
@@ -2420,6 +2575,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitSwitchBlockStatementGroup(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitSwitchBlockStatementGroup(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final SwitchBlockStatementGroupContext switchBlockStatementGroup() throws RecognitionException {
@@ -2491,6 +2651,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitSwitchLabel(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitSwitchLabel(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2580,6 +2745,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitForControl(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitForControl(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ForControlContext forControl() throws RecognitionException {
@@ -2668,6 +2838,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitForInit(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitForInit(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final ForInitContext forInit() throws RecognitionException {
@@ -2705,8 +2880,8 @@ public class ScriptParser extends Parser {
 	}
 
 	public static class EnhancedForControlContext extends ParserRuleContext {
-		public TypeTypeContext typeType() {
-			return getRuleContext(TypeTypeContext.class,0);
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
 		public VariableDeclaratorIdContext variableDeclaratorId() {
 			return getRuleContext(VariableDeclaratorIdContext.class,0);
@@ -2727,6 +2902,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitEnhancedForControl(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitEnhancedForControl(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final EnhancedForControlContext enhancedForControl() throws RecognitionException {
@@ -2736,7 +2916,7 @@ public class ScriptParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(414);
-			typeType();
+			type();
 			setState(415);
 			variableDeclaratorId();
 			setState(416);
@@ -2773,6 +2953,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitParExpression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitParExpression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2823,6 +3008,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitExpressionList(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitExpressionList(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -2884,6 +3074,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFunctionCall(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFunctionCall(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3034,8 +3229,8 @@ public class ScriptParser extends Parser {
 		public TerminalNode THIS() { return getToken(ScriptParser.THIS, 0); }
 		public TerminalNode LBRACK() { return getToken(ScriptParser.LBRACK, 0); }
 		public TerminalNode RBRACK() { return getToken(ScriptParser.RBRACK, 0); }
-		public TypeTypeContext typeType() {
-			return getRuleContext(TypeTypeContext.class,0);
+		public TypeContext type() {
+			return getRuleContext(TypeContext.class,0);
 		}
 		public TerminalNode INSTANCEOF() { return getToken(ScriptParser.INSTANCEOF, 0); }
 		public ExpressionContext(ParserRuleContext parent, int invokingState) {
@@ -3049,6 +3244,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitExpression(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitExpression(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3122,7 +3322,7 @@ public class ScriptParser extends Parser {
 			setState(526);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,57,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
@@ -3425,7 +3625,7 @@ public class ScriptParser extends Parser {
 						setState(522);
 						((ExpressionContext)_localctx).bop = match(INSTANCEOF);
 						setState(523);
-						typeType();
+						type();
 						}
 						break;
 					}
@@ -3471,6 +3671,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitPrimary(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitPrimary(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3545,11 +3750,11 @@ public class ScriptParser extends Parser {
 	}
 
 	public static class TypeListContext extends ParserRuleContext {
-		public List<TypeTypeContext> typeType() {
-			return getRuleContexts(TypeTypeContext.class);
+		public List<TypeContext> type() {
+			return getRuleContexts(TypeContext.class);
 		}
-		public TypeTypeContext typeType(int i) {
-			return getRuleContext(TypeTypeContext.class,i);
+		public TypeContext type(int i) {
+			return getRuleContext(TypeContext.class,i);
 		}
 		public List<TerminalNode> COMMA() { return getTokens(ScriptParser.COMMA); }
 		public TerminalNode COMMA(int i) {
@@ -3567,6 +3772,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitTypeList(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitTypeList(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final TypeListContext typeList() throws RecognitionException {
@@ -3577,7 +3787,7 @@ public class ScriptParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(539);
-			typeType();
+			type();
 			setState(544);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
@@ -3587,7 +3797,7 @@ public class ScriptParser extends Parser {
 				setState(540);
 				match(COMMA);
 				setState(541);
-				typeType();
+				type();
 				}
 				}
 				setState(546);
@@ -3607,7 +3817,7 @@ public class ScriptParser extends Parser {
 		return _localctx;
 	}
 
-	public static class TypeTypeContext extends ParserRuleContext {
+	public static class TypeContext extends ParserRuleContext {
 		public ClassOrInterfaceTypeContext classOrInterfaceType() {
 			return getRuleContext(ClassOrInterfaceTypeContext.class,0);
 		}
@@ -3625,23 +3835,28 @@ public class ScriptParser extends Parser {
 		public TerminalNode RBRACK(int i) {
 			return getToken(ScriptParser.RBRACK, i);
 		}
-		public TypeTypeContext(ParserRuleContext parent, int invokingState) {
+		public TypeContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_typeType; }
+		@Override public int getRuleIndex() { return RULE_type; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).enterTypeType(this);
+			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).enterType(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitTypeType(this);
+			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitType(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final TypeTypeContext typeType() throws RecognitionException {
-		TypeTypeContext _localctx = new TypeTypeContext(_ctx, getState());
-		enterRule(_localctx, 84, RULE_typeType);
+	public final TypeContext type() throws RecognitionException {
+		TypeContext _localctx = new TypeContext(_ctx, getState());
+		enterRule(_localctx, 84, RULE_type);
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
@@ -3681,7 +3896,7 @@ public class ScriptParser extends Parser {
 			setState(556);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,61,_ctx);
-			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
+			while ( _alt!=2 && _alt!= ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					{
 					{
@@ -3711,8 +3926,8 @@ public class ScriptParser extends Parser {
 
 	public static class FunctionTypeContext extends ParserRuleContext {
 		public TerminalNode FUNCTION() { return getToken(ScriptParser.FUNCTION, 0); }
-		public TypeTypeOrVoidContext typeTypeOrVoid() {
-			return getRuleContext(TypeTypeOrVoidContext.class,0);
+		public TypeOrVoidContext typeOrVoid() {
+			return getRuleContext(TypeOrVoidContext.class,0);
 		}
 		public TerminalNode LPAREN() { return getToken(ScriptParser.LPAREN, 0); }
 		public TerminalNode RPAREN() { return getToken(ScriptParser.RPAREN, 0); }
@@ -3731,6 +3946,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitFunctionType(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitFunctionType(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final FunctionTypeContext functionType() throws RecognitionException {
@@ -3743,7 +3963,7 @@ public class ScriptParser extends Parser {
 			setState(559);
 			match(FUNCTION);
 			setState(560);
-			typeTypeOrVoid();
+			typeOrVoid();
 			setState(561);
 			match(LPAREN);
 			setState(563);
@@ -3792,6 +4012,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitPrimitiveType(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitPrimitiveType(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3842,6 +4067,11 @@ public class ScriptParser extends Parser {
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitCreator(this);
 		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitCreator(this);
+			else return visitor.visitChildren(this);
+		}
 	}
 
 	public final CreatorContext creator() throws RecognitionException {
@@ -3884,6 +4114,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitSuperSuffix(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitSuperSuffix(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 
@@ -3953,6 +4188,11 @@ public class ScriptParser extends Parser {
 		@Override
 		public void exitRule(ParseTreeListener listener) {
 			if ( listener instanceof ScriptListener ) ((ScriptListener)listener).exitArguments(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptVisitor ) return ((ScriptVisitor<? extends T>)visitor).visitArguments(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 

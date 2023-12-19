@@ -70,15 +70,15 @@ public interface ScriptListener extends ParseTreeListener {
 	 */
 	void exitFunctionBody(ScriptParser.FunctionBodyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ScriptParser#typeTypeOrVoid}.
+	 * Enter a parse tree produced by {@link ScriptParser#typeOrVoid}.
 	 * @param ctx the parse tree
 	 */
-	void enterTypeTypeOrVoid(ScriptParser.TypeTypeOrVoidContext ctx);
+	void enterTypeOrVoid(ScriptParser.TypeOrVoidContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ScriptParser#typeTypeOrVoid}.
+	 * Exit a parse tree produced by {@link ScriptParser#typeOrVoid}.
 	 * @param ctx the parse tree
 	 */
-	void exitTypeTypeOrVoid(ScriptParser.TypeTypeOrVoidContext ctx);
+	void exitTypeOrVoid(ScriptParser.TypeOrVoidContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ScriptParser#qualifiedNameList}.
 	 * @param ctx the parse tree
@@ -430,15 +430,15 @@ public interface ScriptListener extends ParseTreeListener {
 	 */
 	void exitTypeList(ScriptParser.TypeListContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ScriptParser#typeType}.
+	 * Enter a parse tree produced by {@link ScriptParser#type}.
 	 * @param ctx the parse tree
 	 */
-	void enterTypeType(ScriptParser.TypeTypeContext ctx);
+	void enterType(ScriptParser.TypeContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ScriptParser#typeType}.
+	 * Exit a parse tree produced by {@link ScriptParser#type}.
 	 * @param ctx the parse tree
 	 */
-	void exitTypeType(ScriptParser.TypeTypeContext ctx);
+	void exitType(ScriptParser.TypeContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ScriptParser#functionType}.
 	 * @param ctx the parse tree
