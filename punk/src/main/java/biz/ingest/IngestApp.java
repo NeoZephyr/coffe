@@ -19,43 +19,14 @@ public class IngestApp {
         Map<String, AppInfo> appInfoMap = loadConfig();
         appInfo = appInfoMap.get("CloudNativeTest");
 
-        // System.out.println(getToken());
-
-        // 1654448815593228288 biden@qq.com
-
+//        System.out.println(getToken());
 
         ExecutorService executorService = Executors.newFixedThreadPool(10);
 
-
-        Random random = new Random();
-
-        for (int r = 1; r < 5; r++) {
-
-            for (int i = 1; i < 1000; i++) {
-                int counter;
-
-                if (i % 2 == 0) {
-                    counter = random.nextInt(5000);
-                } else {
-                    counter = i;
-                }
-
-                executorService.execute(() -> {
-                    restService.post(appInfo.profileUrl, getProfile1(counter), appInfo);
-                });
-                executorService.execute(() -> {
-                    restService.post(appInfo.profileUrl, getProfile2(6000 - counter), appInfo);
-                });
-
-                if (i % 50 == 0) {
-                    executorService.execute(() -> {
-                        restService.post(appInfo.profileUrl, getProfile3(counter), appInfo);
-                    });
-                    executorService.execute(() -> {
-                        restService.post(appInfo.profileUrl, getProfile3(6000 - counter), appInfo);
-                    });
-                }
-            }
+        for (int i = 2000; i < 2500; i++) {
+            restService.post(appInfo.profileUrl, getProfile1(i), appInfo);
+            restService.post(appInfo.profileUrl, getProfile2(i), appInfo);
+            restService.post(appInfo.profileUrl, getProfile3(i), appInfo);
         }
 
         executorService.awaitTermination(100, TimeUnit.MINUTES);
@@ -68,18 +39,13 @@ public class IngestApp {
     public static Map getProfile1(int i) {
         Map data = new HashMap();
         List<Map> identities = new ArrayList<>();
-
-        identities.add(new HashMap<String, String>() {{
-            put("type", "email");
-            put("value", "electorn@qq.com");
-        }});
         identities.add(new HashMap<String, String>() {{
             put("type", "mobile");
-            put("value", String.format("133000%05d", i));
+            put("value", String.format("155000%05d", i));
         }});
         data.put("identities", identities);
         data.put("data", new HashMap<String, String>() {{
-            put("_name", "华伦斯坦");
+            put("_name", "在大风大浪中奋勇前进");
         }});
         data.put("messageKey", UUID.randomUUID().toString());
         return data;
@@ -88,19 +54,14 @@ public class IngestApp {
     public static Map getProfile2(int i) {
         Map data = new HashMap();
         List<Map> identities = new ArrayList<>();
-
         identities.add(new HashMap<String, String>() {{
             put("type", "email");
-            put("value", "proton@qq.com");
+            put("value", String.format("corning-%d@qq.com", i));
         }});
 
-        identities.add(new HashMap<String, String>() {{
-            put("type", "mobile");
-            put("value", String.format("189000%05d", i));
-        }});
         data.put("identities", identities);
         data.put("data", new HashMap<String, String>() {{
-            put("_name", "古斯塔夫");
+            put("_name", "在大风大浪中奋勇前进");
         }});
         data.put("messageKey", UUID.randomUUID().toString());
         return data;
@@ -109,19 +70,17 @@ public class IngestApp {
     public static Map getProfile3(int i) {
         Map data = new HashMap();
         List<Map> identities = new ArrayList<>();
-
         identities.add(new HashMap<String, String>() {{
             put("type", "mobile");
-            put("value", String.format("133000%05d", i));
+            put("value", String.format("155000%05d", i));
         }});
-
         identities.add(new HashMap<String, String>() {{
-            put("type", "mobile");
-            put("value", String.format("189000%05d", i));
+            put("type", "email");
+            put("value", String.format("corning-%d@qq.com", i));
         }});
         data.put("identities", identities);
         data.put("data", new HashMap<String, String>() {{
-            put("_name", "第聂伯爵");
+            put("_name", "在大风大浪中奋勇前进");
         }});
         data.put("messageKey", UUID.randomUUID().toString());
         return data;

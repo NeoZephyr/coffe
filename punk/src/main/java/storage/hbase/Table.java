@@ -19,7 +19,7 @@ public interface Table extends Closeable {
 
     void put(byte[] key, byte[] value) throws IOException;
 
-    KeyValue get(byte[] key);
+    KeyValue get(byte[] key) throws IOException;
 
     void delete(byte[] key) throws IOException;
 

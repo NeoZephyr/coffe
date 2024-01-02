@@ -1,5 +1,6 @@
 package compile.antlr.script.symbol;
 
+import compile.antlr.script.types.DefaultFunctionType;
 import compile.antlr.script.types.FunctionType;
 import compile.antlr.script.types.Type;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -12,15 +13,15 @@ import java.util.Set;
 public class Function extends Scope implements FunctionType {
 
     // 参数
-    private List<Variable> params = new LinkedList<>();
+    public List<Variable> params = new LinkedList<>();
 
     // 闭包变量，即引用的外部环境变量
-    private Set<Variable> closureVars = null;
+    public Set<Variable> closureVars = null;
 
     private List<Type> paramTypes = null;
 
     // 返回值
-    private Type returnType = null;
+    public Type returnType = null;
 
     public Function(String name, Scope enclosingScope, ParserRuleContext ctx) {
         this.name = name;
@@ -68,7 +69,7 @@ public class Function extends Scope implements FunctionType {
     @Override
     public boolean isType(Type type) {
         if (type instanceof FunctionType) {
-            return isType(this, (FunctionType) type);
+            return DefaultFunctionType.isType(this, (FunctionType) type);
         }
 
         return false;
@@ -84,7 +85,7 @@ public class Function extends Scope implements FunctionType {
         return name;
     }
 
-    public boolean isKlassMethod() {
+    public boolean isMethod() {
         return enclosingScope instanceof Klass;
     }
 
@@ -94,31 +95,6 @@ public class Function extends Scope implements FunctionType {
     public boolean isConstructor() {
         if (enclosingScope instanceof Klass) {
             return StringUtils.equals(name, enclosingScope.name);
-        }
-
-        return true;
-    }
-
-    public static boolean isType(FunctionType type1, FunctionType type2) {
-        if (type1 == type2) {
-            return true;
-        }
-
-        if (!type1.getReturnType().isType(type2.getReturnType())) {
-            return false;
-        }
-
-        List<Type> paramTypes1 = type1.getParamTypes();
-        List<Type> paramTypes2 = type2.getParamTypes();
-
-        if (paramTypes1.size() != paramTypes2.size()) {
-            return false;
-        }
-
-        for (int i = 0; i < paramTypes1.size(); i++) {
-            if (!paramTypes1.get(i).isType(paramTypes2.get(i))) {
-                return false;
-            }
         }
 
         return true;

@@ -51,7 +51,7 @@ public class Hbase implements Table {
     }
 
     @Override
-    public KeyValue get(byte[] key) {
+    public KeyValue get(byte[] key) throws IOException {
         KeyValue result = null;
         Scanner<KeyValue> scanner = scan(key, Bytes.EMPTY);
 
@@ -106,7 +106,7 @@ public class Hbase implements Table {
         private KeyValue lastKV = null;
         private KeyValue pendingKV = null;
 
-        public RangeScanner(KeyValue stopKV, SeekScanner<KeyValue> it) {
+        public RangeScanner(KeyValue stopKV, SeekScanner it) {
             this.stopKV = stopKV;
             this.storeScanner = it;
         }

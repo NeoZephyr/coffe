@@ -1,6 +1,7 @@
 package compile.antlr.script.symbol;
 
 import compile.antlr.script.types.Type;
+import lombok.Getter;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.List;
@@ -11,11 +12,12 @@ public class Klass extends Scope implements Type {
     private static final Klass ROOT_KLASS = new Klass("Object", null);
 
     // 父类
+    @Getter
     Klass parent = null;
 
-    This thisRef = null;
+    public This thisRef = null;
 
-    Super superRef = null;
+    public Super superRef = null;
 
     DefaultConstructor defaultConstructor = null;
 

@@ -7,29 +7,29 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NameSpace extends Block {
-    private NameSpace parent = null;
-    private List<NameSpace> children = new LinkedList<>();
+public class Namespace extends Block {
+    private Namespace parent = null;
+    private List<Namespace> children = new LinkedList<>();
 
     @Getter
     private String name = null;
 
-    protected NameSpace(String name, Scope enclosingScope, ParserRuleContext ctx) {
+    public Namespace(String name, Scope enclosingScope, ParserRuleContext ctx) {
         this.name = name;
         this.enclosingScope = enclosingScope;
         this.ctx = ctx;
     }
 
-    public List<NameSpace> getChildren() {
+    public List<Namespace> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
-    public void addChild(NameSpace child) {
+    public void addChild(Namespace child) {
         child.parent = this;
         children.add(child);
     }
 
-    public void removeChild(NameSpace child) {
+    public void removeChild(Namespace child) {
         child.parent = null;
         children.remove(child);
     }

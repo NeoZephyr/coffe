@@ -14,6 +14,6 @@ public abstract class Symbol {
     public Scope enclosingScope = null;
 
     // Symbol 关联的 AST 节点
-    protected ParserRuleContext ctx = null;
+    public ParserRuleContext ctx = null;
 
 }

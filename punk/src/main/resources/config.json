@@ -8,7 +8,7 @@
     "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_xie_jiao_tu-smokeeee",
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_kaili_enhance_coupon-kaili-encah",
-    "token": "94e7ef863d7a1d45b72e352ca20b10ad"
+    "token": "0d608e370517dd74429f8f0189e7fb17"
   },
   "monitor_delta": {
     "tenantId": "1734229266",

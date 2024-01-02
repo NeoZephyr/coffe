@@ -9,7 +9,7 @@ import java.util.List;
 public class Scope extends Symbol {
 
     // 该 Scope 中的成员，包括变量、方法、类等
-    protected List<Symbol> symbols = new LinkedList<>();
+    public List<Symbol> symbols = new LinkedList<>();
 
     public void addSymbol(Symbol symbol) {
         symbols.add(symbol);
