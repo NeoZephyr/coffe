@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class ActivationRecord {
 
-    private Map<Variable, Object> members = new HashMap<>();
+    public Map<Variable, Object> members = new HashMap<>();
 
     public boolean empty() {
         return members.isEmpty();

@@ -25,15 +25,15 @@ public class AnnotatedTree {
     public ParseTree ast = null;
 
     // 解析出来的所有类型
-    protected List<Type> types = new LinkedList<>();
+    public List<Type> types = new LinkedList<>();
 
     // AST 节点对应的 Symbol
-    protected Map<ParserRuleContext, Symbol> nodeToSymbol = new HashMap<>();
+    public Map<ParserRuleContext, Symbol> nodeToSymbol = new HashMap<>();
 
     // AST 节点对应的 Scope
-    protected Map<ParserRuleContext, Scope> nodeToScope = new HashMap<>();
+    public Map<ParserRuleContext, Scope> nodeToScope = new HashMap<>();
 
-    protected Map<ParserRuleContext, Type> nodeToType = new HashMap<>();
+    public Map<ParserRuleContext, Type> nodeToType = new HashMap<>();
 
     // 命名空间
     protected Namespace namespace = null;
@@ -64,11 +64,11 @@ public class AnnotatedTree {
         log.info("{}", logInfo);
     }
 
-    protected void error(String message, ParserRuleContext ctx) {
+    public void error(String message, ParserRuleContext ctx) {
         append(message, LogLevel.ERROR, ctx);
     }
 
-    protected boolean hasCompilationError() {
+    public boolean hasCompilationError() {
         for (CompilationLog log : logs) {
             if (log.level == LogLevel.ERROR) {
                 return true;
@@ -81,7 +81,7 @@ public class AnnotatedTree {
     /**
      * 逐级 Scope 查找
      */
-    protected Variable lookupVariable(Scope scope, String name) {
+    public Variable lookupVariable(Scope scope, String name) {
         Variable symbol = scope.getVariable(name);
 
         if ((symbol == null) && (scope.enclosingScope != null)) {

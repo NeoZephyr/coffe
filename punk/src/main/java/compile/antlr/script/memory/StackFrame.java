@@ -4,30 +4,30 @@ import compile.antlr.script.symbol.Block;
 import compile.antlr.script.symbol.Scope;
 import compile.antlr.script.symbol.Variable;
 
-public class CallStack {
+public class StackFrame {
 
-    Scope scope = null;
+    public Scope scope = null;
 
-    CallStack parent = null;
+    public StackFrame parent = null;
 
-    ActivationRecord record = null;
+    public ActivationRecord record = null;
 
-    public CallStack(Block block) {
+    public StackFrame(Block block) {
         this.scope = block;
         this.record = new ActivationRecord();
     }
 
-    public CallStack(KlassObject object) {
+    public StackFrame(KlassObject object) {
         this.scope = object.klass;
         this.record = object;
     }
 
-    public CallStack(FunctionObject object) {
+    public StackFrame(FunctionObject object) {
         this.scope = object.function;
         this.record = object;
     }
 
-    protected boolean contains(Variable symbol) {
+    public boolean contains(Variable symbol) {
         if ((record != null) && !record.empty()) {
             return record.contains(symbol);
         }
