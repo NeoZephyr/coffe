@@ -1,4 +1,4 @@
-package compile.craft;
+package compile.craft.frontend;
 
 public class CharUtils {
 
@@ -53,5 +53,13 @@ public class CharUtils {
 
     public static boolean isBit(char c) {
         return c == '0' || c == '1';
+    }
+
+    public static boolean isSingleQuotes(char c) {
+        return c == '\'';
+    }
+
+    public static boolean isQuotes(char c) {
+        return c == '"';
     }
 }

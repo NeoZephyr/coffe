@@ -7,6 +7,7 @@ import org.apache.hadoop.hbase.filter.{FilterList, PrefixFilter}
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
 import org.apache.hadoop.hbase.mapreduce.{HFileOutputFormat2, LoadIncrementalHFiles, TableInputFormat, TableOutputFormat}
 import org.apache.hadoop.hbase.protobuf.ProtobufUtil
+import org.apache.hadoop.hbase.spark.HBaseContext
 import org.apache.hadoop.hbase.util.{Base64, Bytes}
 import org.apache.hadoop.hbase.{Cell, CellUtil, HColumnDescriptor, HTableDescriptor, KeyValue, TableName}
 import org.apache.hadoop.mapreduce.Job
@@ -182,7 +183,7 @@ object HBaseApp {
             classOf[ImmutableBytesWritable],
             classOf[Result])
         val resultRdd: RDD[String] = hbaseRdd.map(x => {
-            x._2.getValue(Bytes.toBytes("info"), Bytes.toBytes("name")).toString
+            Bytes.toString(x._2.getValue(Bytes.toBytes("info"), Bytes.toBytes("name")))
         })
         resultRdd.collect().foreach(println)
     }
@@ -305,7 +306,11 @@ object HBaseApp {
             })
         }).sortByKey()
 
+        import org.apache.hadoop.hbase.spark.HBaseRDDFunctions.GenericHBaseRDDFunctions
+
         // configuration.set(TableOutputFormat.OUTPUT_TABLE, "test")
+
+        // data.hbaseBulkLoad(new HBaseContext(spark.sparkContext, configuration), TableName.valueOf("test"), null, stagingPath)
 
         data.saveAsNewAPIHadoopFile(
             stagingPath,
@@ -325,6 +330,7 @@ object HBaseApp {
         if (FileSystem.get(configuration).exists(new Path(stagingPath))) {
             val files = new LoadIncrementalHFiles(configuration)
             files.doBulkLoad(new Path(stagingPath), table.asInstanceOf[HTable])
+            // files.doBulkLoad(new Path(stagingPath), connection.getAdmin, table, connection.getRegionLocator(TableName.valueOf("text")))
             FileSystem.get(configuration).delete(new Path(stagingPath), true)
         }
 

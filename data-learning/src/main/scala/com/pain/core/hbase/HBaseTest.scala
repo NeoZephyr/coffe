@@ -2,8 +2,13 @@ package com.pain.core.hbase
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.hbase.{Cell, CellUtil, HColumnDescriptor, HTableDescriptor, TableName}
-import org.apache.hadoop.hbase.client.{Admin, Connection, ConnectionFactory, Consistency, Get, Put, Result}
-import org.apache.hadoop.hbase.util.Bytes
+import org.apache.hadoop.hbase.client.{Admin, Connection, ConnectionFactory, Consistency, Get, Put, Result, Scan}
+import org.apache.hadoop.hbase.io.ImmutableBytesWritable
+import org.apache.hadoop.hbase.mapreduce.TableInputFormat
+import org.apache.hadoop.hbase.protobuf.ProtobufUtil
+import org.apache.hadoop.hbase.util.{Base64, Bytes}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.SparkSession
 
 import java.util
 import java.util.concurrent.atomic.AtomicInteger
@@ -21,14 +26,41 @@ object HBaseTest {
     val admin: Admin = connection.getAdmin
 
     // testConsistency(connection)
+    testDf(configuration)
+  }
 
-    def table = connection.getTable(TableName.valueOf("u2i"))
+  def testDf(configuration: Configuration): Unit = {
+    val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
 
-    val get = new Get(Bytes.toBytes("150-2"))
-    get.setConsistency(Consistency.TIMELINE)
-    val result = table.get(get)
+    configuration.set(TableInputFormat.INPUT_TABLE, "u2i")
+    val scan = new Scan()
+    scan.addFamily(Bytes.toBytes("p"))
+    configuration.set(TableInputFormat.SCAN, Base64.encodeBytes(ProtobufUtil.toScan(scan).toByteArray))
+    val hbaseRdd: RDD[(ImmutableBytesWritable, Result)] = spark.sparkContext.newAPIHadoopRDD(
+      configuration,
+      classOf[TableInputFormat],
+      classOf[ImmutableBytesWritable],
+      classOf[Result])
 
-    println(s"isStale: ${result.isStale}")
+    import spark.implicits._
+
+    val frame = hbaseRdd.flatMap(x => {
+      x._2.rawCells().map(c => {
+        Bytes.toString(CellUtil.cloneQualifier(c))
+      }).filter(s => {
+        val items = s.split('\0')
+        items(0).equals("mobile")
+      }).map(v => {
+        (Bytes.toString(x._1.get()), v)
+      })
+    }).toDF("id", "value")
+
+    frame.show(200)
+
+//    val resultRdd: RDD[String] = hbaseRdd.map(x => {
+//      x._2.getValue(Bytes.toBytes("info"), Bytes.toBytes("name")).toString
+//    })
+//    resultRdd.collect().foreach(println)
   }
 
   def testConsistency(connection: Connection): Unit = {
