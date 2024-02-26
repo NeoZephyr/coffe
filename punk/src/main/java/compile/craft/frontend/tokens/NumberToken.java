@@ -17,6 +17,17 @@ public class NumberToken extends Token {
         super(source);
     }
 
+    /**
+     * 用状态机器实现
+     * while (hasNext) {
+     *     switch (state) {
+     *         case 0:
+     *         case 1:
+     *         case 2:
+     *     }
+     *     next();
+     * }
+     */
     @SneakyThrows
     @Override
     protected void extract() {

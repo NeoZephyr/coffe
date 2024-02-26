@@ -148,18 +148,18 @@ floatLiteral
 
 // STATEMENTS / BLOCKS
 prog
-    : blockStatements
+    : blocks
     ;
 
 block
-    : '{' blockStatements '}'
+    : '{' blocks '}'
     ;
 
-blockStatements
-    : blockStatement*
+blocks
+    : block*
     ;
 
-blockStatement
+block
     : variableDeclarators ';'
     | statement
    // | localTypeDeclaration
@@ -191,7 +191,7 @@ statement
  *  To handle empty cases at the end, we add switchLabel* to statement.
  */
 switchBlockStatementGroup
-    : switchLabel+ blockStatement+
+    : switchLabel+ block+
     ;
 
 switchLabel
@@ -246,8 +246,8 @@ expression
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
     | prefix=('~'|'!') expression
-    | expression bop=('*'|'/'|'%') expression  
-    | expression bop=('+'|'-') expression 
+    | expression bop=('*'|'/'|'%') expression
+    | expression bop=('+'|'-') expression
     | expression ('<' '<' | '>' '>' '>' | '>' '>') expression
     | expression bop=('<=' | '>=' | '>' | '<') expression
     | expression bop=INSTANCEOF type

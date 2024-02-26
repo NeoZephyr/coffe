@@ -5,11 +5,7 @@ public interface ASTVisitor {
         return true;
     }
 
-    default boolean visit(BlockStatement blockStatement) {
-        return true;
-    }
-
-    default boolean visit(VariableDeclarators variableDeclarators) {
+    default boolean visit(Block block) {
         return true;
     }
 }

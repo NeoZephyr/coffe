@@ -1,5 +1,5 @@
 package compile.craft.ast;
 
-public interface AST {
+public interface ASTNode {
     boolean accept(ASTVisitor visitor);
 }

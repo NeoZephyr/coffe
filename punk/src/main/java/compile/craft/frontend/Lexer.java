@@ -46,6 +46,19 @@ public class Lexer {
             return new StringToken(source);
         }
 
+        /**
+         *
+         * (a+b)^100.12==+100-20
+         *
+         * 考虑 +/-/. 之后跟数值，是不是作为 number
+         *
+         * if c is digit
+         *     process number
+         * if c in ['+', '-', '.'] and next is digit
+         *     if lastToken is null or lastToken is not value or lastToken is operator
+         *         retreat
+         *         process number
+         */
         if (TokenKind.SPECIAL_SYMBOL_HEADERS.containsKey(c)) {
             return new SpecialSymbolToken(source);
         }
@@ -81,6 +94,7 @@ public class Lexer {
                     }
                     c = source.advance();
                 }
+                // TODO 错误了
                 continue;
             }
 

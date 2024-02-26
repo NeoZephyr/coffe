@@ -1,8 +1,9 @@
 package compile.craft.ast;
 
-public class ArrayInitializer implements AST {
+public class Block implements ASTNode {
+
     @Override
     public boolean accept(ASTVisitor visitor) {
-        return false;
+        return visitor.visit(this);
     }
 }
