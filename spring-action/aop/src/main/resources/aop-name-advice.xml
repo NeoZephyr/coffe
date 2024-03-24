@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:user="http://www.springframework.org/schema/users"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/users
+        http://www.springframework.org/schema/users.xsd">
+
+    <bean id="helloService" class="com.pain.green.service.HelloServiceImpl" />
+    <bean id="beforeAdvice" class="com.pain.green.aop.advice.BeforeAdvice" />
+
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="beanNames" value="*Service" />
+
+        <!--为 true 则强制使用 cglib 动态代理-->
+        <property name="optimize" value="true" />
+        <property name="interceptorNames" value="beforeAdvice" />
+    </bean>
+</beans>

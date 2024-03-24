@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC
+        "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+
+    <!--指定外部属性文件，最多可配置一个-->
+    <properties resource="datasource.properties" />
+
+    <!--指定数据库驱动位置，可配置多个，也可以不配置-->
+    <classPathEntry location=""/>
+
+    <!--至少配置一个，可以配置多个，运行 MBG 的时候可以指定要运行的 context-->
+    <context id="context" targetRuntime="MyBatis3" defaultModelType="flat">
+
+        <!--配置如何生成注释信息-->
+        <commentGenerator>
+            <!--阻止生成注释-->
+            <property name="suppressAllComments" value="false"/>
+            <!--阻止生成的注释包含时间戳-->
+            <property name="suppressDate" value="true"/>
+        </commentGenerator>
+
+        <!--要连接的数据库信息-->
+        <jdbcConnection driverClass="" connectionURL="" userId="" password=""/>
+
+        <!--指定 JDBC 类型和 java 类型如何转换-->
+        <javaTypeResolver>
+            <!--是否强制将 DECIMAL 和 NUMERIC 的 JDBC 字段转换为 Java 类型的 java.math.BigDecimal-->
+            <property name="forceBigDecimals" value="false"/>
+        </javaTypeResolver>
+
+        <!--控制生成的实体类-->
+        <javaModelGenerator targetPackage="" targetProject="THIS_CONFIGURATION_IS_NOT_REQUIRED">
+            <!--如果为 true 则会根据 catalog 和 schema 来生成子包-->
+            <property name="enableSubPackages" value="false"/>
+            <property name="trimStrings" value="true"/>
+        </javaModelGenerator>
+
+        <!--控制生成的映射文件-->
+        <sqlMapGenerator targetPackage="" targetProject="THIS_CONFIGURATION_IS_NOT_REQUIRED">
+            <property name="enableSubPackages" value="false"/>
+        </sqlMapGenerator>
+
+        <!--控制生成映射接口-->
+        <javaClientGenerator targetPackage="" targetProject="THIS_CONFIGURATION_IS_NOT_REQUIRED" type="XMLMAPPER">
+            <property name="enableSubPackages" value="false"/>
+        </javaClientGenerator>
+
+        <table tableName="user"
+               domainObjectName="User"
+               enableCountByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               enableUpdateByExample="false"
+               selectByExampleQueryId="false" />
+
+    </context>
+</generatorConfiguration>

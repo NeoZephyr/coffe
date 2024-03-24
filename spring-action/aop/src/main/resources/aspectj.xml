@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd"
+       xmlns:p="http://www.springframework.org/schema/p">
+
+    <bean id="helloService" class="com.pain.green.service.HelloServiceImpl" />
+    <bean id="xmlAspect" class="com.pain.green.aspectj.XmlAspect" />
+
+    <!--开启基于注解的 AOP 配置-->
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+
+    <aop:config proxy-target-class="true">
+        <aop:pointcut id="userServicePointcut" expression="execution(* *..*.HelloServiceImpl.*(..))" />
+        <aop:aspect ref="xmlAspect">
+            <aop:around method="around" pointcut-ref="userServicePointcut" />
+        </aop:aspect>
+    </aop:config>
+</beans>

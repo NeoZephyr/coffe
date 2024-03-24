@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties resource="datasource.properties" />
+
+    <settings>
+        <!--全局缓存配置-->
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="defaultStatementTimeout" value="3000"/>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <setting name="useGeneratedKeys" value="true"/>
+        <!--<setting name="aggressiveLazyLoading" value="false" />-->
+
+        <!--日志-->
+        <setting name="logImpl" value="LOG4J" />
+    </settings>
+
+    <!--自定义别名-->
+    <typeAliases>
+        <!--批量别名设置-->
+        <package name="com.pain.flame.mybatis.entity" />
+        <!--单个别名设置-->
+        <!--<typeAlias type="com.pain.pojo.User" alias="user" />-->
+    </typeAliases>
+
+
+    <!--全局配置类型转换器-->
+    <!--可以在 mapper 映射文件中局部配置，例如 result 标签 -->
+    <!--<typeHandlers>-->
+        <!--<typeHandler handler="com.pain.util.BooleanTypeHandler" javaType="Boolean" jdbcType="NUMERIC" />-->
+    <!--</typeHandlers>-->
+
+    <!--对象工厂，创建对象-->
+    <!--<objectFactory type="" />-->
+
+    <!--拦截器-->
+    <!--<plugins>-->
+        <!--<plugin interceptor=""></plugin>-->
+    <!--</plugins>-->
+
+    <!--数据源-->
+    <environments default="development">
+        <environment id="development">
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+                <property name="driver" value="${jdbc.driver}" />
+                <property name="url" value="${jdbc.url}" />
+                <property name="username" value="${jdbc.username}" />
+                <property name="password" value="${jdbc.password}" />
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!--加载映射文件-->
+    <mappers>
+        <!--mapper 映射文件方式-->
+        <mapper resource="mappers/UserMapper.xml" />
+
+        <!--包方式-->
+        <!--<package name="com.pain.mapper" />-->
+    </mappers>
+
+</configuration>

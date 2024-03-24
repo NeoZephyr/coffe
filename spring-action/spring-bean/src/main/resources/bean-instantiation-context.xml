@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="user-by-static-method" class="com.pain.green.ioc.domain.User" factory-method="createUser" />
+    <bean id="user-by-instance-method" factory-bean="userFactory" factory-method="createUser" />
+    <bean id="user-by-factory-bean" class="com.pain.green.bean.factory.UserFactoryBean" />
+
+    <bean id="userFactoryServiceLoader" class="org.springframework.beans.factory.serviceloader.ServiceLoaderFactoryBean">
+        <property name="serviceType" value="com.pain.green.bean.factory.UserFactory" />
+    </bean>
+
+    <bean id="userFactory" class="com.pain.green.bean.factory.DefaultUserFactory" />
+</beans>

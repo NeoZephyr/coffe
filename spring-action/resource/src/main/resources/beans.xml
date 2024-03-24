@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:util="http://www.springframework.org/schema/util"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util
+        https://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean class="com.pain.green.resource.conversion.CustomizedPropertyEditorRegistrar"/>
+
+    <!-- java.util.Properties -->
+    <util:properties id="context">
+        <prop key="id">1</prop>
+        <prop key="name">pain</prop>
+    </util:properties>
+
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <bean class="com.pain.green.resource.conversion.PropertiesToStringConverter" />
+        </property>
+    </bean>
+
+    <bean id="user" class="com.pain.green.ioc.domain.User">
+        <property name="id" value="1" />
+        <property name="name" value="pain" />
+        <property name="context">
+            <value>
+                id = 1
+                name = pain
+            </value>
+        </property>
+        <property name="contextText" ref="context" />
+    </bean>
+
+</beans>

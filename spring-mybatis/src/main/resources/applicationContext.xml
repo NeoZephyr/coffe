@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd"
+       xmlns:p="http://www.springframework.org/schema/p">
+
+    <context:component-scan base-package="com.pain.flame.mybatis" />
+    <!--<context:annotation-config />-->
+
+    <context:property-placeholder location="datasource.properties" file-encoding="utf-8" />
+
+    <!--xml 方式配置数据源-->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="url" value="${jdbc.url}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="typeAliasesPackage" value="com.pain.flame.mybatis.entity" />
+        <property name="configLocation" value="mybatis-config.xml" />
+        <property name="mapperLocations" value="classpath:mappers/*.xml" />
+    </bean>
+
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 扫描所有接口类，转换为 spring bean -->
+        <property name="basePackage" value="com.pain.flame.mybatis.mapper" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
+
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager" p:dataSource-ref="dataSource" />
+
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="get*" read-only="true" rollback-for="Exception" />
+            <tx:method name="buy" propagation="REQUIRES_NEW" isolation="REPEATABLE_READ" />
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <!--<aop:pointcut id="service" expression="execution(* com.pain.flame.mybatis.service..*(..))" />-->
+        <!--<aop:advisor advice-ref="txAdvice" pointcut-ref="service" />-->
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.pain.flame.mybatis.service..*(..))" />
+    </aop:config>
+</beans>

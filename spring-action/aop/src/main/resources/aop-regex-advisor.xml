@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:user="http://www.springframework.org/schema/users"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/users
+        http://www.springframework.org/schema/users.xsd">
+
+    <bean id="helloService" class="com.pain.green.service.HelloServiceImpl" />
+    <bean id="beforeAdvice" class="com.pain.green.aop.advice.BeforeAdvice" />
+
+    <bean id="helloAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+        <property name="pattern" value=".*hello" />
+        <property name="advice" ref="beforeAdvice" />
+    </bean>
+
+    <bean id="helloServiceProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="target" ref="helloService" />
+        <property name="interceptorNames">
+            <array>
+                <value>helloAdvisor</value>
+            </array>
+        </property>
+    </bean>
+</beans>
