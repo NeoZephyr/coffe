@@ -148,18 +148,18 @@ floatLiteral
 
 // STATEMENTS / BLOCKS
 prog
-    : blocks
+    : blockStatements
     ;
 
 block
-    : '{' blocks '}'
+    : '{' blockStatements '}'
     ;
 
-blocks
-    : block*
+blockStatements
+    : blockStatement*
     ;
 
-block
+blockStatement
     : variableDeclarators ';'
     | statement
    // | localTypeDeclaration

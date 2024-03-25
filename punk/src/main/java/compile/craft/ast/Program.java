@@ -1,9 +1,9 @@
 package compile.craft.ast;
 
-public class Program implements ASTNode {
+public class Program extends TreeNode {
 
     @Override
-    public boolean accept(ASTVisitor visitor) {
-        return visitor.visit(this);
+    public <T> T accept(TreeVisitor<? extends T> visitor) {
+        return null;
     }
 }
