@@ -3,6 +3,11 @@ package com.pain
 import org.apache.flink.api.common.eventtime.WatermarkStrategy
 import org.apache.flink.api.common.serialization.{SimpleStringEncoder, SimpleStringSchema}
 import org.apache.flink.configuration.MemorySize
+import org.apache.flink.connector.base.DeliveryGuarantee
+import org.apache.flink.connector.file.sink.FileSink
+import org.apache.flink.connector.kafka.sink.{KafkaRecordSerializationSchema, KafkaSink}
+import org.apache.flink.connector.kafka.source.KafkaSource
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer
 import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.CheckpointingMode
 import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy
@@ -53,7 +58,7 @@ object ConnectorApp {
             .setValueOnlyDeserializer(new SimpleStringSchema())
             .build
 
-        val data: DataStream[String] = env.fromSource(source, WatermarkStrategy.noWatermarks, "Kafka Source")
+        val data: DataStream[String] = env.fromSource(source, WatermarkStrategy.noWatermarks[String], "Kafka Source")
         data.print().setParallelism(1)
     }
 
