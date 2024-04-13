@@ -31,5 +31,16 @@
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
     "token": "0aa86c63a50a301e6b157d17ace555d4"
+  },
+  "test_not_deltalake": {
+    "tenantId": "1734229266",
+    "projectId": "test_not_deltalake",
+    "appId": "cl00d218e0ca1703e",
+    "appSecret": "baf06eab0d465024eb13d147c3ca3a77e8c05514",
+    "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_bad_guy-001",
+    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
+    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
+    "token": "18b0be9c66c940880dd188ab48c8ad9a"
   }
 }

@@ -1,14 +1,20 @@
 package com.pain.core.spark.sql.etl
 
-import org.apache.hadoop.fs.{FileSystem, Path}
+import com.pain.support.JsonUtil
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
-import org.apache.spark.storage.StorageLevel
+
+import java.util.UUID
 
 object LabApp {
 
   def main(args: Array[String]): Unit = {
-    split()
+    // split()
     // split0()
+    import scala.collection.JavaConverters._
+
+    val map = Notifications.createRefreshEvent(1, Dto()).asJava
+    println(map.get("publisher"))
+    println(JsonUtil.objToStr(map))
   }
 
   def split0(): Unit = {
@@ -79,4 +85,34 @@ object LabApp {
     }
   }
 
+}
+
+case class Dto()
+
+object Notifications {
+
+  def createRefreshEvent(tenantId: Long, dto: Dto): Map[String, Any] = {
+    val event = Map[String, Any](
+      "tenantId" -> tenantId,
+      "dto" -> dto,
+      "classType" -> "com.convertlab.foundation.library.business.eventbroker.ImpalaRefreshEvent",
+      "publisher" -> "SPARKJOB",
+      "subscriber" -> "ANY",
+      "sourceGroupId" -> "SPARKJOB",
+      "type" -> "DEFAULT_EVENT_TYPE",
+      "subType" -> "DEFAULT_EVENT_SUBTYPE",
+      "messageId" -> UUID.randomUUID().toString
+    )
+//    val event = new java.util.HashMap[String, Object]()
+//    event.put("tenantId", tenantId)
+//    event.put("dto", dto)
+//    event.put("classType", "com.convertlab.foundation.library.business.eventbroker.ImpalaRefreshEvent")
+//    event.put("publisher", "SPARKJOB")
+//    event.put("subscriber", "ANY")
+//    event.put("sourceGroupId", "SPARKJOB")
+//    event.put("type", "DEFAULT_EVENT_TYPE")
+//    event.put("subType", "DEFAULT_EVENT_SUBTYPE")
+//    event.put("messageId", UUID.randomUUID().toString)
+    event
+  }
 }

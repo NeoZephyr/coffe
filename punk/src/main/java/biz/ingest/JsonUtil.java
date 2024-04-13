@@ -27,7 +27,7 @@ public class JsonUtil {
         mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
     }
 
-    static <T> String objToStr(T obj) {
+    public static <T> String objToStr(T obj) {
         if (null == obj) {
             return null;
         }

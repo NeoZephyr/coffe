@@ -16,24 +16,32 @@ public class IngestApp {
     private static RestService restService = new RestService();
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Map<String, AppInfo> appInfoMap = loadConfig();
-        appInfo = appInfoMap.get("CloudNativeTest");
-
-//        System.out.println(getToken());
-
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-
-        for (int i = 2000; i < 2500; i++) {
-            restService.post(appInfo.profileUrl, getProfile1(i), appInfo);
-            restService.post(appInfo.profileUrl, getProfile2(i), appInfo);
-            restService.post(appInfo.profileUrl, getProfile3(i), appInfo);
-        }
-
-        executorService.awaitTermination(100, TimeUnit.MINUTES);
+        // Map<String, AppInfo> appInfoMap = loadConfig();
+        // appInfo = appInfoMap.get("test_not_deltalake");
+        // System.out.println(getToken());
 
         // ingestProfile(appInfo);
         // ingestDocument(appInfo);
         // deleteIdentity(appInfo);
+
+        Map message = new HashMap();
+        Map merge = new HashMap();
+        Map states = new HashMap();
+        Map extra = new HashMap();
+        merge.put("1749336064234885120", new ArrayList<>());
+        states.put("1749336064234885120", "k");
+        states.put("1749336058690015232", "k");
+        extra.put("key", "1749336064234885120");
+        extra.put("mergeId", "data-t1p1-merge:cache:dw_bad_guy:1749336064234885120");
+        message.put("projectId", "test_not_deltalake");
+        message.put("tableId", "dw_bad_guy");
+        message.put("uid", "1749336058690015232");
+        message.put("merge", merge);
+        message.put("stateChanged", false);
+        message.put("states", states);
+        message.put("action", "compensate");
+        message.put("extra", extra);
+        System.out.println(JsonUtil.objToStr(message));
     }
 
     public static Map getProfile1(int i) {
