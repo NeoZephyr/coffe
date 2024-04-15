@@ -7,7 +7,7 @@ public class DatetimeTest {
     private static long localTimezoneOffset = TimeZone.getTimeZone("Asia/Shanghai").getRawOffset();
 
     public static void main(String[] args) {
-
+        System.out.println(getNextRollTs(10, 10));
     }
 
     public static long getNextRollTs(long ts, long period) {
