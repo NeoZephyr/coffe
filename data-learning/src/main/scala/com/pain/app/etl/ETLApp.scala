@@ -17,6 +17,7 @@ object ETLApp {
         }
     }
 
+    // 执行性能更高
     val extractFields2: Seq[Row] => Seq[(String, Int)] = {
         (rows: Seq[Row]) => {
             rows.map((row: Row) => (row.getString(0), row.getInt(1)))
@@ -41,6 +42,10 @@ object ETLApp {
             instance.write.parquet("")
         case _ =>
     }
+
+    // 把时间区间罗列出来，转换为 broadcast hash join 会更加快
+    // (startDate, endDate) = ("2021-01-01", "2021-01-31")
+    // (startDate, endDate, eventDate) = ("2021-01-01", "2021-01-31"，"2021-01-01"), ... ("2021-01-01", "2021-01-31"，"2021-01-31")
 
     // 使用 Nested Loop Join
     // Nested Loop Join < (Merge Join, Hash Join, Broadcast Join)

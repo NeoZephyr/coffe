@@ -27,7 +27,8 @@
 	<modules>
 		<module>common</module>
 		<module>lab</module>
-	</modules>
+        <module>security</module>
+    </modules>
 
 	<dependencyManagement>
 		<dependencies>
