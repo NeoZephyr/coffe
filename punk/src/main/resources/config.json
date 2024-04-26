@@ -24,13 +24,13 @@
   "extdmdataconnector": {
     "tenantId": "1734229266",
     "projectId": "extdmdataconnector",
-    "appId": "cl004b188a36b7ff4",
-    "appSecret": "16b75d0f884a705f35064448dcff3c30ff3695ef",
+    "appId": "cl03e018f1a113d9f",
+    "appSecret": "d3d41defcc923758c5e1d7e85d794b62db1b2220",
     "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
-    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_t143_customer-plll",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_t143_customer-yanxikais",
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
-    "token": "0aa86c63a50a301e6b157d17ace555d4"
+    "token": "6ed925a0c3f3742dff82bf2a1d22dc82"
   },
   "test_not_deltalake": {
     "tenantId": "1734229266",

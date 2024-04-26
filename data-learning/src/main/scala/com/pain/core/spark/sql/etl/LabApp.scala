@@ -1,6 +1,8 @@
 package com.pain.core.spark.sql.etl
 
 import com.pain.support.JsonUtil
+import org.apache.spark.sql.functions.{coalesce, col, sin, struct, to_json}
+import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 import java.util.UUID
@@ -16,6 +18,16 @@ object LabApp {
     val map = Notifications.createRefreshEvent(10, ImpalaRefreshDto("campaign_event_facts", Seq(PartitionColumn("tenant_id", "10", "Long")).asJava)).asJava
     println(map.get("publisher"))
     println(JsonUtil.objToStr(map))
+
+    kafkaSink()
+  }
+
+  def kafkaSink(): Unit = {
+    val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
+    var df: DataFrame = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("input/identity.csv")
+
+    val sinkFrame = df.select(coalesce(col("_type"), col("_value")).as("key"), to_json(struct(df("*"))).cast(StringType).as("value"))
+    sinkFrame.show(false)
   }
 
   def split0(): Unit = {
