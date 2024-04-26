@@ -73,6 +73,7 @@ dependencies {
 
     implementation 'org.redisson:redisson:3.16.3'
 
+    implementation 'org.apache.httpcomponents:httpcore:4.4.13'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
