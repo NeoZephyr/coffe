@@ -1,9 +1,13 @@
-package network.rpc.core.transport;
+package network.rpc.core;
 
 import network.rpc.api.RpcAccessPoint;
 import network.rpc.api.ServiceSupport;
 import network.rpc.core.client.StubFactory;
 import network.rpc.core.server.ServiceProviderRegistry;
+import network.rpc.core.transport.RequestHandlerRegistry;
+import network.rpc.core.transport.Transport;
+import network.rpc.core.transport.TransportClient;
+import network.rpc.core.transport.TransportServer;
 
 import java.io.Closeable;
 import java.io.IOException;

@@ -10,9 +10,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Header {
-    private int requestId;
-    private int version;
     private int type;
+    private int version;
+    private int requestId;
 
     public int length() {
         return Integer.BYTES + Integer.BYTES + Integer.BYTES;
