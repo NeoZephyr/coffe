@@ -1,24 +1,25 @@
 package jubi.netty.core;
 
-import jubi.netty.RpcAddress;
+import queue.hole.Address;
 import jubi.netty.client.TransportClient;
+import queue.hole.Endpoint;
 
 import java.util.LinkedList;
 import java.util.concurrent.Future;
 
 public class Outbox {
 
-    RpcAddress address;
-    private RpcEnv rpcEnv;
+    public Address address;
+    private Endpoint endpoint;
     private LinkedList<OutboxMessage> messages = new LinkedList<>();
     private boolean stopped = false;
     private boolean draining = false;
     private Future<Void> connectFuture = null;
     private volatile TransportClient client = null;
 
-    public Outbox(RpcAddress address, RpcEnv rpcEnv) {
+    public Outbox(Address address, Endpoint endpoint) {
         this.address = address;
-        this.rpcEnv = rpcEnv;
+        this.endpoint = endpoint;
     }
 
     public void send(OutboxMessage message) {
@@ -121,9 +122,10 @@ public class Outbox {
 
     private void launchConnectTask() {
         Outbox that = this;
-        rpcEnv.connectExecutor.submit(() -> {
+        endpoint.connectExecutor.submit(() -> {
             try {
-                TransportClient client = rpcEnv.createClient(address);
+                // connect to address
+                TransportClient client = null;
 
                 synchronized (that) {
                     that.client = client;
@@ -132,8 +134,6 @@ public class Outbox {
                         closeClient();
                     }
                 }
-            } catch (InterruptedException e) {
-                return;
             } catch (Exception e) {
                 synchronized (that) {
                     connectFuture = null;
@@ -158,7 +158,7 @@ public class Outbox {
             closeClient();
         }
 
-        rpcEnv.removeOutbox(address);
+        endpoint.removeOutbox(address);
 
         do {
             OutboxMessage message = messages.poll();

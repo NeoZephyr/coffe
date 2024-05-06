@@ -1,12 +1,13 @@
-package jubi.netty;
+package queue.hole;
 
 import com.google.common.base.Objects;
 
-public class RpcAddress {
+public class Address {
+
     public String host;
     public int port;
 
-    public RpcAddress(String host, int port) {
+    public Address(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -19,7 +20,7 @@ public class RpcAddress {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RpcAddress that = (RpcAddress) o;
+        Address that = (Address) o;
         return port == that.port && Objects.equal(host, that.host);
     }
 

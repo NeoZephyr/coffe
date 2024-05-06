@@ -35,6 +35,7 @@ public class StreamCountApp {
         }).map(new MapFunction<String, Tuple2<String, Integer>>() {
             @Override
             public Tuple2<String, Integer> map(String value) throws Exception {
+                // Tuple2.of(value, 1);
                 return new Tuple2<>(value, 1);
             }
         }).keyBy(new KeySelector<Tuple2<String, Integer>, String>() {

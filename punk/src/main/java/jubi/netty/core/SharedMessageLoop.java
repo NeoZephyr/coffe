@@ -11,11 +11,9 @@ public class SharedMessageLoop extends MessageLoop {
 
     private ConcurrentHashMap<String, Inbox> inboxes = new ConcurrentHashMap();
 
-    public SharedMessageLoop(JubiConf conf, Dispatcher dispatcher) {
+    public SharedMessageLoop(Dispatcher dispatcher) {
         this.dispatcher = dispatcher;
-
-        int cores = Runtime.getRuntime().availableProcessors();
-        int threadNum = conf.get(TransportConf.NETTY_DISPATCHER_NUM_THREADS, cores);
+        int threadNum = Runtime.getRuntime().availableProcessors();
         pool = ThreadUtils.newDaemonCachedThreadPool(threadNum, "dispatcher-event-loop");
 
         for (int i = 0; i < threadNum; i++) {

@@ -1,7 +1,7 @@
 package jubi.netty.core;
 
 import jubi.JubiException;
-import jubi.netty.RpcEndpoint;
+import queue.hole.Endpoint;
 import jubi.netty.server.RpcService;
 import jubi.netty.client.RpcResponseCallback;
 
@@ -14,14 +14,12 @@ public class Dispatcher {
     private volatile boolean stopped = false;
     private CountDownLatch shutdownLatch = new CountDownLatch(1);
     private ConcurrentHashMap<String, MessageLoop> endpoints = new ConcurrentHashMap<>();
-    private RpcEnv env;
-    private MessageLoop sharedLoop = new SharedMessageLoop(env.conf, this);
+    private MessageLoop sharedLoop = new SharedMessageLoop(this);
 
-    public Dispatcher(RpcEnv env) {
-        this.env = env;
+    public Dispatcher() {
     }
 
-    public void registerEndpoint(RpcEndpoint endpoint, RpcService service) {
+    public void registerEndpoint(Endpoint endpoint, RpcService service) {
         synchronized (this) {
             if (stopped) {
                 throw new IllegalStateException("RpcEnv has been stopped");
@@ -42,7 +40,7 @@ public class Dispatcher {
         }
     }
 
-    public void postMessage(RpcEndpoint endpoint, InboxMessage message, RpcResponseCallback callback) {
+    public void postMessage(Endpoint endpoint, InboxMessage message, RpcResponseCallback callback) {
         Throwable error = null;
 
         synchronized (this) {
@@ -62,7 +60,7 @@ public class Dispatcher {
         }
     }
 
-    void stop() throws InterruptedException {
+    public void stop() throws InterruptedException {
         if (stopped) {
             return;
         }
