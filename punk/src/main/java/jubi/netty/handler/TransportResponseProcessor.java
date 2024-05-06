@@ -1,16 +1,13 @@
 package jubi.netty.handler;
 
+import common.NettyUtils;
 import io.netty.channel.Channel;
 import jubi.netty.client.RpcResponseCallback;
 import jubi.netty.protocol.ResponseMessage;
-import jubi.netty.protocol.RpcFailure;
-import jubi.netty.protocol.RpcResponse;
-import jubi.netty.util.NettyUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -24,17 +21,7 @@ public class TransportResponseProcessor extends MessageProcessor<ResponseMessage
 
     public TransportResponseProcessor(Channel channel) {
         this.channel = channel;
-        this.rpcCallbacks = new ConcurrentHashMap<>();
         this.lastRequestTime = new AtomicLong(0);
-    }
-
-    public void addRpcCallback(long requestId, RpcResponseCallback callback) {
-        updateLastRequestTime();
-        rpcCallbacks.put(requestId, callback);
-    }
-
-    public void removeRpcCallback(long requestId) {
-        rpcCallbacks.remove(requestId);
     }
 
     public void updateLastRequestTime() {
@@ -51,34 +38,10 @@ public class TransportResponseProcessor extends MessageProcessor<ResponseMessage
 
     @Override
     public void handle(ResponseMessage message) throws Exception {
-        if (message instanceof RpcResponse) {
-            RpcResponse response = (RpcResponse) message;
-            RpcResponseCallback callback = rpcCallbacks.remove(response.getRequestId());
-
-            if (callback == null) {
-                log.warn("Ignoring response for RPC {} from {} since it is not outstanding",
-                        response.getRequestId(), NettyUtils.getRemoteAddress(channel));
-            } else {
-                callback.onSuccess(response);
-            }
-        } else if (message instanceof RpcFailure) {
-            RpcFailure response = (RpcFailure) message;
-            RpcResponseCallback callback = rpcCallbacks.remove(response.getRequestId());
-
-            if (callback == null) {
-                log.warn("Ignoring response for RPC {} from {} since it is not outstanding",
-                        response.getRequestId(), NettyUtils.getRemoteAddress(channel));
-            } else {
-                callback.onFailure(new RuntimeException(response.getErrorMsg()));
-            }
-        } else {
-            throw new IllegalStateException("Unknown response type: " + message.type());
-        }
     }
 
     @Override
     public void channelActive() {
-
     }
 
     @Override

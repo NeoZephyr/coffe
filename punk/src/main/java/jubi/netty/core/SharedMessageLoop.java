@@ -1,6 +1,6 @@
 package jubi.netty.core;
 
-import jubi.common.ThreadUtils;
+import common.ThreadUtils;
 import jubi.config.JubiConf;
 import jubi.netty.server.RpcService;
 import jubi.netty.TransportConf;

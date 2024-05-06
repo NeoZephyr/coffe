@@ -2,7 +2,6 @@ package jubi.config;
 
 import com.google.common.collect.Maps;
 import jubi.JubiException;
-import jubi.service.discovery.RetryPolicyKind;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -66,11 +65,6 @@ public class JubiConf {
                     "elapsed for UNTIL_ELAPSED policy to connect the zookeeper ensemble")
             .intConf()
             .createWithDefault(30 * 1000);
-
-    public static final ConfigEntry<String> HA_ZK_CONN_RETRY_POLICY_KIND = buildConf("jubi.ha.zookeeper.connection.retry.policy")
-            .doc("The retry policy for connecting to the ZooKeeper ensemble")
-            .stringConf()
-            .createWithDefault(RetryPolicyKind.EXPONENTIAL_BACKOFF.name());
 
     public static ConfigBuilder buildConf(String key) {
         return new ConfigBuilder(key).callback(JubiConf::register);

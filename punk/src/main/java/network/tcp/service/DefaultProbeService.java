@@ -4,6 +4,11 @@ public class DefaultProbeService implements ProbeService {
 
     @Override
     public String ping() {
+        try {
+            Thread.sleep(10 * 1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return "pong";
     }
 

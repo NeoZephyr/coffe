@@ -188,16 +188,16 @@ public class EchoClient {
     }
 
     public static void callRpc() throws ClassNotFoundException {
-        String face = "net.pipe.service.ProbeService";
+        String face = "network.tcp.service.ProbeService";
         ProbeService service = (ProbeService) ServiceFactory.getProxyService(Class.forName(face));
         String result = service.ping();
         log.info("ping result: {}", result);
 
-        result = service.ready("kafka");
-        log.info("ready result: {}", result);
+        // result = service.ready("kafka");
+        // log.info("ready result: {}", result);
 
-        String status = service.status();
-        log.info("status result: {}", status);
+        // String status = service.status();
+        // log.info("status result: {}", status);
     }
 
     private static void connect(Bootstrap bootstrap, String host, int port, int retry) {

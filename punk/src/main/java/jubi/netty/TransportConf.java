@@ -2,7 +2,7 @@ package jubi.netty;
 
 import jubi.config.ConfigEntry;
 import jubi.config.JubiConf;
-import jubi.netty.util.IOMode;
+import common.IOMode;
 
 import static jubi.config.JubiConf.buildConf;
 

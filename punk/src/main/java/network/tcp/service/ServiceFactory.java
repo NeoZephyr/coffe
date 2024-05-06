@@ -47,7 +47,13 @@ public class ServiceFactory {
                     args
             );
 
-            getChannel().writeAndFlush(msg);
+            getChannel().writeAndFlush(msg).addListener(future -> {
+                if (future.isSuccess()) {
+                    log.info("send request success");
+                } else {
+                    log.warn("send request error");
+                }
+            });
 
             // Promise 来接收结果
             DefaultPromise<Object> promise = new DefaultPromise<>(getChannel().eventLoop());

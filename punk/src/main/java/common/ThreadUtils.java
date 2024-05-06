@@ -1,4 +1,4 @@
-package jubi.common;
+package common;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import java.util.concurrent.*;
 public class ThreadUtils {
 
     public static ScheduledExecutorService newDaemonSingleThreadScheduledExecutor(String name, boolean execAfterShutdown) {
-        NamedThreadFactory threadFactory = new NamedThreadFactory(name, true);
+        ThreadFactory threadFactory = new DaemonThreadFactory(name);
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, threadFactory);
         executor.setRemoveOnCancelPolicy(true);
         executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(execAfterShutdown);
@@ -17,7 +17,7 @@ public class ThreadUtils {
     }
 
     public static ThreadPoolExecutor newDaemonQueuedThreadPool(int poolSize, int queueSize, long keepAliveMillis, String name) {
-        NamedThreadFactory factory = new NamedThreadFactory(name, true);
+        ThreadFactory factory = new DaemonThreadFactory(name);
         LinkedBlockingQueue<Runnable> queue = new LinkedBlockingQueue<>(queueSize);
         ThreadPoolExecutor executor = new ThreadPoolExecutor(poolSize, poolSize, keepAliveMillis, TimeUnit.MILLISECONDS, queue, factory);
         executor.allowCoreThreadTimeOut(true);

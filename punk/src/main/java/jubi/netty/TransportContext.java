@@ -5,9 +5,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import jubi.netty.client.TransportClient;
-import jubi.netty.client.TransportClientFactory;
 import jubi.netty.handler.*;
-import jubi.netty.server.TransportServer;
 
 public class TransportContext {
 
@@ -17,22 +15,6 @@ public class TransportContext {
 
     public TransportContext(TransportConf transportConf) {
         this.transportConf = transportConf;
-    }
-
-    public TransportClientFactory createClientFactory() {
-        return new TransportClientFactory(this);
-    }
-
-    public TransportServer createServer(String host, int port) {
-        return new TransportServer(this, null, port);
-    }
-
-    public TransportServer createServer(int port) {
-        return new TransportServer(this, null, port);
-    }
-
-    public TransportServer createServer() {
-        return createServer(0);
     }
 
     public TransportChannelHandler initializePipeline(SocketChannel channel) {

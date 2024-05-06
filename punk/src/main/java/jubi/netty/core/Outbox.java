@@ -1,6 +1,5 @@
 package jubi.netty.core;
 
-import jubi.JubiException;
 import jubi.netty.RpcAddress;
 import jubi.netty.client.TransportClient;
 
@@ -34,7 +33,7 @@ public class Outbox {
         }
 
         if (dropped) {
-            message.onFailure(new JubiException("Message is dropped because Outbox is stopped"));
+            // message.onFailure(new JubiException("Message is dropped because Outbox is stopped"));
         } else {
             drainOutbox();
         }
@@ -61,7 +60,7 @@ public class Outbox {
             if (message == null) {
                 break;
             }
-            message.onFailure(new JubiException("Message is dropped because Outbox is stopped"));
+            // message.onFailure(new JubiException("Message is dropped because Outbox is stopped"));
         } while (true);
     }
 
@@ -168,7 +167,7 @@ public class Outbox {
                 break;
             }
 
-            message.onFailure(e);
+            // message.onFailure(e);
         } while (true);
     }
 

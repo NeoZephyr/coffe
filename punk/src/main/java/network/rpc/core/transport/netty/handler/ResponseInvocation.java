@@ -1,5 +1,6 @@
 package network.rpc.core.transport.netty.handler;
 
+import common.NettyUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,7 +25,8 @@ public class ResponseInvocation extends SimpleChannelInboundHandler<Command> {
         if (future != null) {
             future.getFuture().complete(response);
         } else {
-            log.warn("Drop response: {}", response);
+            log.warn("Ignoring response for request {} from {} since it is not outstanding",
+                    response.getHeader().getRequestId(), NettyUtils.getRemoteAddress(ctx.channel()));
         }
     }
 

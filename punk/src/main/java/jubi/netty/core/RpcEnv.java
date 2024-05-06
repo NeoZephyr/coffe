@@ -1,17 +1,14 @@
 package jubi.netty.core;
 
-import jubi.common.ThreadUtils;
+import common.ThreadUtils;
 import jubi.config.JubiConf;
 import jubi.netty.RpcAddress;
 import jubi.netty.RpcEndpoint;
 import jubi.netty.TransportConf;
-import jubi.netty.TransportContext;
 import jubi.netty.client.RpcResponseCallback;
 import jubi.netty.client.TransportClient;
-import jubi.netty.client.TransportClientFactory;
 import jubi.netty.protocol.Message;
 import jubi.netty.server.RpcCallContext;
-import jubi.netty.server.TransportServer;
 import jubi.netty.util.Utils;
 
 import java.io.*;
@@ -23,24 +20,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RpcEnv {
     private String host;
-    private TransportConf transportConf;
     JubiConf conf;
     private Dispatcher dispatcher;
-    private TransportContext transportContext;
-    private TransportClientFactory clientFactory = transportContext.createClientFactory();
 
-    private volatile TransportServer server;
     private AtomicBoolean stopped = new AtomicBoolean(false);
     private ConcurrentHashMap<RpcAddress, Outbox> outboxes = new ConcurrentHashMap<>();
 
     ThreadPoolExecutor connectExecutor;
 
+    public RpcEnv() {
+    }
+
     public static RpcEnv create(RpcEnvConfig config) throws Exception {
         RpcEnv rpcEnv = new RpcEnv();
         rpcEnv.conf = config.conf;
-        rpcEnv.transportConf = new TransportConf(config.conf);
         rpcEnv.host = config.host;
-        rpcEnv.transportContext = new TransportContext(rpcEnv.transportConf);
         rpcEnv.connectExecutor = ThreadUtils.newDaemonCachedThreadPool(1, "netty-rpc-connection");
         rpcEnv.dispatcher = new Dispatcher(rpcEnv);
 
@@ -106,13 +100,7 @@ public class RpcEnv {
             dispatcher.stop();
         }
 
-        if (server != null) {
-            server.close();
-        }
-
-        if (clientFactory != null) {
-            clientFactory.close();
-        }
+        // close server
     }
 
     public void awaitTermination() throws InterruptedException {
@@ -128,19 +116,15 @@ public class RpcEnv {
     }
 
     TransportClient createClient(RpcAddress address) throws IOException, InterruptedException {
-        return clientFactory.createClient(address.host, address.port);
+        // new client
+        return null;
     }
 
-    private void startServer(String host, int port) {
-        server = transportContext.createServer(host, port);
-    }
+    private void startServer(String host, int port) {}
 
     private RpcAddress address() {
-        if (server == null) {
-            return new RpcAddress(host, server.getPort());
-        } else {
-            return null;
-        }
+        // return server addr
+        return null;
     }
 
     private ByteBuffer serialize(RpcEndpoint receiver, Message message) throws IOException {

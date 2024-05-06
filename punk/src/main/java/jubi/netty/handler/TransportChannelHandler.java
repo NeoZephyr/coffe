@@ -8,7 +8,7 @@ import jubi.netty.client.TransportClient;
 import jubi.netty.protocol.Message;
 import jubi.netty.protocol.RequestMessage;
 import jubi.netty.protocol.ResponseMessage;
-import jubi.netty.util.NettyUtils;
+import common.NettyUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

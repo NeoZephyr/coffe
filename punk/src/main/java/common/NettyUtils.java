@@ -1,9 +1,10 @@
-package jubi.netty.util;
+package common;
 
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.ServerChannel;
+import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -31,7 +32,10 @@ public class NettyUtils {
             case NIO:
                 return NioSocketChannel.class;
             case EPOLL:
-                return EpollSocketChannel.class;
+                if (Epoll.isAvailable()) {
+                    return EpollSocketChannel.class;
+                }
+                throw new IllegalArgumentException("Epoll mode unsupported");
             default:
                 throw new IllegalArgumentException("Unknown io mode: " + mode);
         }
@@ -44,7 +48,10 @@ public class NettyUtils {
             case NIO:
                 return new NioEventLoopGroup(numThreads, threadFactory);
             case EPOLL:
-                return new EpollEventLoopGroup(numThreads, threadFactory);
+                if (Epoll.isAvailable()) {
+                    return new EpollEventLoopGroup(numThreads, threadFactory);
+                }
+                throw new IllegalArgumentException("Epoll mode unsupported");
             default:
                 throw new IllegalArgumentException("Unknown io mode: " + mode);
         }

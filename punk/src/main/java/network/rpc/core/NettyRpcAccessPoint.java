@@ -6,7 +6,7 @@ import network.rpc.core.client.StubFactory;
 import network.rpc.core.server.ServiceProviderRegistry;
 import network.rpc.core.transport.RequestHandlerRegistry;
 import network.rpc.core.transport.Transport;
-import network.rpc.core.transport.TransportClient;
+import network.rpc.core.transport.ClientTransportFactory;
 import network.rpc.core.transport.TransportServer;
 
 import java.io.Closeable;
@@ -22,7 +22,7 @@ public class NettyRpcAccessPoint implements RpcAccessPoint {
     private final int port = 9999;
     private final URI uri = URI.create("rpc://" + host + ":" + port);
     private TransportServer server = null;
-    private TransportClient client = ServiceSupport.load(TransportClient.class);
+    private ClientTransportFactory client = ServiceSupport.load(ClientTransportFactory.class);
     private Map<URI, Transport> transports = new ConcurrentHashMap<>();
     private final StubFactory stubFactory = ServiceSupport.load(StubFactory.class);
     private final ServiceProviderRegistry serviceProviderRegistry = ServiceSupport.load(ServiceProviderRegistry.class);
@@ -34,7 +34,7 @@ public class NettyRpcAccessPoint implements RpcAccessPoint {
     }
 
     @Override
-    public synchronized  <T> URI addServiceProvider(T service, Class<T> serviceClass) {
+    public synchronized <T> URI addServiceProvider(T service, Class<T> serviceClass) {
         serviceProviderRegistry.addServiceProvider(serviceClass, service);
         return uri;
     }
@@ -64,7 +64,9 @@ public class NettyRpcAccessPoint implements RpcAccessPoint {
 
     private Transport createTransport(URI uri) {
         try {
-            return client.createTransport(new InetSocketAddress(uri.getHost(), uri.getPort()), 3000L);
+            // todo cached
+            // InetSocketAddress.createUnresolved(host, port);
+            return client.createTransport(new InetSocketAddress(uri.getHost(), uri.getPort()));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

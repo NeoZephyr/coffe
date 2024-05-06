@@ -1,4 +1,4 @@
-package jubi.netty.util;
+package common;
 
 public enum IOMode {
     NIO,
