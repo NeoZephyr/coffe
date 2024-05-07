@@ -1,9 +1,7 @@
-package jubi.netty.core;
+package queue.hole;
 
 import common.ThreadUtils;
-import jubi.config.JubiConf;
 import jubi.netty.server.RpcService;
-import jubi.netty.TransportConf;
 
 import java.util.concurrent.ConcurrentHashMap;
 

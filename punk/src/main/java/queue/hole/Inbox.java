@@ -1,7 +1,8 @@
-package jubi.netty.core;
+package queue.hole;
 
 import jubi.netty.server.RpcService;
 import lombok.extern.slf4j.Slf4j;
+import queue.hole.InboxMessage;
 
 import java.util.LinkedList;
 

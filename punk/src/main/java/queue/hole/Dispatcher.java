@@ -1,7 +1,6 @@
-package jubi.netty.core;
+package queue.hole;
 
 import jubi.JubiException;
-import queue.hole.Endpoint;
 import jubi.netty.server.RpcService;
 import jubi.netty.client.RpcResponseCallback;
 

@@ -1,8 +1,6 @@
-package jubi.netty.core;
+package queue.hole;
 
-import queue.hole.Address;
-import jubi.netty.client.TransportClient;
-import queue.hole.Endpoint;
+import network.rpc.core.transport.Transport;
 
 import java.util.LinkedList;
 import java.util.concurrent.Future;
@@ -15,7 +13,7 @@ public class Outbox {
     private boolean stopped = false;
     private boolean draining = false;
     private Future<Void> connectFuture = null;
-    private volatile TransportClient client = null;
+    private volatile Transport transport = null;
 
     public Outbox(Address address, Endpoint endpoint) {
         this.address = address;
@@ -78,7 +76,7 @@ public class Outbox {
                 return;
             }
 
-            if (client == null) {
+            if (transport == null) {
                 launchConnectTask();
                 return;
             }
@@ -97,8 +95,8 @@ public class Outbox {
 
         while (true) {
             try {
-                if (client != null) {
-                    message.sendWith(client);
+                if (transport != null) {
+                    message.sendWith(transport);
                 }
             } catch (Exception e) {
                 handleNetworkFailure(e);
@@ -125,10 +123,10 @@ public class Outbox {
         endpoint.connectExecutor.submit(() -> {
             try {
                 // connect to address
-                TransportClient client = null;
+                Transport transport = null;
 
                 synchronized (that) {
-                    that.client = client;
+                    that.transport = transport;
 
                     if (stopped) {
                         closeClient();
@@ -173,6 +171,6 @@ public class Outbox {
 
     private synchronized void closeClient() {
         // Just set client to null. Don't close it in order to reuse the connection.
-        client = null;
+        transport = null;
     }
 }

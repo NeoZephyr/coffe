@@ -20,7 +20,8 @@ public class IngestApp {
         appInfo = appInfoMap.get("extdmdataconnector");
         // System.out.println(getToken());
 
-        ingestProfile(appInfo);
+        ingestEvent(appInfo);
+        // ingestProfile(appInfo);
         // ingestDocument(appInfo);
         // deleteIdentity(appInfo);
     }
@@ -94,6 +95,14 @@ public class IngestApp {
 
         for (Map document : dataList) {
             restService.post(appInfo.orderUrl, document, appInfo);
+        }
+    }
+
+    public static void ingestEvent(AppInfo appInfo) throws IOException {
+        List<Map> dataList = loadData("source/event.json");
+
+        for (Map event : dataList) {
+            restService.post(appInfo.eventUrl, event, appInfo);
         }
     }
 

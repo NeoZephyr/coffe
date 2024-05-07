@@ -28,9 +28,9 @@
     "appSecret": "d3d41defcc923758c5e1d7e85d794b62db1b2220",
     "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
     "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_t143_customer-yanxikais",
-    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
+    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_acccccc-accidentppp",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
-    "token": "6ed925a0c3f3742dff82bf2a1d22dc82"
+    "token": "b0f7e6e916736f3e1ec6f3c3fea9c22e"
   },
   "test_not_deltalake": {
     "tenantId": "1734229266",

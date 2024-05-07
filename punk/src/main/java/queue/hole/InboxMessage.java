@@ -1,4 +1,4 @@
-package jubi.netty.core;
+package queue.hole;
 
 public class InboxMessage {
 
