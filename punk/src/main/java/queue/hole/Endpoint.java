@@ -1,12 +1,10 @@
 package queue.hole;
 
 import common.ThreadUtils;
-import jubi.netty.client.RpcResponseCallback;
 import jubi.netty.protocol.Message;
 import jubi.netty.util.Utils;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -79,10 +77,7 @@ public class Endpoint {
         }
     }
 
-    public void receive(ByteBuffer content, RpcResponseCallback callback) throws IOException, ClassNotFoundException {
-        // InboxMessage inboxMessage = new InboxMessage();
-        // dispatcher.postMessage(endpoint, inboxMessage, callback);
-    }
+    // receive -> dispatcher -> loop(find by endpoint name) -> post and activate inbox
 
     public void removeOutbox(Address address) {
         Outbox outbox = outboxes.remove(address);

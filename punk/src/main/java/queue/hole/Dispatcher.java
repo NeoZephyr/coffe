@@ -1,8 +1,6 @@
 package queue.hole;
 
-import jubi.JubiException;
 import jubi.netty.server.RpcService;
-import jubi.netty.client.RpcResponseCallback;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,26 +34,6 @@ public class Dispatcher {
 
         if (loop != null) {
             loop.unregister(name);
-        }
-    }
-
-    public void postMessage(Endpoint endpoint, InboxMessage message, RpcResponseCallback callback) {
-        Throwable error = null;
-
-        synchronized (this) {
-            MessageLoop loop = endpoints.get(endpoint.name);
-
-            if (stopped) {
-                error = new JubiException("Dispatcher already stopped");
-            } else if (loop == null) {
-                error = new JubiException(String.format("Could not find %s.", endpoint.name));
-            } else {
-                loop.post(endpoint.name, message);
-            }
-        }
-
-        if (error != null) {
-            callback.onFailure(error);
         }
     }
 

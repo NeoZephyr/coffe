@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public abstract class MessageLoop {
-    private LinkedBlockingQueue<Inbox> inboxes = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<Inbox> activateInboxes = new LinkedBlockingQueue<>();
     private boolean stopped = false;
     protected ExecutorService pool;
     protected Dispatcher dispatcher;
@@ -23,7 +23,7 @@ public abstract class MessageLoop {
             try {
                 while (true) {
                     try {
-                        Inbox inbox = inboxes.take();
+                        Inbox inbox = activateInboxes.take();
 
                         if (inbox == MessageLoop.PoisonPill) {
                             // Put PoisonPill back so that other threads can see it.
@@ -51,7 +51,7 @@ public abstract class MessageLoop {
     public abstract void unregister(String name);
 
     public void activate(Inbox inbox) {
-        inboxes.offer(inbox);
+        activateInboxes.offer(inbox);
     }
 
     public void stop() throws InterruptedException {
