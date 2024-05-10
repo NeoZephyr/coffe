@@ -178,6 +178,11 @@ public class EchoClient {
                                 ByteBuf buf = (ByteBuf) msg;
                                 log.info("=== msg: {}", buf.toString(Charset.defaultCharset()));
                             }
+
+                            @Override
+                            public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+                                ctx.flush();
+                            }
                         });
                     }
                 });
