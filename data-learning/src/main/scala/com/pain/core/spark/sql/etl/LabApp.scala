@@ -25,14 +25,16 @@ object LabApp {
   def sort(): Unit = {
     val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
     var df: DataFrame = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("input/a.csv")
+    var dff: DataFrame = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("input/b.csv")
     df = df.repartition(20)
+    dff = dff.repartition(10)
     df.rdd.mapPartitionsWithIndex((idx, iter) => {
       iter.foreach(r => {
         printf("idx: %s, data: %s\n", idx, r.mkString("---"))
       })
       iter
     }).count()
-    df = df.withColumn("id", (rand() * 10).cast(IntegerType)).sort("id")
+    df = df.withColumn("id", (rand() * 10 + 10).cast(IntegerType)).sort("id")
     println("==========")
     df.rdd.mapPartitionsWithIndex((idx, iter) => {
       iter.foreach(r => {
@@ -41,7 +43,12 @@ object LabApp {
       iter
     }).count()
     df.createOrReplaceTempView("x")
-    spark.sql("select * from x limit 3").show()
+    dff.createOrReplaceTempView("y")
+    val ds = spark.sql("select * from x join y on x.customer_id = y.customer_id")
+    ds.show()
+    ds.createOrReplaceTempView("xx")
+    println("===========")
+    spark.sql("select * from xx limit 5").show()
     // df.show()
   }
 
