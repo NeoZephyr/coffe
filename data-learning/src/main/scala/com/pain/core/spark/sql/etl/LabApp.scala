@@ -1,9 +1,9 @@
 package com.pain.core.spark.sql.etl
 
-import com.pain.support.JsonUtil
-import org.apache.spark.sql.functions.{coalesce, col, sin, struct, to_json}
-import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.functions.{coalesce, col, rand, struct, to_json}
+import org.apache.spark.sql.types.{IntegerType, StringType}
 import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
+import org.slf4j.LoggerFactory
 
 import java.util.UUID
 import scala.beans.BeanProperty
@@ -13,13 +13,36 @@ object LabApp {
   def main(args: Array[String]): Unit = {
     // split()
     // split0()
-    import scala.collection.JavaConverters._
 
-    val map = Notifications.createRefreshEvent(10, ImpalaRefreshDto("campaign_event_facts", Seq(PartitionColumn("tenant_id", "10", "Long")).asJava)).asJava
-    println(map.get("publisher"))
-    println(JsonUtil.objToStr(map))
+//    val map = Notifications.createRefreshEvent(10, ImpalaRefreshDto("campaign_event_facts", Seq(PartitionColumn("tenant_id", "10", "Long")).asJava)).asJava
+//    println(map.get("publisher"))
+//
+//    kafkaSink()
 
-    kafkaSink()
+    sort()
+  }
+
+  def sort(): Unit = {
+    val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
+    var df: DataFrame = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("input/a.csv")
+    df = df.repartition(20)
+    df.rdd.mapPartitionsWithIndex((idx, iter) => {
+      iter.foreach(r => {
+        printf("idx: %s, data: %s\n", idx, r.mkString("---"))
+      })
+      iter
+    }).count()
+    df = df.withColumn("id", (rand() * 10).cast(IntegerType)).sort("id")
+    println("==========")
+    df.rdd.mapPartitionsWithIndex((idx, iter) => {
+      iter.foreach(r => {
+        printf("idx: %s, data: %s\n", idx, r.mkString("---"))
+      })
+      iter
+    }).count()
+    df.createOrReplaceTempView("x")
+    spark.sql("select * from x limit 3").show()
+    // df.show()
   }
 
   def kafkaSink(): Unit = {
