@@ -1,9 +1,9 @@
 package network.rpc.core.transport.netty;
 
+import common.NettyUtils;
 import io.netty.channel.Channel;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import common.NettyUtils;
 import lombok.extern.slf4j.Slf4j;
 import network.rpc.core.transport.InFlightRequests;
 import network.rpc.core.transport.ResponseFuture;
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.SocketAddress;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class NettyTransport implements Transport {

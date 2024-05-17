@@ -10,14 +10,14 @@ import java.net.URI
 
 object HdfsApp {
 
-    val HDFS_URL = "hdfs://cdh:8020"
+    val HDFS_URL = "hdfs://cdp:8020"
 
     def main(args: Array[String]): Unit = {
         val configuration = new Configuration()
-        val fileSystem: FileSystem = FileSystem.get(new URI(HDFS_URL), configuration, "vagrant")
+        val fileSystem: FileSystem = FileSystem.get(new URI(HDFS_URL), configuration, "ubuntu")
 
         // mkdir(fileSystem, "/hdfs_test")
-        // createFile(fileSystem, "/hdfs_test/hadoop.txt", "hadoop 棒极了！")
+        createFile(fileSystem, "/hello/hadoop.txt", "hadoop 棒极了！")
         // readFile(fileSystem, "/hdfs_test/hadoop.txt")
         // rename(fileSystem, "/hdfs_test/hadoop.txt", "/hdfs_test/hdfs.txt")
         // copyFromLocal(fileSystem, "input/words.txt", "/hdfs_test/hadoop.txt")

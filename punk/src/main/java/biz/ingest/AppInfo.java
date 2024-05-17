@@ -11,6 +11,7 @@ public class AppInfo {
 
     String tokenUrl;
     String profileUrl;
+    String customerUrl;
     String eventUrl;
     String orderUrl;
     String token;

@@ -22,6 +22,15 @@ public class RestService {
         restTemplate = builder.build();
     }
 
+    public Map get(String url, AppInfo appInfo) {
+        HttpEntity entity = new HttpEntity(getHttpHeaders(appInfo));
+        ResponseEntity<String> res = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+        log.info("=== response: {}", res.getBody());
+
+        return JsonUtil.strToObj(res.getBody(), Map.class);
+    }
+
     public Map post(String url, Map data, AppInfo appInfo) {
         HttpEntity entity = null;
 

@@ -9,7 +9,7 @@ public class ConfigBuilder {
 
     private String doc = "";
     private final String key;
-    private Consumer<ConfigEntry<?>> callback;
+    private Consumer<ConfigEntry<?>> callback = JubiConf::register;
 
     public ConfigBuilder(String key) {
         this.key = key;

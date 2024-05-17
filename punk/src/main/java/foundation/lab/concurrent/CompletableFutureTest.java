@@ -63,9 +63,19 @@ public class CompletableFutureTest {
         log.info("all task ok");
 
         for (CompletableFuture<?> future : futures) {
-            Result o = (Result) future.get();
-            log.info("{}", o);
+            if (future.isCompletedExceptionally()) {
+                try {
+                    future.get();
+                } catch (Exception e) {
+                    log.error("complete exception {}", e.getMessage());
+                }
+            } else {
+                Result o = (Result) future.get();
+                log.info("complete result {}", o);
+            }
         }
+
+        log.info("complete");
     }
 
     @Data

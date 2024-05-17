@@ -38,9 +38,28 @@
     "appId": "cl00d218e0ca1703e",
     "appSecret": "baf06eab0d465024eb13d147c3ca3a77e8c05514",
     "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
-    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_bad_guy-001",
-    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_dd_tour-event-import",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_new_pp-big-data-pour",
+    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_clean_bad_guy-three-five-clean",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
-    "token": "18b0be9c66c940880dd188ab48c8ad9a"
+    "token": "d93d382668a27fb6c51a2ddfc886edbf"
+  },
+  "dmhub": {
+    "tenantId": "1734229266",
+    "projectId": "dmhub",
+    "appId": "cl00d118f5646d31b",
+    "appSecret": "f4d9f6c700264a9c409c5f973945d141cc8773e5",
+    "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_usa_school-build-school",
+    "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_usa_school_activity-shot-beat",
+    "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
+    "token": "a0a1d49ec681954344b233c102ccef50"
+  },
+  "dmhub143": {
+    "tenantId": "143",
+    "appId": "cl018618f5c760722",
+    "appSecret": "0bb7627d9e8b642238414a01835030b788c5aa1b",
+    "tokenUrl": "https://master-api.dmhub.cn/v2/oauth2/token?grant_type=client_credentials",
+    "customerUrl": "https://master-api.dmhub.cn/v2/customers",
+    "token": "197336da5deb3161769e574b41a275e4"
   }
 }

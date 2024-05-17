@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+// 防止不同 .proto 项目间命名发生冲突
+package hole;
+
+// 生成的 Java 代码将被分割成多个文件而不是一个文件
+option java_multiple_files = true;
+
+// 指定生成的 Java 代码中的外部类名称
+option java_outer_classname = "HeartbeatPB";
+
+// 指定生成的 Java 代码所属的包名
+option java_package = "queue.hole.protocol";
+
+// 启用生成的 Java 代码中的泛型服务
+// option java_generic_services = true;
+
+message Heartbeat {
+  optional string version = 1;
+}
+
+service HealthService {
+  rpc heartBeat(Heartbeat) returns (Heartbeat);
+}

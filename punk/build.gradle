@@ -3,7 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
     id 'groovy'
-    id 'com.google.protobuf' version '0.8.15'
+    id 'com.google.protobuf' version '0.9.4'
 }
 
 group = 'com.pain.flame'
@@ -11,8 +11,8 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
 targetCompatibility = 1.8
 
-def grpcVersion = '1.38.0'
-def protobufVersion = '3.12.0'
+def grpcVersion = '1.65.0'
+def protobufVersion = '3.25.1'
 def protocVersion = protobufVersion
 
 repositories {
@@ -88,6 +88,7 @@ dependencies {
     runtimeOnly "io.grpc:grpc-netty-shaded:${grpcVersion}"
 }
 
+//https://github.com/google/protobuf-gradle-plugin
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:${protocVersion}"
@@ -126,4 +127,15 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+
+    duplicatesStrategy = DuplicatesStrategy.WARN
+    zip64 = true
+}
+
+bootJar {
+    enabled = false
+}
+
+bootJarMainClassName {
+    enabled = false
 }
