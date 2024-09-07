@@ -37,8 +37,6 @@ object LabApp {
     write()
   }
 
-  // spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version
-
   def event(): Unit = {
     val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
     spark.sql("set spark.sql.session.timeZone = UTC")
@@ -125,6 +123,20 @@ object LabApp {
 
     // spark.read.table("cdp.dynamic_list_member").show()
     // spark.sql("select * from cdp.dynamic_list_member").show()
+  }
+
+  def estimate(): Unit = {
+    val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
+    var df: DataFrame = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("input/a.csv")
+    df.cache.count
+
+    val plan = df.queryExecution.logical
+    val estimated: BigInt = spark
+      .sessionState
+      .executePlan(plan)
+      .optimizedPlan
+      .stats
+      .sizeInBytes
   }
 
   def collect(): Unit = {

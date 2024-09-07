@@ -53,6 +53,7 @@ public class HttpServer {
         }
     }
 
+    // wrk -c 40 -d30s --latency http://localhost:8801
     public static void start() throws InterruptedException {
         NioEventLoopGroup boss = new NioEventLoopGroup(1);
         NioEventLoopGroup worker = new NioEventLoopGroup(2);
