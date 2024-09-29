@@ -1,7 +1,9 @@
 package algorithm.leetcode.recursion;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 public class GenerateParentheses {
 
@@ -31,5 +33,45 @@ public class GenerateParentheses {
         }
 
         // 这里隐藏退出了
+    }
+
+    // 可以用 Node 结构记录 left right
+    public List<String> generateParenthesis1(int n) {
+        List<String> seq = new ArrayList<>();
+        Queue<String> queue = new ArrayDeque<>();
+        queue.offer("");
+
+        while (!queue.isEmpty()) {
+            int sz = queue.size();
+
+            for (int i = 0; i < sz; i++) {
+                String s = queue.poll();
+                int left = 0;
+                int right = 0;
+
+                if (s.length() == 2 * n) {
+                    seq.add(s);
+                    continue;
+                }
+
+                for (int j = 0; j < s.length(); j++) {
+                    if (s.charAt(j) == '(') {
+                        left++;
+                    } else {
+                        right++;
+                    }
+                }
+
+                if (left > right) {
+                    queue.offer(s + ')');
+                }
+
+                if (left < n) {
+                    queue.offer(s + '(');
+                }
+            }
+        }
+
+        return seq;
     }
 }

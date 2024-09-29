@@ -51,4 +51,20 @@ public class Subsets {
     }
 
     // 逐个枚举，空集的幂集只有空集，每增加一个元素，让之前幂集中的每个集合，追加这个元素，就是新增的子集
+
+    // DFS 栈的写法
+//    def DFS(self, tree) {
+//        if tree.root is None {
+//            return [];
+//        }
+//        visited, stack = [], [tree.root];
+//
+//        while stack {
+//            node = stack.pop();
+//            visited.add(node);
+//            process(node);
+//            nodes = gen_related_nodes(node);
+//            stack.push(nodes)
+//        }
+//    }
 }
