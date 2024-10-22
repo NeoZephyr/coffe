@@ -1,12 +1,66 @@
 package foundation.lab.concurrent;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+@Slf4j
 public class ThreadPoolTest {
     public static void main(String[] args) throws InterruptedException {
-        createThreadPool();
+        // createThreadPool();
+        shutdown();
+    }
+
+    public static void shutdown() throws InterruptedException {
+        ThreadPoolTaskExecutor worker = new ThreadPoolTaskExecutor();
+        worker.setMaxPoolSize(3);
+        worker.setCorePoolSize(3);
+        worker.setQueueCapacity(1000);
+        worker.setKeepAliveSeconds(60);
+        worker.setThreadNamePrefix("identity-sink-worker-");
+        worker.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        worker.setWaitForTasksToCompleteOnShutdown(false);
+        worker.setAwaitTerminationSeconds(2);
+        worker.initialize();
+
+        for (int i = 0; i < 10; i++) {
+            int finalI = i;
+            worker.submit(() -> {
+                log.info("before exec task {}", finalI);
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    log.warn("exec task interrupted {}", finalI, e);
+                    // throw new RuntimeException(e);
+                }
+
+                log.info("after exec task {}", finalI);
+            });
+        }
+
+        Thread.sleep(3000);
+
+
+        // 1. stop all actively executing tasks
+        // 2. halts the processing of waiting tasks, and returns a list of the tasks that were awaiting execution
+        // 3. stop processing actively executing tasks via Thread.interrupt, any task that fails to respond to interrupts may never terminate
+        // List<Runnable> runnables = worker.getThreadPoolExecutor().shutdownNow();
+        // log.info("waiting tasks size: {}", runnables.size());
+
+        // 1. previously submitted tasks are executed
+        // 2. no new tasks will be accepted
+        // worker.getThreadPoolExecutor().shutdown();
+
+        worker.shutdown();
+        worker.submit(() -> System.out.println("hello"));
+        Thread.sleep(10 * 1000);
+        log.info("======= finish");
+        worker.submit(() -> System.out.println("hello"));
     }
 
     private static void createThreadPool() throws InterruptedException {

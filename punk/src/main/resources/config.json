@@ -38,10 +38,10 @@
     "appId": "cl00d218e0ca1703e",
     "appSecret": "baf06eab0d465024eb13d147c3ca3a77e8c05514",
     "tokenUrl": "https://master-data.dmhub.cn/api/v1/oauth2/token?grant_type=client_credentials",
-    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_new_pp-big-data-pour",
+    "profileUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_frog_gua-qingwa",
     "eventUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_clean_bad_guy-three-five-clean",
     "orderUrl": "https://master-data.dmhub.cn/api/v1/dataCollection/dw_shaluote_kao-shaluoke",
-    "token": "d93d382668a27fb6c51a2ddfc886edbf"
+    "token": "3ed3f51795cc14290132a7a7a73aada0"
   },
   "dmhub": {
     "tenantId": "1734229266",

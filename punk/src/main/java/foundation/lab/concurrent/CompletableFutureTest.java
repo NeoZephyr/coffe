@@ -39,7 +39,14 @@ public class CompletableFutureTest {
                 }
                 log.info("task {} complete", finalI);
                 if (finalI % 2 == 0) {
-                    throw new RuntimeException("fuck");
+                    throw new RuntimeException("boom");
+                }
+                try {
+                    if (finalI == 3) {
+                        Thread.sleep(time * 1000);
+                    }
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
 
                 return new Result(true, String.format("hello %d", finalI));
@@ -49,16 +56,16 @@ public class CompletableFutureTest {
 
         CompletableFuture<Void> f = CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0]));
 
-//        try {
-//            f.join();
-//        } catch (Exception e) {
-//            log.info("------ fukc");
-//        }
-
-        while (!f.isDone()) {
-            Thread.sleep(1000);
-            log.info("=== processing");
+        try {
+            f.join();
+        } catch (Exception e) {
+            log.info("------ fuck");
         }
+
+//        while (!f.isDone()) {
+//            Thread.sleep(1000);
+//            log.info("=== processing");
+//        }
 
         log.info("all task ok");
 

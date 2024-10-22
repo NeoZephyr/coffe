@@ -1,5 +1,7 @@
 package biz.ingest;
 
+import foundation.lab.concurrent.CompletableFutureTest;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -7,7 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.*;
 
 @Slf4j
 public class IngestApp {
@@ -22,43 +26,154 @@ public class IngestApp {
 
         // concurrentMigration();
         // concurrentMerge();
+        // ingestProfile(appInfo, 0, 1);
 
-        ingestProfile(appInfo, 0, 1);
+        long startTime = System.currentTimeMillis();
+        Thread[] threads = new Thread[5];
 
-//        Thread[] threads = new Thread[5];
-//
-//        for (int i = 0; i < 5; i++) {
-//            int ii = i;
-//            threads[i] = new Thread(() -> {
-//                try {
-//                    ingestProfile(appInfo, ii * 200000, (ii + 1) * 200000);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            });
-//            threads[i].start();
-//        }
-//
-//        for (int i = 0; i < 5; i++) {
-//            threads[i].join();
-//        }
-//
-//        log.info("=== end");
+        for (int i = 0; i < 5; i++) {
+            int ii = i;
+            threads[i] = new Thread(() -> {
+                try {
+                    ingestProfile(appInfo, ii * 200000, (ii + 1) * 200000);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            threads[i].start();
+        }
+
+        for (int i = 0; i < 5; i++) {
+            threads[i].join();
+        }
+
+        log.info("===================== end");
+
+        long cost = System.currentTimeMillis() - startTime;
+        log.info("cost {}ms, {}s", cost, cost / 1000);
 
         // ingestCustomerEvent(appInfo);
 
         // restService.post("https://master-api.dmhub.cn/v2/customerService/findCustomerByIdentity?identityType=cp_datahubconnector_uid&identityValue=1778367678759569408", appInfo);
         // createList();
 
-//        for (int i = 0; i < 100; i++) {
-//            ingestCustomer(appInfo);
-//            // Thread.sleep(8 * 1000);
-//        }
+        // ingestCustomer(appInfo);
         // ingestDocument(appInfo);
         // deleteIdentity(appInfo);
 
         // ingestProfile(appInfo);
         // ingestEvent(appInfo);
+
+        // long startTime = System.currentTimeMillis();
+        // benchmark1();
+//        benchmark2();
+//        long cost = System.currentTimeMillis() - startTime;
+//        log.info("cost {}ms, {}s", cost, cost / 1000);
+    }
+
+    static ThreadPoolExecutor executor = new ThreadPoolExecutor(
+            5, 5, 0L,
+            TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+
+    public static void benchmark1() throws IOException {
+        log.info("===== start");
+
+        for (int i = 0; i < 10000; i++) {
+            ingestProfile(appInfo, i, i + 1);
+        }
+
+        log.info("===== end");
+    }
+
+    public static void benchmark2() throws IOException, InterruptedException {
+        log.info("===== start");
+
+        List<Call> calls = new ArrayList<>(10);
+
+        for (int i = 0; i < 10; i++) {
+            calls.add(new Call());
+        }
+
+        for (int i = 0; i < 1000; i++) {
+            Call call = null;
+            int k = 0;
+
+            while (true) {
+                for (int j = 0; j < calls.size(); j++) {
+                    if (calls.get(j).future.isDone()) {
+                        call = calls.get(j);
+                        break;
+                    }
+                }
+
+                if (call != null) {
+                    break;
+                }
+
+                k++;
+                Thread.sleep(1);
+
+                if (k > 100) {
+                    log.error("wait too many times");
+                }
+            }
+
+            CompletableFuture<Result> future = concurrentTask(i * 10);
+            call.free = false;
+            call.future = future;
+        }
+
+        List<CompletableFuture<Result>> futures = new ArrayList<>();
+
+        for (int j = 0; j < calls.size(); j++) {
+            if (!calls.get(j).free) {
+                futures.add(calls.get(j).future);
+            }
+        }
+
+        if (!futures.isEmpty()) {
+            CompletableFuture<Void> f = CompletableFuture.allOf(futures.toArray(new CompletableFuture<?>[0]));
+            try {
+                f.join();
+            } catch (Exception e) {
+                log.info("------ fuck");
+            }
+        }
+
+        executor.getQueue().size();
+
+        log.info("===== end");
+    }
+
+    public static CompletableFuture<Result> concurrentTask(int i) {
+
+        CompletableFuture<Result> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                ingestProfile(appInfo, i, i + 10);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return new Result(true, null);
+        }, executor);
+
+        return future;
+    }
+
+    @Data
+    static class Call {
+        CompletableFuture<Result> future;
+        boolean free = true;
+    }
+
+    @Data
+    static class Result {
+        boolean success;
+        String data;
+
+        public Result(boolean success, String data) {
+            this.success = success;
+            this.data = data;
+        }
     }
 
     public static void concurrentMigration() {
@@ -143,16 +258,19 @@ public class IngestApp {
             Map data = new HashMap();
             List<Map> identities = new ArrayList<>();
             int ii = i;
-            identities.add(new HashMap<String, String>() {{
-                put("type", "email");
-                put("value", String.format("kakun-%s@qq.com", ii));
-            }});
+
+            for (int j = 0; j < 5; j++) {
+                int finalJ = j;
+                identities.add(new HashMap<String, String>() {{
+                    put("type", "email");
+                    put("value", String.format("omi-%d-qi-%s@qq.com", finalJ, ii));
+                }});
+            }
 
             data.put("identities", identities);
             data.put("data", new HashMap<String, String>() {{
-                put("_name", String.format("卡坤 %d", ii));
+                put("_name", String.format("欧姆与姆欧 %d", ii));
             }});
-
             data.put("messageKey", UUID.randomUUID().toString());
 
             restService.post(appInfo.profileUrl, data, appInfo);

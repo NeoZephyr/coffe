@@ -39,28 +39,32 @@ public class PunkClient extends GrpcClient {
     }
 
     <R> R sendRequest(Function<PunkGrpc.PunkBlockingStub, R> func) {
-        return func.apply(stub.withDeadlineAfter(3, TimeUnit.SECONDS));
+        return func.apply(stub.withDeadlineAfter(3, TimeUnit.MINUTES));
     }
 
     public static void main(String[] args) throws Exception {
         HeaderEnhanceInterceptor interceptor = new HeaderEnhanceInterceptor();
-        PunkClient client = new PunkClient("localhost", 5858, true, 3, new HeaderEnhanceInterceptor[]{interceptor});
-        ExecutorService executorService = Executors.newFixedThreadPool(3);
+        // PunkClient client = new PunkClient("localhost", 5858, true, 3, new HeaderEnhanceInterceptor[]{interceptor});
+        PunkClient client = new PunkClient("localhost", 5858, true, 3);
 
-        for (int i = 0; i < 100; i++) {
-            int finalI = i;
-            executorService.submit(() -> {
-                try {
-                    client.ping();
-                } catch (StatusRuntimeException e) {
-                    log.warn("counter: {}, status: {}, message: {}", finalI, e.getStatus(), e.getMessage());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        }
+        client.ping();
 
-        executorService.shutdown();
-        executorService.awaitTermination(1000, TimeUnit.SECONDS);
+//        ExecutorService executorService = Executors.newFixedThreadPool(3);
+//
+//        for (int i = 0; i < 100; i++) {
+//            int finalI = i;
+//            executorService.submit(() -> {
+//                try {
+//                    client.ping();
+//                } catch (StatusRuntimeException e) {
+//                    log.warn("counter: {}, status: {}, message: {}", finalI, e.getStatus(), e.getMessage());
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
+//            });
+//        }
+//
+//        executorService.shutdown();
+//        executorService.awaitTermination(1000, TimeUnit.SECONDS);
     }
 }

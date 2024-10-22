@@ -34,7 +34,34 @@ object LabApp {
 
     // event()
 
-    write()
+    // write()
+
+    val b = 1000
+    val a = Map[String, Any]("b" -> b)
+
+    val count = a.get("b") match {
+      case x: Some[Long] => x.get
+//      case x: Some[Int] => x.get
+      case None => throw new RuntimeException("count field not found")
+    }
+
+    if (count > 0) {
+      println(count)
+    }
+
+    // aggSort()
+  }
+
+  // spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version
+
+  def aggSort(): Unit = {
+    val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
+    var df: DataFrame = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("input/a.csv")
+    df.createOrReplaceTempView("x")
+    df.show()
+
+    spark.sql("select count(1) as count from x group by customer_id having count(1) > 1 order by count desc").show()
+    // spark.sql("select _uid, count(1) as c, collect_set(_value) from x where _type = 'mobile' group by _uid having count(1) > 1").show()
   }
 
   def event(): Unit = {
