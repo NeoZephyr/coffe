@@ -19,6 +19,7 @@ public class Permutations2 {
         return seq;
     }
 
+    // for + dfs 对比 coin change
     public void dfs(List<List<Integer>> seq, List<Integer> path, int[] nums, Set<Integer> uniqueNums, Map<Integer, Integer> count) {
         if (path.size() == nums.length) {
             seq.add(new ArrayList<>(path));

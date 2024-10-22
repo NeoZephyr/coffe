@@ -33,8 +33,6 @@ public class Draft {
             dfs(coins, amount, total, queue);
             total -= coins[i];
             queue.removeLast();
-
-            dfs(coins, amount, total, queue);
         }
     }
 }

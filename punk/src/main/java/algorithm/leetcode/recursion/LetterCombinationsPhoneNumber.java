@@ -40,6 +40,7 @@ public class LetterCombinationsPhoneNumber {
         return ans;
     }
 
+    // for + dfs 对比 coin change
     public void combine(List<String> ans, Map<Character, String> mapping, String digits, StringBuilder sb, int pos) {
         if (sb.length() == digits.length()) {
             ans.add(sb.toString());

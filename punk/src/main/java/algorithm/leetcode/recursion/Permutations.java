@@ -33,6 +33,7 @@ public class Permutations {
             seq.add(new ArrayList<>(path));
         }
 
+        // for + dfs 对比 coin change
         for (int i = 0; i < nums.length; i++) {
             if (!visited[i]) {
                 visited[i] = true;
