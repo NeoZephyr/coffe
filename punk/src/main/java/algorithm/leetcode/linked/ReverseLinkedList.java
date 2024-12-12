@@ -24,16 +24,17 @@ public class ReverseLinkedList {
     /**
      * 1 -> 2 -> 3 -> 4 -> 5 -> null
      *
-     * 1 -> 2 -> 3 -> 4 <- 5
-     * 1 -> 2 -> 3 <- 4 <- 5
-     * 1 -> 2 <- 3 <- 4 <- 5
-     * 1 <- 2 <- 3 <- 4 <- 5
+     * 1 -> 2 -> 3 -> 4         null <- 4 <- 5
+     * 1 -> 2 -> 3              null <- 3 <- 4 <- 5
+     * 1 -> 2                   null <- 2 <- 3 <- 4 <- 5
+     *                          null <- 1 <- 2 <- 3 <- 4 <- 5
      */
     public ListNode reverseList2(ListNode head) {
         if (head == null || head.next == null) {
             return head;
         }
 
+        // 这个 p 就是之前正序的第一个节点
         ListNode p = reverseList2(head.next);
 
         // 将反转链表的尾结点 head.next 的 next 指向当前即将反转的节点

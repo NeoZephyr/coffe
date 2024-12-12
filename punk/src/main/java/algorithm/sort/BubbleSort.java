@@ -28,10 +28,10 @@ public class BubbleSort {
             return;
         }
 
-        for (int i = 1; i < data.length; ++i) {
+        for (int i = data.length - 1; i > 0; --i) {
             boolean swap = false;
 
-            for (int j = 0; j < data.length - i; ++j) {
+            for (int j = 0; j < i; ++j) {
                 if (data[j] > data[j + 1]) {
                     int tmp = data[j + 1];
                     data[j + 1] = data[j];

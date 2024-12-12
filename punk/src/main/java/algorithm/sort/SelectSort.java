@@ -17,22 +17,22 @@ public class SelectSort {
      * @param data
      */
     public void sort(int[] data) {
-        if (data == null || data.length == 0 || data.length == 1) {
+        if (data == null || data.length < 2) {
             return;
         }
 
-        for (int i = 1; i < data.length; ++i) {
-            int candPos = i - 1;
+        for (int i = 0; i < data.length - 1; ++i) {
+            int minIdx = i;
 
-            for (int j = i; j < data.length; ++j) {
-                if (data[j] < data[candPos]) {
-                    candPos = j;
+            for (int j = i + 1; j < data.length; ++j) {
+                if (data[j] < data[minIdx]) {
+                    minIdx = j;
                 }
             }
 
-            if (candPos != i - 1) {
-                int tmp = data[candPos];
-                data[candPos] = data[i - 1];
+            if (minIdx != i - 1) {
+                int tmp = data[minIdx];
+                data[minIdx] = data[i - 1];
                 data[i - 1] = tmp;
             }
         }
