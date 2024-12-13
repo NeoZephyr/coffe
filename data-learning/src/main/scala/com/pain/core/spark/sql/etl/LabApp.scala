@@ -36,23 +36,33 @@ object LabApp {
 
     // write()
 
-    val b = 1000
+    val b = 1000L
     val a = Map[String, Any]("b" -> b)
-
-    val count = a.get("b") match {
+    val c = a.get("b") match {
       case x: Some[Long] => x.get
 //      case x: Some[Int] => x.get
       case None => throw new RuntimeException("count field not found")
     }
 
-    if (count > 0) {
-      println(count)
+    if (c > 0) {
+      println(c)
     }
 
     // aggSort()
+
+    count()
   }
 
   // spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version
+
+  def count(): Unit = {
+    val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()
+    val df: DataFrame = spark.read.format("csv").option("header", "true").option("inferSchema", "true").load("input/a.csv")
+    df.createOrReplaceTempView("x")
+    def c = spark.sql("select customer_id from x").count()
+
+    println(c)
+  }
 
   def aggSort(): Unit = {
     val spark: SparkSession = SparkSession.builder().master("local").getOrCreate()

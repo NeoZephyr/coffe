@@ -39,7 +39,7 @@ public class PunkClient extends GrpcClient {
     }
 
     <R> R sendRequest(Function<PunkGrpc.PunkBlockingStub, R> func) {
-        return func.apply(stub.withDeadlineAfter(3, TimeUnit.MINUTES));
+        return func.apply(stub.withDeadlineAfter(30, TimeUnit.MINUTES));
     }
 
     public static void main(String[] args) throws Exception {
