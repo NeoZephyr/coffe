@@ -1,10 +1,13 @@
 package algorithm.leetcode.hash;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TwoSum {
 
+    // 由于要返回的是数组下标，所以排序方法不行（位置变了）
+    // 哈希表方法
     public int[] twoSum(int[] nums, int target) {
         if (nums == null || nums.length < 2) {
             return null;
