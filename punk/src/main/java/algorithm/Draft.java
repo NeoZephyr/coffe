@@ -5,13 +5,20 @@ import java.util.*;
 public class Draft {
 
     public static void main(String[] args) {
-        Deque<Integer> queue = new ArrayDeque<>();
-        int[] coins = new int[]{2, 9, 10};
-        int amount = 38;
-        // new Draft().dfs(coins, amount, 0, new ArrayDeque<>());
-
-        Draft draft = new Draft();
-        draft.testDfs1();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    System.out.println("exception occur...");
+                } finally {
+                    System.out.println("finally run...");
+                }
+            }
+        }, "Daemon");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     private void count(int[] coins, int amount) {

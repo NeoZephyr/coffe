@@ -23,7 +23,11 @@ public class LockTest {
                 .setSubscriptionConnectionMinimumIdleSize(10)
                 .setSubscriptionsPerConnection(50);
         RedissonClient client = Redisson.create(config);
+        RLock lock = client.getReadWriteLock("redis").readLock();
+        lock.lock(20, TimeUnit.SECONDS);
+    }
 
+    public static void benchmark(RedissonClient client) throws InterruptedException {
         ExecutorService service = Executors.newFixedThreadPool(5);
 
         for (int i = 0; i < 5; i++) {
