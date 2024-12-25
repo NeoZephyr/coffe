@@ -5,17 +5,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.DependencyDescriptor;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor;
 import org.springframework.context.annotation.CommonAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.ContextAnnotationAutowireCandidateResolver;
 import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.env.StandardEnvironment;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public class BeanPostProcessorDemo {
@@ -71,11 +74,31 @@ public class BeanPostProcessorDemo {
         // AutowiredAnnotationBeanPostProcessor#postProcessProperties 方法
         metadata.inject(a, "a", null);
         System.out.println(a);
+
+        // 3. 按照类型查找
+        Field f = A.class.getDeclaredField("b");
+        DependencyDescriptor dd1 = new DependencyDescriptor(f, false);
+        Object o1 = beanFactory.doResolveDependency(dd1, null, null, null);
+        System.out.println(o1);
+
+        Method m1 = A.class.getDeclaredMethod("setB", B.class);
+        DependencyDescriptor dd2 = new DependencyDescriptor(new MethodParameter(m1, 0), false);
+        Object o2 = beanFactory.doResolveDependency(dd2, null, null, null);
+        System.out.println(o2);
+
+        Method m2 = A.class.getDeclaredMethod("setUser", String.class);
+        DependencyDescriptor dd3 = new DependencyDescriptor(new MethodParameter(m2,0), false);
+        Object o3 = beanFactory.doResolveDependency(dd3, null, null, null);
+        System.out.println(o3);
     }
 
     static class A {
+
+        @Resource
         private B b;
+
         private C c;
+
         private String user;
 
         @Resource
