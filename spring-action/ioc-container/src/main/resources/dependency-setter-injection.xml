@@ -12,7 +12,7 @@
 
     <import resource="dependency-lookup-context.xml" />
 
-    <bean class="com.pain.green.ioc.domain.UserHolder">
+    <foo class="com.pain.green.ioc.domain.UserHolder">
         <property name="user" ref="superUser" />
-    </bean>
+    </foo>
 </beans>

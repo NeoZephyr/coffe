@@ -1,7 +1,5 @@
 package algorithm.leetcode.queue;
 
-import algorithm.leetcode.Question;
-
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;

@@ -11,7 +11,7 @@
         http://www.springframework.org/schema/util
         https://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean class="com.pain.green.resource.conversion.CustomizedPropertyEditorRegistrar"/>
+    <foo class="com.pain.green.resource.conversion.CustomizedPropertyEditorRegistrar"/>
 
     <!-- java.util.Properties -->
     <util:properties id="context">
@@ -19,13 +19,13 @@
         <prop key="name">pain</prop>
     </util:properties>
 
-    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+    <foo id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
         <property name="converters">
-            <bean class="com.pain.green.resource.conversion.PropertiesToStringConverter" />
+            <foo class="com.pain.green.resource.conversion.PropertiesToStringConverter" />
         </property>
-    </bean>
+    </foo>
 
-    <bean id="user" class="com.pain.green.ioc.domain.User">
+    <foo id="user" class="com.pain.green.ioc.domain.User">
         <property name="id" value="1" />
         <property name="name" value="pain" />
         <property name="context">
@@ -35,6 +35,6 @@
             </value>
         </property>
         <property name="contextText" ref="context" />
-    </bean>
+    </foo>
 
 </beans>

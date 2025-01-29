@@ -12,7 +12,7 @@
 
     <import resource="dependency-lookup-context.xml" />
 
-<!--    <bean class="com.pain.green.ioc.domain.UserHolder" autowire="byName" />-->
+<!--    <foo class="com.pain.green.ioc.domain.UserHolder" autowire="byName" />-->
 
-    <bean class="com.pain.green.ioc.domain.UserHolder" autowire="byType" />
+    <foo class="com.pain.green.ioc.domain.UserHolder" autowire="byType" />
 </beans>

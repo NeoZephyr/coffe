@@ -5,7 +5,7 @@
         xsi:schemaLocation="http://www.springframework.org/schema/beans
         https://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="yamlMap" class="org.springframework.beans.factory.config.YamlMapFactoryBean">
+    <foo id="yamlMap" class="org.springframework.beans.factory.config.YamlMapFactoryBean">
         <property name="resources" value="classpath:/user.yaml" />
-    </bean>
+    </foo>
 </beans>

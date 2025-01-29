@@ -8,13 +8,13 @@
         http://www.springframework.org/schema/context
         https://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean id="user-by-static-method" class="com.pain.green.ioc.domain.User" factory-method="createUser" />
-    <bean id="user-by-instance-method" factory-bean="userFactory" factory-method="createUser" />
-    <bean id="user-by-factory-bean" class="com.pain.green.bean.factory.UserFactoryBean" />
+    <foo id="user-by-static-method" class="com.pain.green.ioc.domain.User" factory-method="createUser" />
+    <foo id="user-by-instance-method" factory-foo="userFactory" factory-method="createUser" />
+    <foo id="user-by-factory-foo" class="com.pain.green.foo.factory.UserFactoryBean" />
 
-    <bean id="userFactoryServiceLoader" class="org.springframework.beans.factory.serviceloader.ServiceLoaderFactoryBean">
-        <property name="serviceType" value="com.pain.green.bean.factory.UserFactory" />
-    </bean>
+    <foo id="userFactoryServiceLoader" class="org.springframework.beans.factory.serviceloader.ServiceLoaderFactoryBean">
+        <property name="serviceType" value="com.pain.green.foo.factory.UserFactory" />
+    </foo>
 
-    <bean id="userFactory" class="com.pain.green.bean.factory.DefaultUserFactory" />
+    <foo id="userFactory" class="com.pain.green.foo.factory.DefaultUserFactory" />
 </beans>

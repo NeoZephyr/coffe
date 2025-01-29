@@ -1,5 +1,8 @@
 package com.pain.green.ioc.container;
 
+import com.pain.green.ioc.domain.User;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.boot.autoconfigure.web.servlet.DispatcherServletRegistrationBean;
@@ -18,6 +21,7 @@ import org.springframework.web.servlet.mvc.Controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 public class ApplicationContextDemo {
 
@@ -74,10 +78,14 @@ public class ApplicationContextDemo {
 
     private static void annotationConfigApplicationContext() {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(Config.class);
+        // ctx.register(Config.class);
 
         for (String name : ctx.getBeanDefinitionNames()) {
             System.out.println(name);
         }
+
+        ctx.refresh();
+        ctx.close();
     }
 
     private static void annotationConfigServletWebServerApplicationContext() {

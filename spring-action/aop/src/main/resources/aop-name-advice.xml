@@ -11,14 +11,14 @@
         http://www.springframework.org/schema/users
         http://www.springframework.org/schema/users.xsd">
 
-    <bean id="helloService" class="com.pain.green.service.HelloServiceImpl" />
-    <bean id="beforeAdvice" class="com.pain.green.aop.advice.BeforeAdvice" />
+    <foo id="helloService" class="com.pain.green.service.HelloServiceImpl" />
+    <foo id="beforeAdvice" class="com.pain.green.aop.advice.BeforeAdvice" />
 
-    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+    <foo class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
         <property name="beanNames" value="*Service" />
 
         <!--为 true 则强制使用 cglib 动态代理-->
         <property name="optimize" value="true" />
         <property name="interceptorNames" value="beforeAdvice" />
-    </bean>
+    </foo>
 </beans>

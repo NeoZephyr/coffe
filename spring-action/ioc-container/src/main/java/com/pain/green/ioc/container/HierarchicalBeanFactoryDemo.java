@@ -10,7 +10,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class HierarchicalBeanFactoryDemo {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-        applicationContext.register(AnnotationApplicationContextDemo.class);
+        // applicationContext.register(AnnotationApplicationContextDemo.class);
         applicationContext.refresh();
 
         ConfigurableListableBeanFactory beanFactory = applicationContext.getBeanFactory();

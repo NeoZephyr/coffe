@@ -11,13 +11,13 @@
         http://www.springframework.org/schema/users
         http://www.springframework.org/schema/users.xsd">
 
-    <bean id="helloService" class="com.pain.green.service.HelloServiceImpl" />
-    <bean id="beforeAdvice" class="com.pain.green.aop.advice.BeforeAdvice" />
+    <foo id="helloService" class="com.pain.green.service.HelloServiceImpl" />
+    <foo id="beforeAdvice" class="com.pain.green.aop.advice.BeforeAdvice" />
 
-    <bean id="helloAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+    <foo id="helloAdvisor" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
         <property name="pattern" value=".*hello" />
         <property name="advice" ref="beforeAdvice" />
-    </bean>
+    </foo>
 
-    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
+    <foo class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" />
 </beans>

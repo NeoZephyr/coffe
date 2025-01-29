@@ -55,6 +55,8 @@ public class UniquePaths {
     }
 
     // 正向思考
+    // 正向：从 start 到 <i, j> 的不同路径
+    // 反向：从 <i, j> 到 end 的不同路径
     public int uniquePaths1(int m, int n) {
         int[][] f = new int[m][n];
 

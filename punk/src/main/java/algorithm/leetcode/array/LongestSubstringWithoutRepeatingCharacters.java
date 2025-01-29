@@ -1,14 +1,15 @@
 package algorithm.leetcode.array;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class LongestSubstringWithoutRepeatingCharacters {
 
     // 滑动窗口
     public int lengthOfLongestSubstring1(String s) {
-
-        if (s == null || s.length() == 0) {
+        if (s == null || s.isEmpty()) {
             return 0;
         }
 
@@ -47,7 +48,7 @@ public class LongestSubstringWithoutRepeatingCharacters {
     }
 
     public int lengthOfLongestSubstring2(String s) {
-        if (s == null || s.length() == 0) {
+        if (s == null || s.isEmpty()) {
             return 0;
         }
 
@@ -56,6 +57,8 @@ public class LongestSubstringWithoutRepeatingCharacters {
         }
 
         int i = 0, j = -1;
+
+        // 可以改成 boolean
         int[] freq = new int[256];
 
         int len = -1;
@@ -71,5 +74,26 @@ public class LongestSubstringWithoutRepeatingCharacters {
         }
 
         return len;
+    }
+
+    public int lengthOfLongestSubstring3(String s) {
+        if (s == null || s.isEmpty()) {
+            return 0;
+        }
+
+        int ans = 1;
+        int left = 0;
+        Set<Character> set = new HashSet<>();
+        set.add(s.charAt(left));
+
+        for (int i = 1; i < s.length(); i++) {
+            while (set.contains(s.charAt(i))) {
+                set.remove(s.charAt(left++));
+            }
+            set.add(s.charAt(i));
+            ans = Math.max(ans, i - left + 1);
+        }
+
+        return ans;
     }
 }
