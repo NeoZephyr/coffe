@@ -4,6 +4,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 
+/**
+ * https://leetcode.cn/problems/design-circular-queue/
+ */
 public class DesignCircularQueue {
 
     int cap;

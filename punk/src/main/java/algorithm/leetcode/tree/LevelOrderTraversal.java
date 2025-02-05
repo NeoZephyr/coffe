@@ -1,13 +1,14 @@
-package algorithm.leetcode.search;
-
-import algorithm.leetcode.tree.TreeNode;
+package algorithm.leetcode.tree;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-public class BinaryTreeLevelOrderTraversal {
+/**
+ * https://leetcode.cn/problems/binary-tree-level-order-traversal/
+ */
+public class LevelOrderTraversal {
 
     public List<List<Integer>> levelOrder(TreeNode root) {
         List<List<Integer>> ans = new ArrayList<>();

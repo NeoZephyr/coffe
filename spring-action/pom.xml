@@ -19,6 +19,7 @@
         <module>aop</module>
         <module>jdbc</module>
         <module>boot</module>
+        <module>web</module>
     </modules>
 
     <properties>

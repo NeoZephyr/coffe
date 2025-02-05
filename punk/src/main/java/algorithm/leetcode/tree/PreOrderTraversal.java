@@ -5,6 +5,9 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * https://leetcode.cn/problems/binary-tree-preorder-traversal/description/
+ */
 public class PreOrderTraversal {
 
     public List<Integer> preorderTraversal(TreeNode root) {
@@ -64,7 +67,10 @@ public class PreOrderTraversal {
             return;
         }
         seq.add(root.val);
+        // 1. 第一次触碰 root
         traversal(root.left, seq);
+        // 2. 第二次触碰 root
         traversal(root.right, seq);
+        // 3. 第三次触碰 root
     }
 }
