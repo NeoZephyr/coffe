@@ -1,5 +1,7 @@
 package algorithm.sort;
 
+import java.util.Arrays;
+
 public class SelectSort {
     /**
      * 操作步骤：
@@ -30,11 +32,19 @@ public class SelectSort {
                 }
             }
 
-            if (minIdx != i - 1) {
+            if (minIdx != i) {
                 int tmp = data[minIdx];
-                data[minIdx] = data[i - 1];
-                data[i - 1] = tmp;
+                data[minIdx] = data[i];
+                data[i] = tmp;
             }
         }
+    }
+
+    public static void main(String[] args) {
+        SelectSort selectSort = new SelectSort();
+        int[] a = new int[]{3, 9, 1, 20, 8};
+        System.out.println(Arrays.toString(a));
+        selectSort.sort(a);
+        System.out.println(Arrays.toString(a));
     }
 }

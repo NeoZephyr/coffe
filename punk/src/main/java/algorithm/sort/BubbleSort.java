@@ -20,8 +20,6 @@ public class BubbleSort {
      * 最好情况下，要排序的数据已经是有序的了，只需要进行一次冒泡操作，就可以结束了，时间复杂度是 O(n)
      * 最坏情况下，要排序的数据刚好是倒序排列的，需要进行 n 次冒泡操作，时间复杂度为 O(n * n)
      *
-     *
-     * @param data
      */
     public void sort(int[] data) {
         if (data == null || data.length == 0 || data.length == 1) {

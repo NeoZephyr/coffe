@@ -13,7 +13,6 @@ public class QuickSort {
      * 内存消耗：
      * 原地排序算法
      *
-     * @param data
      */
     public void sort(int[] data) {
         if (data == null || data.length == 0 || data.length == 1) {
@@ -42,7 +41,7 @@ public class QuickSort {
     /**
      * 类似选择排序，分成两部分已处理区间和未处理区间。小于 i 的区间是小于 pivotValue 的区间，小于 j 的区间是已处理区间
      *
-     * @return
+     * 单向双指针
      */
     private int partition(int[] data, int begin, int end) {
         // 优化：选择随机位置的元素为轴心

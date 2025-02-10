@@ -197,6 +197,8 @@ public class WebServerApplicationContextDemo {
                     .map(anno -> anno.annotationType().getSimpleName())
                     .collect(Collectors.joining());
 
+            // javac -parameters 编译之后，会在字节码中保留参数名 反射可以获取到参数名
+            // javac -g 编译之后，会在字节码中保留参数名 反射可以获取到参数名，但是 asm 技术可以
             // 参数名解析
             methodParameter.initParameterNameDiscovery(new DefaultParameterNameDiscoverer());
 

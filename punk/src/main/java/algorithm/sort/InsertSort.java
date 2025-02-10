@@ -45,6 +45,10 @@ public class InsertSort {
         }
     }
 
+    /**
+     * 如果一个很大的元素在最前面，如果还是普通插入排序，会有很多次的挪动
+     * shell 插入排序可以让大的元素快点挪动到后面，减少移动次数
+     */
     public void shellSort(int[] data) {
         if (data == null || data.length == 0 || data.length == 1) {
             return;
