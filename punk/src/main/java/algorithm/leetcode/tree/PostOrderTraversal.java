@@ -33,6 +33,7 @@ public class PostOrderTraversal {
             root = queue.pop();
 
             // 是否有右子树，或者右子树是否访问过
+            // 左子树一定是在父节点之前出栈并且处理
             if (root.right == null || root.right == prev) {
                 seq.add(root.val);
 
@@ -47,6 +48,35 @@ public class PostOrderTraversal {
 
         return seq;
     }
+
+    public List<Integer> postorderTraversal2(TreeNode root) {
+        List<Integer> seq = new ArrayList<>();
+
+        if (root == null) {
+            return seq;
+        }
+
+        Deque<TreeNode> queue = new LinkedList<>();
+        queue.push(root);
+
+        while (!queue.isEmpty()) {
+            TreeNode cur = queue.peek();
+
+            if (cur.left != null && root != cur.left && root != cur.right) {
+                queue.push(cur.left); // 左右子树都还没有访问
+            } else if (cur.right != null && root != cur.right) {
+                queue.push(cur.right); // 右子树还没有访问
+            } else {
+                root = queue.pop();
+                seq.add(cur.val);
+            }
+        }
+
+        return seq;
+    }
+
+    // 还有方法：
+    // 原有的先序遍历是：中左右，可以改为中右左，然后逆序就是左右中，即为后续遍历的顺序了
 
     private void traversal(TreeNode root, List<Integer> seq) {
         if (root == null) {

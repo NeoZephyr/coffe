@@ -27,13 +27,13 @@ public class ValidParentheses {
         for (int i = 0; i < s.length(); ++i) {
             char c = s.charAt(i);
 
-            if (!pairs.containsKey(c)) {
+            if (!pairs.containsKey(c)) { // 左括号就压入
                 stack.push(c);
-            } else if (stack.isEmpty() || pairs.get(c) != stack.pop()) {
+            } else if (stack.isEmpty() || pairs.get(c) != stack.pop()) { // 右括号检查
                 return false;
             }
         }
 
-        return stack.isEmpty();
+        return stack.isEmpty(); // 是否完全匹配
     }
 }

@@ -34,6 +34,51 @@ public class PreOrderTraversal {
         return seq;
     }
 
+    public List<Integer> preorderTraversal11(TreeNode root) {
+        List<Integer> seq = new ArrayList<>();
+        Deque<TreeNode> queue = new LinkedList<>();
+
+        while (!queue.isEmpty() || root != null) {
+            while (root != null) {
+                seq.add(root.val);
+                queue.push(root);
+                root = root.left;
+            }
+
+            root = queue.pop();
+            root = root.right;
+        }
+        return seq;
+    }
+
+    public List<Integer> preorderTraversal3(TreeNode root) {
+        List<Integer> seq = new ArrayList<>();
+
+        if (root == null) {
+            return seq;
+        }
+
+        Deque<TreeNode> queue = new LinkedList<>();
+        queue.push(root);
+
+        while (!queue.isEmpty()) {
+            root = queue.pop();
+            seq.add(root.val);
+
+            // 先压右，再压左。保证弹出时，先处理左子树
+
+            if (root.right != null) {
+                queue.push(root.right);
+            }
+
+            if (root.left != null) {
+                queue.push(root.left);
+            }
+        }
+
+        return seq;
+    }
+
     public List<Integer> preorderTraversal2(TreeNode root) {
         List<Integer> seq = new ArrayList<>();
 

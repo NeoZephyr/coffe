@@ -1,5 +1,6 @@
 package algorithm.hw;
 
+import java.io.*;
 import java.util.*;
 
 public class Test1 {
@@ -39,6 +40,29 @@ public class Test1 {
                 list.remove(x);
             }
         });
+    }
+
+    private static void test0() throws IOException {
+        // 相比与 Scanner，提高效率
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        // 忽略空格、回车，高效读取
+        StreamTokenizer tokenizer = new StreamTokenizer(reader);
+        PrintWriter writer = new PrintWriter(new OutputStreamWriter(System.out));
+
+        // 按照行读取
+        // reader.readLine();
+
+        // 文件没有结束就继续
+        while (tokenizer.nextToken() != StreamTokenizer.TT_EOF) {
+            String s = tokenizer.sval;
+            // 每次读之前，都要调用一下 nextToken
+        }
+
+        // 答案输出
+        writer.println("");
+        writer.flush();
+        writer.close();
     }
 
     // 如果数值有范围，可以用一个数组

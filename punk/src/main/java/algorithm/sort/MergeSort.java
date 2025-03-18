@@ -48,6 +48,9 @@ public class MergeSort {
 
     private void merge(int[] data, int begin, int mid, int end) {
         int len = (end - begin + 1);
+
+        // 辅助数组可以一次性开辟好
+        // 比如：new int[max];
         int[] tmp = new int[len];
 
         // Arrays.copyOfRange
@@ -78,5 +81,59 @@ public class MergeSort {
         while (i < len) {
             data[j++] = tmp[i++];
         }
+    }
+
+    /**
+     * https://leetcode.cn/problems/sort-an-array/
+     */
+    public int[] sortArray(int[] nums) {
+        if (nums.length <= 1) {
+            return nums;
+        }
+
+        sort(nums, 0, nums.length - 1);
+        return nums;
+    }
+
+    public void sort(int[] nums, int left, int right) {
+        if (left == right) {
+            return;
+        }
+
+        // 注意 >> 的优先级，非常低
+        int m = left + ((right - left) >> 1);
+        sort(nums, left, m);
+        sort(nums, m + 1, right);
+        merge(nums, left, m, right);
+    }
+
+    /**
+     * 非递归
+     */
+    public int[] sortArray1(int[] nums) {
+        for (int step = 1; step < nums.length; step <<= 2) {
+            int l = 0;
+            int m = l + step - 1;
+
+            while (l < nums.length) {
+                // 右半部分缺失，就不需要合并排序
+                if (m + 1 >= nums.length) {
+                    break;
+                }
+
+                // 有可能右半部分不足 step 的个数
+                int r = Math.min(nums.length - 1, l + step * 2 - 1);
+                merge(nums, l, m, r);
+                l = r + 1;
+                m = l + step - 1;
+            }
+        }
+
+        return nums;
+    }
+
+    public static void main(String[] args) {
+        MergeSort mergeSort = new MergeSort();
+        mergeSort.sortArray(new int[]{5,2,3,1});
     }
 }

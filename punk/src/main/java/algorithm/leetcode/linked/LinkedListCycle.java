@@ -19,6 +19,7 @@ public class LinkedListCycle {
         ListNode slow = head;
         ListNode quick = head.next.next;
 
+        // 其实，值需要检查 quick 是否为 null 即可
         while (slow != null && quick != null) {
             if (slow == quick) {
                 return true;

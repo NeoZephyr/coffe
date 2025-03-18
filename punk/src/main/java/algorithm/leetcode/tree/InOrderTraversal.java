@@ -21,14 +21,34 @@ public class InOrderTraversal {
         Deque<TreeNode> queue = new LinkedList<>();
 
         while (root != null || !queue.isEmpty()) {
+            // 整条左边界进栈
             while (root != null) {
                 queue.push(root);
                 root = root.left;
             }
 
+            // 此时左子树处理完成，开始处理父节点与右子树
             root = queue.pop();
             seq.add(root.val);
             root = root.right;
+        }
+
+        return seq;
+    }
+
+    public List<Integer> inorderTraversal3(TreeNode root) {
+        List<Integer> seq = new ArrayList<>();
+        Deque<TreeNode> queue = new LinkedList<>();
+
+        while (root != null || !queue.isEmpty()) {
+            if (root != null) {
+                queue.push(root);
+                root = root.left;
+            } else {
+                root = queue.pop();
+                seq.add(root.val);
+                root = root.right;
+            }
         }
 
         return seq;

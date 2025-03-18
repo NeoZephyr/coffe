@@ -13,6 +13,7 @@ public class SwapNodesInPairs {
             return head;
         }
 
+        // 维护三个指针
         ListNode prev = null;
         ListNode prev1 = head;
         ListNode prev2 = head.next;
@@ -76,6 +77,7 @@ public class SwapNodesInPairs {
 
         ListNode p = swapPairs3(head.next.next);
 
+        // 没有反转的跟反转的接上
         ListNode tmp = head.next;
         head.next = p;
         tmp.next = head;
