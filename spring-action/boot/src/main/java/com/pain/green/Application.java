@@ -1,5 +1,6 @@
 package com.pain.green;
 
+import com.pain.green.annotation.AnnotationTests;
 import com.pain.green.service.FooService;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
@@ -22,7 +23,10 @@ public class Application {
 
     public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException, IOException {
         // applicationContext(args);
-        aspectjAop(args);
+        // aspectjAop(args);
+        // AnnotationTests.componentScanTest();
+        // AnnotationTests.importTest();
+        AnnotationTests.profileTest();
     }
 
     /**

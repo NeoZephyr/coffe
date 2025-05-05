@@ -10,12 +10,12 @@
 
     <import resource="dependency-lookup-context.xml" />
 
-    <foo class="com.pain.green.foo.lifecycle.UserInstantiationAwareBeanPostProcessor" />
+<!--    <bean class="com.pain.green.bean.lifecycle.UserInstantiationAwareBeanPostProcessor" />-->
 
     <alias name="user" alias="anotherUser" />
 
-    <foo id="userHolder" class="com.pain.green.ioc.domain.UserHolder" autowire="constructor"
+    <bean id="userHolder" class="com.pain.green.ioc.domain.UserHolder" autowire="constructor"
           init-method="customInit" destroy-method="customDestroy">
         <property name="desc" value="user default description" />
-    </foo>
+    </bean>
 </beans>

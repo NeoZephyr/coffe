@@ -15,7 +15,6 @@
         <module>configuration</module>
         <module>resource</module>
         <module>event</module>
-        <module>annotation</module>
         <module>aop</module>
         <module>jdbc</module>
         <module>boot</module>

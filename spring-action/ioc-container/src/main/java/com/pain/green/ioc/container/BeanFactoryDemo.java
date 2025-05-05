@@ -4,6 +4,7 @@ import com.pain.green.ioc.domain.User;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -22,6 +23,13 @@ public class BeanFactoryDemo {
         inspect();
     }
 
+    /**
+     * ConfigurationClassPostProcessor 识别 @Configuration 和 @Bean
+     *
+     * 1. Config 这个配置类相当于是一个工厂，内部标注 @Bean 注解的方法相当于工厂方法（从 BeanDefinition 中可以看出）
+     * 2. @Bean 标注的方法不支持重载，如果有多个重载方法，只有一个能入选为工厂方法
+     *
+     */
     @Configuration
     static class Config {
 
@@ -44,6 +52,26 @@ public class BeanFactoryDemo {
         public C2 c2() {
             return new C2();
         }
+
+        // 3. 不加 @Configuration 也能工作，但是 Configuration 默认会为标注的类生成代理，目的是保证 @Bean 方法互相调用时，仍然能够保证单例性
+        // 会为 Config 类生成一个代理类
+        // @Configuration(proxyBeanMethods = false) 不会生成代理类了
+        @Bean
+        public C2 c3() {
+            B b = b();
+            System.out.println("get Bean b in method c3(), b: " + b);
+            return new C2();
+        }
+
+        // 如果在 Config 类里面配置了 BeanFactoryPostProcessor，而且是成员方法，就会有问题
+        // 因为 BeanFactoryPostProcessor 执行比较早，因此这种 Bean 创建也比较早
+        // 但由于是通过成员方法调用创建的，因此需要先创建 Config 对象，但 Config 对象不应该这么早就被创建
+        // 如果太早创建，一些必要的 BeanPostProcessor 还没有准备好，不能执行依赖注入之类的操作
+        // 这样 version 就注入不了了
+
+        // 方法一：把实例工厂方法改为静态工厂方法
+        @Value("${java.class.version}")
+        private String version;
     }
 
     static class A {

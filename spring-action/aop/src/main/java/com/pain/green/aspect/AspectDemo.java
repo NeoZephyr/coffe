@@ -56,9 +56,6 @@ public class AspectDemo {
             }
         };
 
-        // 准备切面
-        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(pointcut, advice);
-
         // 准备代理
         // 1. proxyTargetClass 为 false 的时候，检查目标类是否实现接口，如果实现接口，使用 jdk 生成代理
         // 2. proxyTargetClass 为 false 的时候，如果目标类没有实现接口，使用 CGLIB 生成代理
@@ -70,11 +67,32 @@ public class AspectDemo {
         ProxyFactory factory = new ProxyFactory();
         Target target = new Target();
         factory.setTarget(target);
+
+        // 这种方式，没有指定 pointcut，调用任何方法都会增强
+//        factory.addAdvice((MethodInterceptor) invocation -> {
+//            System.out.println(">>> before");
+//            Object result = invocation.proceed();
+//            System.out.println(">>> after");
+//            return result;
+//        });
+
+        // 准备切面
+        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(pointcut, advice);
+
+        // 可以加多个切面
         factory.addAdvisors(advisor);
 
+        // 如果要使用 JDK 的动态代理，那么在创建代理之前，加一个接口
+        // 因为 JDK 的动态代理是基于接口实现的
+        // factory.addInterface(Foo.class);
         // 告知目标类上实现的接口
         // factory.setInterfaces(target.getClass().getInterfaces());
+
+        // 指定了接口，也希望用 CGLib 生成代理
         // factory.setProxyTargetClass(true);
+
+        // 创建代理对象
+        // 代理对象中，会间接引用到切面对象
         Foo proxy = (Foo) factory.getProxy();
 
         System.out.println(proxy.getClass());
@@ -89,8 +107,14 @@ public class AspectDemo {
 
         // AnnotationAwareAspectJAutoProxyCreator 是 Bean 后处理器
         // AnnotationAwareAspectJAutoProxyCreator 能识别高级切面中的注解
-        // 根据收集的切面注解创建代理
+        // 根据切点表达式查看，有没有匹配的目标，或者这么说，根据 bean 类型查找切面类
+        // 有的话，就为目标自动创建代理
         context.registerBean(AnnotationAwareAspectJAutoProxyCreator.class);
+
+        // 创建自动代理的时机
+        // 1. 创建 Bean 实例阶段，一般用的少。postProcessBeforeInstantiation
+        // 2. 初始化阶段，用的最多。postProcessAfterInitialization
+        // 3. 依赖注入阶段，处理循环依赖。通过工厂对象会调用到 getEarlyBeanReference
 
         context.refresh();
 
@@ -232,7 +256,7 @@ public class AspectDemo {
     @Aspect
     @Order(1) // 切面顺序设置
     static class Aspect0 {
-        @Before("execution(* foo())")
+        @Before("execution(* foo())") // -> 转换为一个 advisor 切面
         public void before() {
             System.out.println(">>> before");
         }
@@ -252,7 +276,7 @@ public class AspectDemo {
 
     @Configuration
     static class Config {
-        // 低级切面
+        // Advisor 低级切面，相比 Aspect 粒度更细
         @Bean
         public Advisor advisor(MethodInterceptor advice) {
             AspectJExpressionPointcut p = new AspectJExpressionPointcut();
