@@ -1,11 +1,17 @@
 package com.pain.green.ioc.bean;
 
 import com.pain.green.ioc.domain.User;
+import com.pain.green.ioc.domain.UserHolder;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.EncodedResource;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

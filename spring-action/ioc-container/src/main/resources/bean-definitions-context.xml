@@ -10,7 +10,7 @@
 
     <import resource="dependency-lookup-context.xml" />
 
-<!--    <bean class="com.pain.green.bean.lifecycle.UserInstantiationAwareBeanPostProcessor" />-->
+<!--    <bean class="com.pain.green.ioc.bean.BeanInstantiationTests.UserInstantiationAwareBeanPostProcessor" />-->
 
     <alias name="user" alias="anotherUser" />
 

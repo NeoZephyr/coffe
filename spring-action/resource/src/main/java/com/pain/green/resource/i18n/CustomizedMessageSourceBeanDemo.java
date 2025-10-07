@@ -13,12 +13,16 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 @EnableAutoConfiguration
 public class CustomizedMessageSourceBeanDemo {
 
+    /**
+     * 属于 primary source，比 MessageSourceAutoConfiguration 优先
+     */
     @Bean(AbstractApplicationContext.MESSAGE_SOURCE_BEAN_NAME)
     public MessageSource messageSource() {
         return new ReloadableResourceBundleMessageSource();
     }
 
     public static void main(String[] args) {
+        // CustomizedMessageSourceBeanDemo 为 primarySources
         ConfigurableApplicationContext applicationContext = new SpringApplicationBuilder(CustomizedMessageSourceBeanDemo.class)
                 .web(WebApplicationType.NONE)
                 .run(args);

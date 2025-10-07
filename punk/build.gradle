@@ -76,6 +76,8 @@ dependencies {
 
     implementation 'org.apache.httpcomponents:httpcore:4.4.13'
 
+    implementation 'com.alibaba:transmittable-thread-local:2.14.2'
+
     implementation 'com.itranswarp:compiler:1.0'
 
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

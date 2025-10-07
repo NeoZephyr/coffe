@@ -17,7 +17,7 @@ public class SuperUser extends User {
     @Override
     public String toString() {
         return "SuperUser{" +
-                "score=" + score +
-                "} " + super.toString();
+                "score=" + score + ", user=" + super.toString() +
+                "}";
     }
 }

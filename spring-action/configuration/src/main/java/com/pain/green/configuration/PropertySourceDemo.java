@@ -18,7 +18,6 @@ public class PropertySourceDemo {
         User user = new User();
         user.setId(id);
         user.setName(name);
-
         return user;
     }
 
@@ -27,7 +26,10 @@ public class PropertySourceDemo {
         applicationContext.register(PropertySourceDemo.class);
 
         Map propertySourceMap = new HashMap();
-        propertySourceMap.put("user.name", "赵破奴");
+        propertySourceMap.put("user.name", "五只小鸭");
+
+        // 扩展 env 中的 PropertySources
+        // 插入一个，优先级最高的
         org.springframework.core.env.PropertySource customPropertySource = new MapPropertySource("customProperties", propertySourceMap);
         applicationContext.getEnvironment().getPropertySources().addFirst(customPropertySource);
         applicationContext.refresh();

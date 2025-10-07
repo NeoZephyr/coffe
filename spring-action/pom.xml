@@ -11,7 +11,6 @@
 
     <modules>
         <module>ioc-container</module>
-        <module>spring-bean</module>
         <module>configuration</module>
         <module>resource</module>
         <module>event</module>

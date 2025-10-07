@@ -18,7 +18,10 @@ public class ErrorsMessageDemo {
 
         Errors errors = new BeanPropertyBindingResult(user, "user");
 
+        // 生成 ObjectError
         errors.reject("user.properties.not.null");
+
+        // 生成 FieldError
         errors.rejectValue("name", "name.required");
 
         List<FieldError> fieldErrors = errors.getFieldErrors();

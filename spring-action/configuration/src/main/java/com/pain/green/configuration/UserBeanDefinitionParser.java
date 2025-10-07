@@ -7,6 +7,9 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
+/**
+ * user 元素的 BeanDefinitionParser 实现
+ */
 public class UserBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
     @Override

@@ -12,7 +12,11 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class ResourcePatternResolverDemo {
+
     public static void main(String[] args) throws IOException {
+        // 两者区别
+        // classpath*:META-INF/*-beans.xml
+        // classpath:META-INF/*-beans.xml
         String locationPattern = "/" + System.getProperty("user.dir") + "/resource/src/main/java/com/pain/green/resource/*.java";
         PathMatchingResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver(new FileSystemResourceLoader());
         resourcePatternResolver.setPathMatcher(new JavaFilePathMatcher());

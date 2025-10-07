@@ -58,6 +58,7 @@ public class DynamicResourceMessageSource extends AbstractMessageSource implemen
         this.messagePropertiesResource = getMessagePropertiesResource();
         this.messageProperties = loadMessageProperties();
         this.executorService = Executors.newSingleThreadExecutor();
+
         // 监听资源文件（Java NIO 2 WatchService）
         onMessagePropertiesChanged();
     }

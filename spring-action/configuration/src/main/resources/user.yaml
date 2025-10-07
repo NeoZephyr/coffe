@@ -1,4 +1,5 @@
+# 见 BeanDefinitionTests
 user:
-    id: 15
-    name: 王基
+    id: 9
+    name: 热干面
     city: WuHan

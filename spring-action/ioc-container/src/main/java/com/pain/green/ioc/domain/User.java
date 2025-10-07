@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class User {
+
     private Long id;
     private String name;
     private City city;
@@ -21,9 +22,11 @@ public class User {
     private String contextText;
 
     public User() {
+        System.out.println("====");
     }
 
     public User(Long id, String name) {
+        System.out.println("========");
         this.id = id;
         this.name = name;
     }

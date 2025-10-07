@@ -3,6 +3,7 @@ package com.pain.green.ioc.bean;
 import com.pain.green.ioc.domain.City;
 import com.pain.green.ioc.domain.User;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.SingletonBeanRegistry;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -25,8 +26,8 @@ import java.util.Properties;
 public class BeanDefinitionTests {
 
     public static void main(String[] args) {
-        // readBeanDefinition();
-        registerBeanDefinition();
+        readBeanDefinition();
+        // registerBeanDefinition();
     }
 
     private static void readBeanDefinition() {
@@ -38,12 +39,20 @@ public class BeanDefinitionTests {
         PropertiesBeanDefinitionReader reader1 = new PropertiesBeanDefinitionReader(beanFactory);
         DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
         Resource resource = resourceLoader.getResource("classpath:/META-INF/user.properties");
+        // Resource resource = new ClassPathResource("META-INF/user.properties");
+
         EncodedResource encodedResource = new EncodedResource(resource, "UTF-8");
-        reader1.loadBeanDefinitions(encodedResource);
+        int beanDefinitionCount = reader1.loadBeanDefinitions(encodedResource);
         bdNames = beanFactory.getBeanDefinitionNames();
-        System.out.println("beanNames: " + Arrays.toString(bdNames));
+        System.out.println("beanDefinitionCount = " + beanDefinitionCount + ", beanNames = " + Arrays.toString(bdNames));
+
+        // 查看 BeanDefinition 内容
+        // beanFactory.getBeanDefinition("user");
+        User user = beanFactory.getBean("user", User.class);
+        System.out.println("user = " + user);
 
         // yaml 文件读取
+        // YamlMapFactoryBean 原理，实现了 InitializingBean 接口，并重写 afterPropertiesSet 方法
         XmlBeanDefinitionReader reader2 = new XmlBeanDefinitionReader(beanFactory);
         reader2.loadBeanDefinitions("classpath:/yaml-map-context.xml");
         bdNames = beanFactory.getBeanDefinitionNames();
@@ -54,6 +63,16 @@ public class BeanDefinitionTests {
         reader3.loadBeanDefinitions(new ClassPathResource("bean-definitions-context.xml"));
         bdNames = beanFactory.getBeanDefinitionNames();
         System.out.println("beanNames: " + Arrays.toString(bdNames));
+
+        // 注解读取
+        // AnnotatedBeanDefinitionReader 主要负责将 Configuration Class 解析并注册 BeanDefinition
+        // ConfigurationClassBeanDefinitionReader 则是根据前者所注册 BeanDefinition 进一步的处理，比如处理 @Import 或 @ComponentScan 等注解
+        AnnotatedBeanDefinitionReader reader4 = new AnnotatedBeanDefinitionReader(beanFactory);
+        int beanDefinitionCountBefore = ((BeanDefinitionRegistry) beanFactory).getBeanDefinitionCount();
+        reader4.register(Config.class);
+        int beanDefinitionCountAfter = ((BeanDefinitionRegistry) beanFactory).getBeanDefinitionCount();
+        beanDefinitionCount = beanDefinitionCountAfter - beanDefinitionCountBefore;
+        System.out.println("annotation reader beanDefinitionCount = " + beanDefinitionCount);
 
         // 从配置类中获取
         beanFactory.registerBeanDefinition(

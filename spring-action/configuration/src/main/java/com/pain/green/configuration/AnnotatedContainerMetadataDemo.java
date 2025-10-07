@@ -7,9 +7,11 @@ import org.springframework.context.annotation.*;
 import java.util.Map;
 
 @ImportResource("classpath:/dependency-lookup-context.xml")
+
+// java8 支持一个注解加多次，@Repeatable 支持
 @PropertySource("classpath:/META-INF/user.properties")
 @PropertySource("classpath:/META-INF/user.properties")
-@Import(User.class)
+@Import(User.class) // 这种方式的 bean name 为全路径名
 public class AnnotatedContainerMetadataDemo {
 
     @Bean

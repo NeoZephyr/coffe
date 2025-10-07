@@ -34,4 +34,13 @@ public class UserRepo {
     public void setUsers(List<User> users) {
         this.users = users;
     }
+
+    @Override
+    public String toString() {
+        return "UserRepo{" +
+                "users=" + users +
+                ", beanFactory=" + beanFactory +
+                ", objectFactory=" + objectFactory +
+                '}';
+    }
 }

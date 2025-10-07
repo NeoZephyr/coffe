@@ -14,5 +14,5 @@
 
 <!--    <foo class="com.pain.green.ioc.domain.UserHolder" autowire="byName" />-->
 
-    <foo class="com.pain.green.ioc.domain.UserHolder" autowire="constructor" />
+    <bean class="com.pain.green.ioc.domain.UserHolder" autowire="constructor" />
 </beans>

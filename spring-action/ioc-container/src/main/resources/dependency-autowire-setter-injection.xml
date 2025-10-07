@@ -14,5 +14,7 @@
 
 <!--    <foo class="com.pain.green.ioc.domain.UserHolder" autowire="byName" />-->
 
-    <foo class="com.pain.green.ioc.domain.UserHolder" autowire="byType" />
+    <bean class="com.pain.green.ioc.domain.UserHolder" autowire="byType" />
+
+    <bean class="com.pain.green.ioc.domain.UserRepo" autowire="byType" />
 </beans>
