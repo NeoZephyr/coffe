@@ -1,0 +1,110 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor 前端用户 as front
+participant 网关 as gate
+participant 接收服务 as recv
+participant cti
+queue kafka
+database redis
+database mysql
+
+autonumber
+
+== 用户进线 ==
+
+front -> gate: 会话初始化接口 /user/initConv
+gate -> gate: 验证 accessToken，获取 appId, tenantId, 用户 id。并添加到 header
+gate -> recv: 转发请求
+recv-> redis: recv 从缓存获取用户会话信息
+recv-> mysql: 若缓存为空，则读取表 conv_member
+note over recv
+检查当前用户是否存在活跃的座席会话
+end note
+
+alt #lightgreen 用户有活跃的座席会话
+recv -> gate: 复用会话，返回响应
+else #skyblue 用户没有活跃的座席会话
+recv -> mysql: 创建一个新会话，向 conv 表写入新记录
+
+group 创建用户腿
+recv -> mysql: 写 conv_member 表，创建会话成员记录
+recv -> kafka: 向 cti 投递建立用户腿事件
+note over recv
+创建用户退事件包括：
+CallCreatedEvent
+ConnCreatedEvent
+ServiceInitiatedEvent
+OriginatedEvent
+end note
+
+kafka -> cti: cti 消费用户腿事件
+end
+
+group 请求分配 ivr 或者人工座席
+recv -> mysql: 更新 conv 表中会话状态为排队中
+recv -> kafka: 向 CTI 投递路由事件
+note over recv
+创建用户退事件包括：
+RouteQueuedEvent
+RouteRequestEvent
+end note
+
+kafka -> cti: cti 消费路由事件，检查 dn 类型，dn 与 appId 绑定
+
+group 人工座席
+cti -> cti: 若 dn 类型为人工，则向 uds 发起寻找座席请求
+cti -> recv: cti 回调 recv 人工排队提示语接口 /route/queue/prompt
+recv -> kafka: 推送排队提示语
+end
+
+cti -> recv: cti 回调 recv /route/result/notify 接口
+note over recv
+接口传入
+1. sessionId 等同于数字媒体的会话 id
+2. 数字分机号
+3. DN 类型
+4. 接听类型：自动接听、手动接听
+5. 随路数据
+end note
+
+alt dn 是 IVR
+group 创建 IVR 腿
+note over recv
+一次性投递创建 IVR 腿的所有事件，无需接听，包括
+ConnCreatedEvent
+ServiceInitiatedEvent
+IVR_AGENT_CONN_DIVERTED
+IVR_CONN_ESTABLISH
+end note
+recv -> mysql: 在 conv_member 表创建 ivr 会话成员记录
+recv -> mysql: 更新 conv 表中会话状态为会话中
+end
+else dn 是人工座席
+group 创建人工座席腿
+recv -> kafka: 向 cti 投递座席腿响铃
+note over recv
+创建座席腿响铃事件包括
+ConnCreatedEvent
+ServiceInitiatedEvent
+DeliveredEvent
+end note
+kafka -> cti: cti 消费用户腿事件
+cti -> recv: cti 回调 recv 座席接通接口 /agent/deliver/notify 返回接通结果
+recv -> kafka: 向 cti 投递座席腿接通事件
+note over recv
+座席腿接通事件包括
+RouteUsedEvent
+RouteDivertedEvent
+EstablishedEvent
+end note
+recv -> mysql: 在 conv_member 创建座席会话成员记录
+recv -> mysql: 更新 conv 表中会话状态为会话中
+end
+end
+
+end
+
+end
+
+@enduml

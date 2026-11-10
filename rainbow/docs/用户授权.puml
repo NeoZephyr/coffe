@@ -1,0 +1,27 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor 前端用户 as front
+participant 业务系统 as biz
+participant 认证授权系统 as auth
+participant 网关 as gate
+
+autonumber
+
+== 用户授权 ==
+
+auth -> biz: 周期性（120s）发放 ticket
+front -> biz: 请求获取 sign 和 customerId
+biz -> biz: 基于 ticket 生成 sign
+biz -> front: 返回 ak, channelId, customerId, sign
+front -> gate: 请求接口 /auth/channel 接口获取 accessToken
+note over front, gate
+携带 ak, channelId, customerId, sign 参数
+后续用户侧在 websocket 建立连接和 http 请求中，都需要携带 accessToken
+end note
+gate -> auth: 转发请求
+auth -> auth: 签名认证，然后发放 accessToken
+auth -> gate: 返回 accessToken
+gate -> front: 返回 accessToken 给前端
+
+@enduml

@@ -20,6 +20,8 @@ public class DataBinderDemo {
         // BindingResult bindingResult = testAll(source, dataBinder);
         // BindingResult bindingResult = testUnknownFields(source, dataBinder);
         // BindingResult bindingResult = testAutoGrowNestedPaths(source, dataBinder);
+
+        // 包含错误文案 code
         BindingResult bindingResult = testRequiredFields(source, dataBinder);
 
         System.out.println(user);
@@ -32,6 +34,9 @@ public class DataBinderDemo {
         return dataBinder.getBindingResult();
     }
 
+    /**
+     * propertyValues 中存在未知属性（默认是忽略的）
+     */
     private static BindingResult testUnknownFields(Map source, DataBinder dataBinder) {
         source.put("age", 28);
         MutablePropertyValues propertyValues = new MutablePropertyValues(source);
@@ -40,17 +45,24 @@ public class DataBinderDemo {
         return dataBinder.getBindingResult();
     }
 
+    /**
+     * 嵌套属性（默认是支持的）
+     */
     private static BindingResult testAutoGrowNestedPaths(Map source, DataBinder dataBinder) {
         source.put("company", new Company());
         source.put("company.name", "google");
         MutablePropertyValues propertyValues = new MutablePropertyValues(source);
         dataBinder.setAutoGrowNestedPaths(false);
+        // dataBinder.setIgnoreInvalidFields(true);
         dataBinder.bind(propertyValues);
         return dataBinder.getBindingResult();
     }
 
     private static BindingResult testRequiredFields(Map source, DataBinder dataBinder) {
         dataBinder.setRequiredFields("id", "name", "city");
+
+        // 配置避免属性被绑定
+        // setDisallowedFields
         MutablePropertyValues propertyValues = new MutablePropertyValues(source);
         dataBinder.bind(propertyValues);
         return dataBinder.getBindingResult();

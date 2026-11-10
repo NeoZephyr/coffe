@@ -14,6 +14,7 @@ public class BeanValidationDemo {
     public static void main(String[] args) {
         ConfigurableApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:validation-context.xml");
 
+        // LocalValidatorFactoryBean 里面有 setValidationMessageSource 方法注入 MessageSource
         Validator validator = applicationContext.getBean(Validator.class);
         System.out.println(validator instanceof LocalValidatorFactoryBean);
 

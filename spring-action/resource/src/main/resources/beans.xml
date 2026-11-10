@@ -11,7 +11,7 @@
         http://www.springframework.org/schema/util
         https://www.springframework.org/schema/util/spring-util.xsd">
 
-    <foo class="com.pain.green.resource.conversion.CustomizedPropertyEditorRegistrar"/>
+    <bean class="com.pain.green.resource.conversion.CustomizedPropertyEditorRegistrar"/>
 
     <!-- java.util.Properties -->
     <util:properties id="context">
@@ -19,13 +19,16 @@
         <prop key="name">pain</prop>
     </util:properties>
 
-    <foo id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+    <!-- 名字必须要叫 conversionService-->
+    <!-- 比一般普通 bean 实例化要早，在 DefaultListableBeanFactory#preInstantiateSingletons 之前-->
+    <!-- AbstractApplicationContext#refresh -> AbstractApplicationContext#finishBeanFactoryInitialization-->
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
         <property name="converters">
-            <foo class="com.pain.green.resource.conversion.PropertiesToStringConverter" />
+            <bean class="com.pain.green.resource.conversion.PropertiesToStringConverter" />
         </property>
-    </foo>
+    </bean>
 
-    <foo id="user" class="com.pain.green.ioc.domain.User">
+    <bean id="user" class="com.pain.green.ioc.domain.User">
         <property name="id" value="1" />
         <property name="name" value="pain" />
         <property name="context">
@@ -35,6 +38,6 @@
             </value>
         </property>
         <property name="contextText" ref="context" />
-    </foo>
+    </bean>
 
 </beans>

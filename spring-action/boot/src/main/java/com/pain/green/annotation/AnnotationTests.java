@@ -63,6 +63,11 @@ public class AnnotationTests {
 
     static class ProfileConfig {
 
+        // 这个两个 bean 名字一样，但是是互斥的
+
+        // 外部化配置，参数方式指定
+        // -Dspring.profiles.active=local
+
         @Bean("setting")
         @Profile("local")
         public Setting local() {
@@ -76,12 +81,15 @@ public class AnnotationTests {
         }
     }
 
+    /**
+     * 模仿 @Profile  ProfileCondition
+     */
     static class DevProfileCondition implements Condition {
 
         @Override
         public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
 
-            // 参考 ProfileCondition
+            // 参考 ProfileCondition 利用 Environment
             Environment environment = context.getEnvironment();
             return environment.acceptsProfiles(Profiles.of("dev"));
         }
@@ -132,6 +140,13 @@ public class AnnotationTests {
     @Import(Registry.class)
     public @interface EnableFoo {}
 
+    /**
+     * EnableXXX 实现的三种方式
+     *
+     * 1. Import configuration class (应该不用加 @Configuration 也可以)
+     * 2. Import ImportSelector
+     * 3. Import ImportBeanDefinitionRegistrar
+     */
     @EnableFoo
     public static class FooModule {}
 

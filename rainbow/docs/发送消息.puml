@@ -1,0 +1,44 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor 前端用户 as front
+participant 网关 as gate
+participant 接收服务 as recv
+database redis
+participant cti
+
+autonumber
+
+== 发送消息或者事件 ==
+
+front -> gate: 发送消息或者事件
+gate -> recv: 转发
+recv -> recv: 识别 session，获取 appId，tenantId
+recv -> recv: 生成 msgId，设置 sendTime
+recv -> recv: 识别指令 id，根据 cmdId 进行处理
+
+alt 普通消息发送
+recv -> recv: 判断会话是否有效
+
+alt 会话已关闭或过期
+note over recv
+重新走创建座席会话逻辑
+end note
+else 会话活跃
+recv -> recv: SendMsgHandler 处理
+end
+else 退出会话事件
+recv -> mysql: 修改 conv_member 成员状态为退出
+recv -> kafka: 向 cti 投递 routeEndEvent 事件
+recv -> kafka: 向 cti 投递用户侧 ConnClearedEvent 事件
+recv -> kafka: 向 cti 投递座席侧 ConnClearedEvent 事件
+recv -> kafka: 向 cti 投递用户侧 CallClearedEvent 事件
+end
+
+recv -> kafka: 按照 convId 为分区 key 投递消息
+recv -> gate: 返回 ack
+gate -> front: 发送 ack
+front -> front: 根据 clientMsgId 更新对应消息 msgId
+
+
+@enduml

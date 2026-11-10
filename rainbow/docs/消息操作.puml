@@ -1,0 +1,30 @@
+@startuml
+
+participant 客户端 as C
+participant 网关 as G
+participant 消息服务 as M
+participant 数据库 as D
+
+Note over C, D: 场景1：发送消息 & 更新未读
+C -> G: 1. 发送消息
+G -> M: 2. 路由消息
+M -> D: 3. 存储消息记录
+M -> D: 4. 更新会话摘要 (latest_msg_id)
+M -> D: 5. 增加接收方未读数 (排除发送者)
+M -> C: 6. 推送消息&未读变更
+
+Note over C, D: 场景2：已读上报 & 清未读
+C-> G: 7. 上报消息已读
+G-> M: 8. 上报已读状态
+M-> D: 9. 更新消息已读标志 (readedFlag)
+M-> D: 10. 清空会话未读数 (unreadNum=0)
+M-> C: 11. 广播已读回执
+
+Note over C, D: 场景3：消息撤回
+C-> G: 12. 请求撤回消息
+G-> M: 13. 校验权限与时效
+M-> D: 14. 更新消息状态为“已撤回”
+M-> D: 15. 撤回的是最新消息则更新会话摘要
+M-> C: 16. 推送撤回通知，更新UI
+
+@enduml

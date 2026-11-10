@@ -1,0 +1,39 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+participant 推送服务 as push
+participant cti
+queue kafka
+database redis
+database mysql
+
+autonumber
+
+== 消息处理 ==
+
+kafka -> push: 批量消费消息
+push -> push: 按照 convId 分组处理
+push -> redis: 通过 redis 原子操作，批量设置座席会话序列号 和 用户会话序列号
+push -> kafka: 投递座席会话最大 seq 和用户会话最大 seq
+push -> mysql: 处理撤回消息（如果有）
+note over push
+更新被撤回消息成撤回状态
+更新引用了撤回消息的引用消息
+end note
+push -> redis: 从 redis 和 mysql 获取会话成员
+push -> push: 若为离开会话事件，则更新次会话成员的 masSeq（最大可见序列号）；若为转接事件，则更新转接后座席和转接前座席的 minSeq 和 masSeq
+push -> redis: 写消息缓存
+note over push
+根据会话 id，会话 seq，msgId 更新 redis zset
+end note
+push -> mysql: 写 msg 表
+push -> push: 执行写扩散，判断推送成员和个性化消息处理
+push -> push: 若会话成员离开，则不推送
+push -> mysql: 如果有个性化消息，存储到 msg_member 表
+note over push
+若为普通文本，设置推送文本范围为排除发送者，发送给其他会话成员
+若为推送给所有成员的事件消息，设置提送范围为发送给所有成员
+若为提示消息，根据配置判断是否需要推送
+end note
+
+@enduml

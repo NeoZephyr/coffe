@@ -1,0 +1,25 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor 前端用户 as front
+participant 网关 as gate
+participant 接收服务 as recv
+participant 消息服务 as msg
+participant cti
+
+autonumber
+
+== 发送消息或者事件 ==
+
+front -> gate: 请求会话历史消息
+note over front
+携带用户 id
+起始序列号
+拉取数量
+end note
+gate -> msg: 转发
+msg -> mysql: 查询历史消息
+msg -> gate: 返回响应
+gate -> front: 返回响应
+
+@enduml

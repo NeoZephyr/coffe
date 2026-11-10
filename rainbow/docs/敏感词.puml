@@ -1,0 +1,43 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor 前端用户 as front
+participant 接收服务 as recv
+participant 推送服务 as push
+database mysql
+actor 前端座席 as agent
+actor 管理员 as admin
+
+autonumber
+
+== 敏感词 ==
+
+recv -> mysql: 服务启动，读取敏感词库，加载到内存，构造 DFA 结构
+recv -> recv
+
+front -> recv: 发送消息
+front -> front: 渲染发送的消息
+
+alt 包含敏感词
+recv -> recv: 将敏感词过滤之后，返回给前端。存储原始文本，设置 sensitiveFlag 为 true
+recv -> front
+front -> front: 重新渲染发送的消息
+push -> agent: 推送过滤后的消息
+else 不包含敏感词
+recv -> push:推送原消息
+recv -> front
+front -> front:不需要重新渲染
+push-> agent
+end
+
+admin->mysql:手动更新词库
+recv -> recv:发送广播消息，标记对哪个敏感词组进行了修改或者删除操作
+recv -> recv:消费消息，进行DFA 结构更新
+note over recv
+替换过程使用写锁，防止并发写
+用户发消息过程中过滤，使用读锁，避免读的时候被修改
+end note
+
+
+
+@enduml

@@ -17,7 +17,11 @@ public class InjectingApplicationEventPublisherDemo implements ApplicationEventP
 
     @PostConstruct
     public void init() {
+        // 关注事件发布顺序
         applicationEventPublisher.publishEvent(new MySpringEvent("Event from @Autowired ApplicationEventPublisher"));
+
+        // ApplicationContext 实现了 ApplicationEventPublisher 接口
+        // ApplicationEventPublisher 与 ApplicationEventMulticaster 之间没有层级关系，属于弱联系
         applicationContext.publishEvent(new MySpringEvent("Event from @Autowired ApplicationContext"));
     }
 
@@ -31,6 +35,8 @@ public class InjectingApplicationEventPublisherDemo implements ApplicationEventP
 
     @Override
     public void setApplicationEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
+        // 如果这个 bean 是 BeanPostProcessor 或者 BeanFactoryPostProcessor（实现这个接口）初始化比较早
+        // 然后事件可能就是早期事件 要存入 earlyApplicationEvents 一切 ready 之后进行回放
         applicationEventPublisher.publishEvent(new MySpringEvent("Event from ApplicationEventPublisherAware"));
     }
 

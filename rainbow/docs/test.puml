@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+participant Client as C
+participant recvServer as R
+participant UDS as U
+participant ctiServer as CTI
+participant Agent as A
+
+Note over C, A: 会话初始化与用户进线
+C->>R: 1. 点击咨询，CREATE_CONV消息
+R->>R: 2. 创建会话，初始化seq
+R->>U: 3. 发起REQUEST_ROUTER(请求路由)
+U->>CTI: 4. 通知进入排队(路由排队事件)
+CTI->>C: 5. 推送排队提示语
+
+Note over C, A: 座席匹配与接听
+U->>CTI: 6. 找到可用座席
+CTI->>R: 7. 通知座席信息
+R->>A: 8. 分配请求(振铃)
+
+alt 自动接听
+    A->>CTI: 9. 自动接听
+else 手动接听
+    A->>CTI: 9. 手动接听
+end
+
+CTI->>R: 10. 座席接听结果回调
+R->>C: 11. 发送接通提示语
+R->>A: 11. 发送用户信息及上下文
+
+Note over C, A: 会话进行与结束
+loop 消息交互
+    C->>A: 发送消息
+    A->>C: 回复消息
+end
+
+alt 用户主动结束
+    C->>R: 12. 结束会话(310事件)
+else 座席结束/超时
+    A->>CTI: 12. 挂断或超时
+    CTI->>R: 触发结束事件
+end
+
+R->>R: 13. 清理资源，更新状态
+R->>C: 14. 通知会话结束
+R->>A: 14. 通知会话结束
+@enduml

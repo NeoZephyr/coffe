@@ -1,0 +1,30 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor 前端用户 as front
+participant 网关 as gate
+participant 接收服务 as recv
+database redis
+participant cti
+participant 座席服务 as portal
+actor 前端座席 as agent
+
+autonumber
+
+== 用户建立 websocket 连接 ==
+
+front -> gate: 用户与网关建立 websocket 长连接
+gate -> gate: 验证 accessToken，获取 appId, tenantId, 用户 id
+gate -> recv: 网关与 recv 建立 websocket 长连接
+note over recv
+通过 header 传入 appId, tenantId, 用户 id
+end note
+recv -> redis: 存储签入状态，用户 id，recv 实例 ip 与端口，sessionId
+
+== 座席建立 websocket 连接 ==
+agent -> portal: 座席端建立长连接
+portal -> recv: 请求 online 接口，传入座席 id、座席服务实例 ip 和 端口、deviceCode、sessionId
+recv -> cti: 同步终端/分机号上线事件
+recv -> redis: 存储签入状态，座席 id、座席服务实例 ip 和 端口、deviceCode、sessionId
+
+@enduml

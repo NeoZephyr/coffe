@@ -12,6 +12,7 @@ public class InjectingEnvironmentDemo implements EnvironmentAware, ApplicationCo
 
     private Environment environment1;
 
+    // BeanFactory 单列注入了，依赖查找、注入都能找到
     @Autowired
     private Environment environment2;
 

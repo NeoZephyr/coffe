@@ -15,6 +15,7 @@ public class ObserverDemo {
     static class EventObservable extends Observable {
         @Override
         public void notifyObservers(Object arg) {
+            // set changed 才能通知到
             super.setChanged();
             super.notifyObservers(new EventObject(arg));
             super.clearChanged();

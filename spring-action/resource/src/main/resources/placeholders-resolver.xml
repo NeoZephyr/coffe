@@ -16,15 +16,16 @@
 <!--        <property name="fileEncoding" value="UTF-8" />-->
 <!--    </foo>-->
 
-    <foo class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <!-- 注意 PropertySources 优先级-->
         <property name="location" value="default-user.properties" />
         <property name="fileEncoding" value="UTF-8" />
-    </foo>
+    </bean>
 
-    <foo id="user" class="com.pain.green.ioc.domain.User">
+    <bean id="user" class="com.pain.green.ioc.domain.User">
         <property name="id" value="${user.id}" />
         <property name="name" value="${user.name}" />
         <property name="city" value="${user.city}" />
-    </foo>
+    </bean>
 
 </beans>

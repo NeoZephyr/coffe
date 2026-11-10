@@ -20,6 +20,7 @@ public class EnvironmentPropertySourceChangeDemo {
         ConfigurableEnvironment environment = applicationContext.getEnvironment();
         MutablePropertySources propertySources = environment.getPropertySources();
 
+        // 动态插入 PropertySource
         Map<String, Object> source = new HashMap<>();
         source.put("user.name", "萧衍");
         MapPropertySource propertySource = new MapPropertySource("customized", source);
@@ -27,6 +28,7 @@ public class EnvironmentPropertySourceChangeDemo {
 
         applicationContext.refresh();
 
+        // 启动后更改，没有动态刷新能力，bean 注入的变量不会改变
         source.put("user.name", "侯景");
 
         EnvironmentPropertySourceChangeDemo demo = applicationContext.getBean(EnvironmentPropertySourceChangeDemo.class);

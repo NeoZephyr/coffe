@@ -1,0 +1,42 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor 前端用户 as front
+participant 网关 as gate
+participant 接收服务 as recv
+participant 推送服务 as push
+participant 座席服务 as portal
+participant 消息服务 as msg
+participant nacos
+database redis
+actor 前端座席 as agent
+
+autonumber
+
+== 消息图送 ==
+
+alt 推送给用户
+push -> redis: 获取推送用户/座席的签入信息，ip 和端口
+push -> nacos: 获取 recv 实例列表
+push -> recv: 根据签入信息进行推送
+recv -> front: 推送给用户
+else 推送给座席
+push -> redis: 获取推送用户/座席的签入信息，ip 和端口
+push -> nacos: 获取 portal 实例列表
+push -> portal: 推送座席网关
+portal -> agent: 推送给座席
+else 推送给 ivr
+push -> nacos: 获取 ivr 实例列表
+push ->push:构建一致性 hash，确保相同convId的消息推送到同一个实例
+push -> ivr:将消息推送给匹配的ivr后端实例
+end
+
+push-> kafka: 异步投送一份原始消息，给 msg 服务消费
+push -> kafka: 手动提交 offset
+kafka -> msg: 批量消费会话序列号 topic
+msg -> mysql: 更新 user_seq表中每个会话的最大消息序列号
+kafka -> msg: 批量消费原始消息 topic
+msg -> mysql: 更新 conv_member 表中每个成员的未读数
+msg -> mysql: 更新 conv 表中的会话摘要
+
+@enduml

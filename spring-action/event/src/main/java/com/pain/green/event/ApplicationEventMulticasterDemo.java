@@ -16,9 +16,12 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 public class ApplicationEventMulticasterDemo {
     public static void main(String[] args) {
         GenericApplicationContext applicationContext = new GenericApplicationContext();
+
+        // retrieverCache 事件类型对应 0 1 ... 或多个 listener
         applicationContext.addApplicationListener(new MySpringEventListener());
         applicationContext.refresh();
 
+        // 依赖查找
         ApplicationEventMulticaster multicaster = applicationContext.getBean(
                 AbstractApplicationContext.APPLICATION_EVENT_MULTICASTER_BEAN_NAME,
                 ApplicationEventMulticaster.class);
@@ -27,9 +30,12 @@ public class ApplicationEventMulticasterDemo {
             SimpleApplicationEventMulticaster simpleMulticaster = (SimpleApplicationEventMulticaster) multicaster;
             ExecutorService taskExecutor = newSingleThreadExecutor(new CustomizableThreadFactory("customize-spring-event-thread-pool"));
 
-            // 同步 -> 异步
+            // @Async 注解加到 @EventListener 方法上是局部的
+
+            // 同步 -> 异步 （全局异步）
             simpleMulticaster.setTaskExecutor(taskExecutor);
 
+            // 关闭线程池避免程序无法关闭
             multicaster.addApplicationListener((ApplicationListener<ContextClosedEvent>) event -> {
                 System.out.printf("context closed event listener, thread: %s, event: %s\n", Thread.currentThread().getName(), event);
                 if (!taskExecutor.isShutdown()) {
@@ -37,6 +43,7 @@ public class ApplicationEventMulticasterDemo {
                 }
             });
 
+            // 设置异常处理
             simpleMulticaster.setErrorHandler(e -> {
                 System.err.println("spring event error：" + e.getMessage());
             });
